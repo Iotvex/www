@@ -13,6 +13,7 @@ import { ExternalLink, Plus, Trash2, RefreshCw } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState, useTransition } from "react"
 import { cn } from "@/shared/lib/utils"
+import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
 import { EmptyState, CreateCard, PageToolbar } from "@/shared/ui/page-toolbar"
 
 type Mod = {
@@ -106,11 +107,16 @@ export function ModulesPage() {
           }
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-3">
           {items.map((m, i) => (
             <article
               key={m.id}
-              className="iotvex-card-in rounded-xl border border-border/60 bg-card/55 p-4 backdrop-blur-xl transition-colors duration-300 hover:bg-card/70 dark:border-white/[0.08] dark:bg-card/40"
+              className={cn(
+                "iotvex-card-in border border-border/60 bg-card/55 p-4 backdrop-blur-xl transition-colors duration-300 hover:bg-card/70 dark:border-white/[0.08] dark:bg-card/40",
+                stackRadiusClass(i, items.length, "xl"),
+                stackItemOffsetClass(i),
+                "sm:mt-0 sm:rounded-xl",
+              )}
               style={{ animationDelay: `${i * 40}ms` }}
             >
               <div className="flex items-start justify-between gap-2">

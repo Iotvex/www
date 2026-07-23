@@ -3,6 +3,7 @@
 import { useLocaleSwitch } from "@/app/providers/locale-provider"
 import { locales, type AppLocale } from "@/i18n/config"
 import { cn } from "@/shared/lib/utils"
+import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
 import { Button } from "@/shared/ui/button"
 import {
   DropdownMenu,
@@ -24,8 +25,8 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         <Languages className="h-4 w-4 text-muted-foreground" />
         {tSettings("label")}
       </div>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {locales.map((code) => {
+      <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-2">
+        {locales.map((code, index) => {
           const active = locale === code
           return (
             <button
@@ -34,8 +35,11 @@ export function LanguageSwitcher({ className }: { className?: string }) {
               disabled={pending}
               onClick={() => setLocale(code as AppLocale)}
               className={cn(
-                "flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-left text-sm outline-none transition-colors",
+                "flex min-h-11 items-center justify-between gap-2 border px-3 py-2.5 text-left text-sm outline-none transition-colors",
                 "focus-visible:ring-1 focus-visible:ring-ring/40",
+                stackRadiusClass(index, locales.length, "xl"),
+                stackItemOffsetClass(index),
+                "sm:mt-0 sm:rounded-xl",
                 active
                   ? "border-primary/70 bg-primary/10 text-foreground"
                   : "border-border/60 bg-card text-muted-foreground hover:bg-accent hover:text-foreground",

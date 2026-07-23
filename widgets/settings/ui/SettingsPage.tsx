@@ -23,6 +23,8 @@ import { AppearancePanel } from "@/features/theme/ui/ThemeSwitcher";
 import { $agentConnection, $agentOnline, $node, $nodeError, fetchCatalogFx } from "@/entities/device/model/store";
 import { $user } from "@/entities/auth/model/store";
 import { DeploymentPanel } from "@/widgets/settings/ui/DeploymentPanel";
+import { cn } from "@/shared/lib/utils";
+import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius";
 
 type SettingsTab = "account" | "appearance" | "services" | "users" | "backup" | "tools";
 
@@ -397,11 +399,15 @@ function UsersPanel() {
           description={t("users.emptyDescription")}
         />
       ) : (
-        <div className="grid gap-2">
-          {items.map((user) => (
+        <div className="flex flex-col">
+          {items.map((user, index) => (
             <div
               key={user.id}
-              className="iotvex-card-in flex items-center gap-3 rounded-xl border border-border/60 bg-card/60 px-3 py-3"
+              className={cn(
+                "iotvex-card-in flex items-center gap-3 border border-border/60 bg-card/60 px-3 py-3",
+                stackRadiusClass(index, items.length, "xl"),
+                stackItemOffsetClass(index),
+              )}
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{user.email}</p>

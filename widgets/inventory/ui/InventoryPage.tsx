@@ -48,6 +48,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
+import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
 import { useMemo, useState, useTransition } from "react"
 
 type InventoryTab = "devices" | "entities" | "areas"
@@ -129,13 +130,23 @@ function DevicesTab() {
           }
         />
       ) : (
-        <div className="grid gap-2 md:grid-cols-2 md:gap-2.5">
+        <div className="flex flex-col md:grid md:grid-cols-2 md:gap-2.5">
           {devices.map((d, i) => {
             const linked = entities.filter((e) => e.device_id === d.id)
             const onCount = linked.filter(isEntityActive).length
             const areaName = areas.find((a) => a.id === d.area_id)?.name
             return (
-              <Card key={d.id} className="iotvex-card-in transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:shadow-[0_12px_40px_-18px_rgba(0,0,0,0.65)]" style={{ animationDelay: `${i * 40}ms` }}>
+              <Card
+                key={d.id}
+                className={cn(
+                  "iotvex-card-in transition-[transform,box-shadow,border-color] duration-300 hover:z-[1] hover:-translate-y-0.5 hover:border-white/[0.12] hover:shadow-[0_12px_40px_-18px_rgba(0,0,0,0.65)]",
+                  stackRadiusClass(i, devices.length, "xl"),
+                  stackItemOffsetClass(i),
+                  "sm:mt-0 sm:rounded-xl sm:hover:-translate-y-0.5",
+                  "max-sm:hover:translate-y-0",
+                )}
+                style={{ animationDelay: `${i * 40}ms` }}
+              >
                 <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
                   <div className="min-w-0">
                     <CardTitle className="truncate text-sm sm:text-base">{d.name}</CardTitle>
@@ -669,7 +680,7 @@ function AreasTab() {
           }
         />
       ) : (
-        <div className="grid gap-2 sm:grid-cols-2 sm:gap-2.5 xl:grid-cols-3">
+        <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-2.5 xl:grid-cols-3">
           {areas.map((a, i) => {
             const ents = entities.filter((e) => e.area === a.id)
             const entityDeviceIds = new Set(
@@ -679,7 +690,16 @@ function AreasTab() {
               (d) => d.area_id === a.id || entityDeviceIds.has(d.id),
             )
             return (
-              <Card key={a.id} className="iotvex-card-in" style={{ animationDelay: `${i * 35}ms` }}>
+              <Card
+                key={a.id}
+                className={cn(
+                  "iotvex-card-in",
+                  stackRadiusClass(i, areas.length, "xl"),
+                  stackItemOffsetClass(i),
+                  "sm:mt-0 sm:rounded-xl",
+                )}
+                style={{ animationDelay: `${i * 35}ms` }}
+              >
                 <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
                   <div className="min-w-0">
                     <CardTitle className="truncate text-sm sm:text-base">{a.name}</CardTitle>

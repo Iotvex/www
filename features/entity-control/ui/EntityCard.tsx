@@ -5,7 +5,7 @@ import { hasCapability } from "@/entities/device/model/capabilities"
 import type { Device, EntityState } from "@/entities/device/model/types"
 import { Badge } from "@/shared/ui/badge"
 import { Button } from "@/shared/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card"
+import { Card, CardContent } from "@/shared/ui/card"
 import { ColorPicker, type Rgb } from "@/shared/ui/color-picker"
 import {
   DropdownMenu,
@@ -18,10 +18,10 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu"
 import { FieldSelect } from "@/shared/ui/page-toolbar"
-import { Separator } from "@/shared/ui/separator"
 import { Slider } from "@/shared/ui/slider"
 import { Switch } from "@/shared/ui/switch"
 import { cn } from "@/shared/lib/utils"
+import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
 import {
   Atom,
   Binary,
@@ -390,11 +390,15 @@ function DeviceEntityCard({
   onEdit,
   style,
   menu,
+  stackIndex = 0,
+  stackTotal = 1,
 }: {
   group: DeviceGroup
   onEdit?: (entity: EntityState) => void
   style?: CSSProperties
   menu?: ReactNode
+  stackIndex?: number
+  stackTotal?: number
 }) {
   const t = useTranslations("entity")
   const Icon = group.entities.some((e) => e.domain === "light")
@@ -404,40 +408,46 @@ function DeviceEntityCard({
       : Power
 
   return (
-    <Card
+    <div
       style={style}
       className={cn(
-        "iotvex-card-in group relative min-w-0 overflow-hidden transition-[transform,box-shadow,border-color] duration-300",
-        "hover:-translate-y-0.5 hover:border-white/[0.12] hover:shadow-[0_14px_44px_-18px_rgba(0,0,0,0.7)]",
+        "iotvex-card-in relative min-w-0 overflow-hidden border border-white/[0.07] bg-black/50 shadow-sm backdrop-blur-2xl transition-[transform,box-shadow,border-color,background-color] duration-300",
+        "hover:z-[1] hover:border-white/[0.12] hover:bg-black/65 hover:shadow-[0_14px_44px_-18px_rgba(0,0,0,0.7)]",
+        stackRadiusClass(stackIndex, stackTotal, "xl"),
+        stackItemOffsetClass(stackIndex),
       )}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-      <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-3 pb-3 sm:p-3.5">
+
+      <div className="flex flex-row items-start justify-between gap-2 p-3 sm:p-3.5">
         <div className="flex min-w-0 items-center gap-2.5">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.05] text-foreground/85 backdrop-blur-md">
             <Icon className="h-5 w-5" strokeWidth={1.75} />
           </div>
           <div className="min-w-0">
-            <CardTitle className="truncate text-base tracking-tight">{group.title}</CardTitle>
+            <p className="truncate text-base font-semibold tracking-tight">{group.title}</p>
             <p className="mt-0.5 truncate text-xs text-muted-foreground">
               {group.subtitle || t("groupCount", { count: group.entities.length })}
             </p>
           </div>
         </div>
         {menu ? <div className="shrink-0">{menu}</div> : null}
-      </CardHeader>
+      </div>
 
-      <Separator className="bg-white/[0.08]" />
-
-      <CardContent className="space-y-0 p-0 px-3 sm:px-3.5">
+      <div className="flex flex-col">
         {group.entities.map((entity, index) => (
-          <div key={entity.entity_id}>
-            {index > 0 ? <Separator className="bg-white/[0.06]" /> : null}
+          <div
+            key={entity.entity_id}
+            className={cn(
+              "border-t border-white/[0.06] px-3 sm:px-3.5",
+              // Inner segments stay flush; outer card owns the stack radius.
+            )}
+          >
             <EntityControls entity={entity} onEdit={onEdit} compact />
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
@@ -471,21 +481,31 @@ export function EntityGrid({
 
   if (!groupByDevice) {
     return (
-      <div className={cn("grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-2.5", className)}>
-        {entities.map((e, i) => (
-          <EntityCard
-            key={e.entity_id}
-            entity={e}
-            onEdit={onEdit}
-            style={{ animationDelay: `${i * 35}ms` }}
-          />
-        ))}
+      <div className={cn("flex flex-col md:grid md:grid-cols-2 md:gap-2.5", className)}>
+        {entities.map((e, i) => {
+          const stacked = stackRadiusClass(i, entities.length, "xl")
+          return (
+            <EntityCard
+              key={e.entity_id}
+              entity={e}
+              onEdit={onEdit}
+              style={{ animationDelay: `${i * 35}ms` }}
+              className={cn(
+                "hover:z-[1] max-md:hover:translate-y-0",
+                stackItemOffsetClass(i),
+                stacked,
+                // Restore independent cards from md up (override stack radius).
+                "md:mt-0 md:rounded-xl",
+              )}
+            />
+          )
+        })}
       </div>
     )
   }
 
   return (
-    <div className={cn("grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-3", className)}>
+    <div className={cn("flex flex-col", className)}>
       {groups.map((group, gi) => (
         <DeviceEntityCard
           key={group.key}
@@ -493,6 +513,8 @@ export function EntityGrid({
           onEdit={onEdit}
           style={{ animationDelay: `${gi * 55}ms` }}
           menu={headerMenu?.(group)}
+          stackIndex={gi}
+          stackTotal={groups.length}
         />
       ))}
     </div>
