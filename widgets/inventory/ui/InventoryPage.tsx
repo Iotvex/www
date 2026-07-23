@@ -136,7 +136,7 @@ function DevicesTab() {
             const onCount = linked.filter(isEntityActive).length
             const areaName = areas.find((a) => a.id === d.area_id)?.name
             return (
-              <Card key={d.id} className="iotvex-card-in" style={{ animationDelay: `${i * 40}ms` }}>
+              <Card key={d.id} className="iotvex-card-in transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:shadow-[0_12px_40px_-18px_rgba(0,0,0,0.65)]" style={{ animationDelay: `${i * 40}ms` }}>
                 <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
                   <div className="min-w-0">
                     <CardTitle className="truncate text-sm sm:text-base">{d.name}</CardTitle>
@@ -235,7 +235,7 @@ function DevicesTab() {
   )
 }
 
-type EntitySort = "name_asc" | "name_desc" | "domain" | "active" | "id"
+type EntitySort = "name_asc" | "name_desc" | "domain" | "active" | "device"
 
 function EntitiesTab() {
   const t = useTranslations("inventory")
@@ -244,7 +244,7 @@ function EntitiesTab() {
   const areas = useUnit($areas)
   const devices = useUnit($devices)
   const [q, setQ] = useState("")
-  const [sort, setSort] = useState<EntitySort>("name_asc")
+  const [sort, setSort] = useState<EntitySort>("device")
   const [areaFilter, setAreaFilter] = useState("all")
   const [domainFilter, setDomainFilter] = useState("all")
   const [pending, start] = useTransition()
@@ -268,10 +268,11 @@ function EntitiesTab() {
       if (areaFilter !== "all" && areaFilter !== "none" && e.area !== areaFilter) return false
       if (domainFilter !== "all" && e.domain !== domainFilter) return false
       if (!s) return true
+      const deviceName = devices.find((d) => d.id === e.device_id)?.name?.toLowerCase() || ""
       return (
-        e.entity_id.toLowerCase().includes(s) ||
         e.name.toLowerCase().includes(s) ||
-        e.domain.includes(s)
+        e.domain.includes(s) ||
+        deviceName.includes(s)
       )
     })
 
@@ -288,19 +289,25 @@ function EntitiesTab() {
         if (aOn !== bOn) return aOn - bOn
         return collator.compare(a.name, b.name)
       }
-      if (sort === "id") return collator.compare(a.entity_id, b.entity_id)
+      if (sort === "device") {
+        const an = devices.find((d) => d.id === a.device_id)?.name || ""
+        const bn = devices.find((d) => d.id === b.device_id)?.name || ""
+        const byDevice = collator.compare(an, bn)
+        if (byDevice) return byDevice
+        return collator.compare(a.name, b.name)
+      }
       const byName = collator.compare(a.name, b.name)
       return sort === "name_desc" ? -byName : byName
     })
     return list
-  }, [entities, q, areaFilter, domainFilter, sort])
+  }, [entities, devices, q, areaFilter, domainFilter, sort])
 
   const sortOptions: Array<{ id: EntitySort; label: string }> = [
     { id: "name_asc", label: t("entities.sortNameAsc") },
     { id: "name_desc", label: t("entities.sortNameDesc") },
     { id: "domain", label: t("entities.sortDomain") },
     { id: "active", label: t("entities.sortActive") },
-    { id: "id", label: t("entities.sortId") },
+    { id: "device", label: t("entities.sortDevice") },
   ]
 
   const save = () => {
@@ -449,6 +456,7 @@ function EntitiesTab() {
       ) : (
         <EntityGrid
           entities={filtered}
+          devices={devices}
           onEdit={(e) =>
             setEdit({
               id: e.entity_id,
@@ -706,7 +714,6 @@ function AreasTab() {
                 <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
                   <div className="min-w-0">
                     <CardTitle className="truncate text-sm sm:text-base">{a.name}</CardTitle>
-                    <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">{a.id}</p>
                   </div>
                   <div className="flex gap-0.5 self-start">
                     <Button variant="ghost" size="icon-sm" onClick={() => openEdit(a.id, a.name)}>

@@ -116,7 +116,6 @@ export function ModulesPage() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <h2 className="font-semibold tracking-tight">{m.name}</h2>
-                  <p className="mt-0.5 font-mono text-xs text-muted-foreground">{m.id}</p>
                 </div>
                 <span
                   className={cn(

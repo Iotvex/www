@@ -517,6 +517,25 @@
     -webkit-backdrop-filter: blur(24px) saturate(1.2);
   }
 
+  .iotvex-glass-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .iotvex-glass-sheen::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: -40% auto auto -30%;
+    width: 70%;
+    height: 70%;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.10), transparent 68%);
+    opacity: 0.75;
+  }
+  .dark .iotvex-glass-sheen::after {
+    background: radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 68%);
+  }
+
+
   .iotvex-hue-range {
     background: linear-gradient(
       90deg,

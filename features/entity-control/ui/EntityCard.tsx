@@ -2,7 +2,7 @@
 
 import { callEntity, smoothToggleEntity } from "@/entities/device/model/store"
 import { hasCapability } from "@/entities/device/model/capabilities"
-import type { EntityState } from "@/entities/device/model/types"
+import type { Device, EntityState } from "@/entities/device/model/types"
 import { Badge } from "@/shared/ui/badge"
 import { Button } from "@/shared/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card"
@@ -14,34 +14,41 @@ import { cn } from "@/shared/lib/utils"
 import {
   Binary,
   Droplets,
+  Gauge,
   Lightbulb,
   Pencil,
   Power,
   Thermometer,
   ToggleLeft,
+  Wind,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect, useMemo, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react"
 
 function DomainIcon({ entity }: { entity: EntityState }) {
+  const cls = entity.attributes.device_class
   if (entity.domain === "light") return <Lightbulb className="h-4 w-4" />
   if (entity.domain === "switch") return <ToggleLeft className="h-4 w-4" />
-  if (hasCapability(entity, "temperature")) return <Thermometer className="h-4 w-4" />
-  if (hasCapability(entity, "humidity")) return <Droplets className="h-4 w-4" />
+  if (hasCapability(entity, "temperature") || cls === "temperature")
+    return <Thermometer className="h-4 w-4" />
+  if (hasCapability(entity, "humidity") || cls === "humidity")
+    return <Droplets className="h-4 w-4" />
+  if (cls === "carbon_dioxide" || cls === "co2") return <Wind className="h-4 w-4" />
+  if (cls === "illuminance" || cls === "pressure") return <Gauge className="h-4 w-4" />
   if (hasCapability(entity, "binary")) return <Binary className="h-4 w-4" />
   return <Power className="h-4 w-4" />
 }
 
-type StateLabels = { offline: string; on: string; off: string }
+function isSensorReading(entity: EntityState) {
+  return (
+    (entity.domain === "sensor" || entity.domain === "binary_sensor") &&
+    hasCapability(entity, "value") &&
+    !hasCapability(entity, "on_off")
+  )
+}
 
-function stateLabel(entity: EntityState, labels: StateLabels) {
-  if (!entity.available) return labels.offline
-  if (hasCapability(entity, "on_off") || hasCapability(entity, "binary")) {
-    const on = entity.state === "on" || entity.state === "home" || entity.state === "open"
-    return on ? labels.on : labels.off
-  }
-  const unit = String(entity.attributes.unit_of_measurement || entity.attributes.unit || "")
-  return unit ? `${entity.state} ${unit}` : entity.state
+function unitOf(entity: EntityState) {
+  return String(entity.attributes.unit_of_measurement || entity.attributes.unit || "")
 }
 
 function effectOptions(
@@ -59,10 +66,12 @@ export function EntityCard({
   entity,
   className,
   onEdit,
+  style,
 }: {
   entity: EntityState
   className?: string
   onEdit?: (entity: EntityState) => void
+  style?: CSSProperties
 }) {
   const t = useTranslations("entity")
   const tActions = useTranslations("actions")
@@ -81,11 +90,7 @@ export function EntityCard({
   const briPct = Math.round((localBri / 255) * 100)
   const fallbackEffect = t("fallbackEffect")
   const effects = useMemo(() => effectOptions(entity, fallbackEffect), [entity, fallbackEffect])
-  const currentStateLabel = stateLabel(entity, {
-    offline: t("states.offline"),
-    on: t("states.on"),
-    off: t("states.off"),
-  })
+  const sensor = isSensorReading(entity)
   const isLightStrip =
     hasCapability(entity, "brightness") ||
     hasCapability(entity, "color") ||
@@ -123,34 +128,55 @@ export function EntityCard({
     })
   }
 
+  const statusBadge = (() => {
+    if (!entity.available) {
+      return (
+        <Badge variant="danger" className="font-normal">
+          {t("states.offline")}
+        </Badge>
+      )
+    }
+    if (sensor) return null
+    if (hasCapability(entity, "on_off") || hasCapability(entity, "binary")) {
+      return (
+        <Badge
+          variant="secondary"
+          className={cn(
+            "font-normal border-transparent",
+            on ? "bg-primary/15 text-primary" : "bg-white/[0.06] text-muted-foreground",
+          )}
+        >
+          {on ? t("states.on") : t("states.off")}
+        </Badge>
+      )
+    }
+    return null
+  })()
+
   return (
-    <Card className={cn("relative min-w-0 overflow-hidden", className)}>
+    <Card
+      style={style}
+      className={cn(
+        "iotvex-card-in group relative min-w-0 overflow-hidden transition-[transform,box-shadow,background-color,border-color] duration-300",
+        "hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-black/65 hover:shadow-[0_12px_40px_-18px_rgba(0,0,0,0.65)]",
+        className,
+      )}
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-70" />
       <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 pb-1.5 sm:p-3 sm:pb-2">
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/[0.04] text-muted-foreground">
+          <div
+            className={cn(
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.04] text-muted-foreground backdrop-blur-md transition-colors duration-300",
+              entity.available && on && "border-primary/20 bg-primary/10 text-primary",
+              sensor && entity.available && "border-white/[0.08] bg-white/[0.06] text-foreground/80",
+            )}
+          >
             <DomainIcon entity={entity} />
           </div>
           <div className="min-w-0">
             <CardTitle className="truncate text-sm">{entity.name}</CardTitle>
-            <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-1.5">
-              <Badge
-                variant={
-                  entity.available
-                    ? on || hasCapability(entity, "value")
-                      ? "secondary"
-                      : "secondary"
-                    : "danger"
-                }
-                className={cn(
-                  entity.available && (on || hasCapability(entity, "value")) && "border-transparent bg-white/[0.06] text-foreground",
-                )}
-              >
-                {currentStateLabel}
-              </Badge>
-              <span className="truncate font-mono text-[11px] text-muted-foreground">
-                {entity.entity_id}
-              </span>
-            </div>
+            {statusBadge ? <div className="mt-1">{statusBadge}</div> : null}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-0.5">
@@ -172,13 +198,13 @@ export function EntityCard({
       </CardHeader>
 
       <CardContent className="space-y-2.5 p-2.5 pt-0 sm:p-3 sm:pt-0">
-        {hasCapability(entity, "value") && !hasCapability(entity, "on_off") ? (
-          <div className="text-xl font-semibold tracking-tight text-foreground">
-            {entity.state}
-            {entity.attributes.unit_of_measurement || entity.attributes.unit ? (
-              <span className="ml-1 text-sm font-normal text-muted-foreground">
-                {String(entity.attributes.unit_of_measurement || entity.attributes.unit)}
-              </span>
+        {sensor ? (
+          <div className="iotvex-stat-value flex items-baseline gap-1.5 pt-0.5">
+            <span className="text-2xl font-semibold tracking-tight tabular-nums text-foreground">
+              {entity.state}
+            </span>
+            {unitOf(entity) ? (
+              <span className="text-sm font-medium text-muted-foreground">{unitOf(entity)}</span>
             ) : null}
           </div>
         ) : null}
@@ -280,25 +306,107 @@ export function EntityCard({
   )
 }
 
+type DeviceGroup = {
+  key: string
+  title: string
+  entities: EntityState[]
+}
+
+function groupEntitiesByDevice(
+  entities: EntityState[],
+  devices: Device[],
+  unboundLabel: string,
+): DeviceGroup[] {
+  const byId = new Map(devices.map((d) => [d.id, d]))
+  const buckets = new Map<string, EntityState[]>()
+
+  for (const e of entities) {
+    const key = e.device_id && byId.has(e.device_id) ? e.device_id : "__unbound__"
+    const list = buckets.get(key)
+    if (list) list.push(e)
+    else buckets.set(key, [e])
+  }
+
+  const collator = new Intl.Collator(undefined, { sensitivity: "base", numeric: true })
+  const groups: DeviceGroup[] = []
+
+  for (const [key, list] of buckets) {
+    list.sort((a, b) => {
+      const byDomain = collator.compare(a.domain, b.domain)
+      if (byDomain) return byDomain
+      const ai = Number(a.attributes.strip_index)
+      const bi = Number(b.attributes.strip_index)
+      if (Number.isFinite(ai) && Number.isFinite(bi) && ai !== bi) return ai - bi
+      return collator.compare(a.name, b.name)
+    })
+    const device = key === "__unbound__" ? null : byId.get(key)
+    groups.push({
+      key,
+      title: device?.name || unboundLabel,
+      entities: list,
+    })
+  }
+
+  groups.sort((a, b) => {
+    if (a.key === "__unbound__") return 1
+    if (b.key === "__unbound__") return -1
+    return collator.compare(a.title, b.title)
+  })
+  return groups
+}
+
 export function EntityGrid({
   entities,
+  devices = [],
   empty,
   className,
   onEdit,
 }: {
   entities: EntityState[]
+  devices?: Device[]
   empty?: ReactNode
   className?: string
   onEdit?: (entity: EntityState) => void
 }) {
   const t = useTranslations("entity")
+  const groups = useMemo(
+    () => groupEntitiesByDevice(entities, devices, t("unboundDevice")),
+    [entities, devices, t],
+  )
+
   if (!entities.length) {
     return empty ?? <p className="text-sm text-muted-foreground">{t("emptyEntities")}</p>
   }
+
   return (
-    <div className={cn("grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-2.5", className)}>
-      {entities.map((e) => (
-        <EntityCard key={e.entity_id} entity={e} onEdit={onEdit} />
+    <div className={cn("space-y-5", className)}>
+      {groups.map((group, gi) => (
+        <section
+          key={group.key}
+          className="iotvex-card-in space-y-2.5"
+          style={{ animationDelay: `${gi * 55}ms` }}
+        >
+          <div className="iotvex-glass-muted flex items-center justify-between gap-3 rounded-2xl px-3 py-2">
+            <div className="min-w-0">
+              <h3 className="truncate text-sm font-semibold tracking-tight text-foreground">
+                {group.title}
+              </h3>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                {t("groupCount", { count: group.entities.length })}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-2.5">
+            {group.entities.map((e, i) => (
+              <EntityCard
+                key={e.entity_id}
+                entity={e}
+                onEdit={onEdit}
+                style={{ animationDelay: `${gi * 55 + i * 35}ms` }}
+              />
+            ))}
+          </div>
+        </section>
       ))}
     </div>
   )

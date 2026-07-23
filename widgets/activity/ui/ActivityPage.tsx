@@ -200,7 +200,6 @@ export function ActivityPage() {
                   <p className="iotvex-hide-scroll mt-0.5 min-w-0 overflow-x-auto whitespace-nowrap text-xs text-muted-foreground">
                     {e.kind}
                     {e.detail ? ` · ${e.detail}` : ""}
-                    {e.entity_id ? ` · ${e.entity_id}` : ""}
                   </p>
                 </div>
                 <time className="shrink-0 text-xs tabular-nums text-muted-foreground">

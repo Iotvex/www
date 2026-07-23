@@ -291,8 +291,8 @@
       "sortNameDesc": "Имя Я→А",
       "sortDomain": "По домену",
       "sortActive": "Сначала активные",
-      "sortId": "По ID",
-      "filterAria": "Фильтры"
+      "filterAria": "Фильтры",
+      "sortDevice": "По устройству"
     },
     "areas": {
       "title": "Зоны",
@@ -668,7 +668,9 @@
         "hex": "Hex",
         "presets": "Пресеты"
       }
-    }
+    },
+    "unboundDevice": "Без устройства",
+    "groupCount": "{count} в группе"
   },
   "theme": {
     "ariaLabel": "Оформление",

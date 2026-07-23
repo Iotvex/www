@@ -1026,7 +1026,7 @@ function ActivityList() {
             ) : null}
           </div>
           <p className="iotvex-hide-scroll mt-0.5 min-w-0 overflow-x-auto whitespace-nowrap text-xs text-muted-foreground">
-            {[event.detail, event.entity_id].filter(Boolean).join(" · ") || event.kind || ""}
+            {event.detail || event.kind || ""}
           </p>
         </div>
       ))}
