@@ -227,7 +227,10 @@
       "menuAria": "إجراءات العنصر",
       "moveLeft": "Move left",
       "moveRight": "Move right",
-      "dragAria": "Drag widget"
+      "dragAria": "Drag widget",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately",
+      "ungroupedDevice": "Other"
     },
     "statusWidget": {
       "controller": "وحدة التحكم",
@@ -292,7 +295,11 @@
       "sortDomain": "حسب المجال",
       "sortActive": "النشطة أولاً",
       "filterAria": "Filters",
-      "sortDevice": "By device"
+      "sortDevice": "By device",
+      "viewMenuAria": "View options",
+      "viewMenuLabel": "View",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately"
     },
     "areas": {
       "title": "المناطق",

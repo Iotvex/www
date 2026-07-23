@@ -227,7 +227,10 @@
       "menuAria": "Actions du widget",
       "moveLeft": "Move left",
       "moveRight": "Move right",
-      "dragAria": "Drag widget"
+      "dragAria": "Drag widget",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately",
+      "ungroupedDevice": "Other"
     },
     "statusWidget": {
       "controller": "Contrôleur",
@@ -292,7 +295,11 @@
       "sortDomain": "Par domaine",
       "sortActive": "Actifs d’abord",
       "filterAria": "Filters",
-      "sortDevice": "By device"
+      "sortDevice": "By device",
+      "viewMenuAria": "View options",
+      "viewMenuLabel": "View",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately"
     },
     "areas": {
       "title": "Zones",

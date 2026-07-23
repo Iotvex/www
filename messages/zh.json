@@ -227,7 +227,10 @@
       "menuAria": "小组件操作",
       "moveLeft": "Move left",
       "moveRight": "Move right",
-      "dragAria": "Drag widget"
+      "dragAria": "Drag widget",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately",
+      "ungroupedDevice": "Other"
     },
     "statusWidget": {
       "controller": "控制器",
@@ -292,7 +295,11 @@
       "sortDomain": "按域",
       "sortActive": "活跃优先",
       "filterAria": "Filters",
-      "sortDevice": "按设备"
+      "sortDevice": "按设备",
+      "viewMenuAria": "View options",
+      "viewMenuLabel": "View",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately"
     },
     "areas": {
       "title": "区域",

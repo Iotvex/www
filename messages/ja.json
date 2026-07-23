@@ -227,7 +227,10 @@
       "menuAria": "ウィジェット操作",
       "moveLeft": "Move left",
       "moveRight": "Move right",
-      "dragAria": "Drag widget"
+      "dragAria": "Drag widget",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately",
+      "ungroupedDevice": "Other"
     },
     "statusWidget": {
       "controller": "コントローラー",
@@ -292,7 +295,11 @@
       "sortDomain": "ドメイン順",
       "sortActive": "稼働中を先に",
       "filterAria": "Filters",
-      "sortDevice": "デバイス別"
+      "sortDevice": "デバイス別",
+      "viewMenuAria": "View options",
+      "viewMenuLabel": "View",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately"
     },
     "areas": {
       "title": "ゾーン",

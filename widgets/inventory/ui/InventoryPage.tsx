@@ -12,7 +12,8 @@ import {
   fetchCatalogFx,
   fetchNodeFx,
 } from "@/entities/device/model/store"
-import { EntityGrid } from "@/features/entity-control/ui/EntityCard"
+import { EntityGrid, EntityViewMenu } from "@/features/entity-control/ui/EntityCard"
+import { useEntityViewPrefs, type EntityViewSort } from "@/shared/lib/ui-view-prefs"
 import {
   EmptyState,
   CreateCard,
@@ -38,9 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu"
 import {
-  ArrowUpDown,
   Boxes,
-  Check,
   MapPinned,
   Pencil,
   Plus,
@@ -235,16 +234,16 @@ function DevicesTab() {
   )
 }
 
-type EntitySort = "name_asc" | "name_desc" | "domain" | "active" | "device"
-
 function EntitiesTab() {
   const t = useTranslations("inventory")
   const common = useTranslations("common")
   const entities = useUnit($entities)
   const areas = useUnit($areas)
   const devices = useUnit($devices)
+  const { prefs, update: updatePrefs } = useEntityViewPrefs()
   const [q, setQ] = useState("")
-  const [sort, setSort] = useState<EntitySort>("device")
+  const sort = prefs.sort
+  const setSort = (next: EntityViewSort) => updatePrefs({ sort: next })
   const [areaFilter, setAreaFilter] = useState("all")
   const [domainFilter, setDomainFilter] = useState("all")
   const [pending, start] = useTransition()
@@ -301,14 +300,6 @@ function EntitiesTab() {
     })
     return list
   }, [entities, devices, q, areaFilter, domainFilter, sort])
-
-  const sortOptions: Array<{ id: EntitySort; label: string }> = [
-    { id: "name_asc", label: t("entities.sortNameAsc") },
-    { id: "name_desc", label: t("entities.sortNameDesc") },
-    { id: "domain", label: t("entities.sortDomain") },
-    { id: "active", label: t("entities.sortActive") },
-    { id: "device", label: t("entities.sortDevice") },
-  ]
 
   const save = () => {
     if (!edit) return
@@ -399,31 +390,12 @@ function EntitiesTab() {
                 </div>
               </PopoverContent>
             </Popover>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="secondary"
-                  className="h-10 w-10 shrink-0"
-                  aria-label={t("entities.sortAria")}
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[12rem]">
-                {sortOptions.map((option) => (
-                  <DropdownMenuItem
-                    key={option.id}
-                    onSelect={() => setSort(option.id)}
-                    className="justify-between gap-3"
-                  >
-                    <span>{option.label}</span>
-                    {sort === option.id ? <Check className="h-4 w-4 text-primary" /> : null}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <EntityViewMenu
+              groupByDevice={prefs.groupByDevice}
+              sort={sort}
+              onGroupByDeviceChange={(v) => updatePrefs({ groupByDevice: v })}
+              onSortChange={(v) => setSort(v as EntityViewSort)}
+            />
           </div>
         }
       />
@@ -457,6 +429,7 @@ function EntitiesTab() {
         <EntityGrid
           entities={filtered}
           devices={devices}
+          groupByDevice={prefs.groupByDevice}
           onEdit={(e) =>
             setEdit({
               id: e.entity_id,

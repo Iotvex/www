@@ -77,6 +77,8 @@ import {
   type AgentConnection,
 } from "@/entities/device/model/store";
 import { setView } from "@/entities/nav/model/store";
+import { groupEntitiesByDevice } from "@/features/entity-control/ui/EntityCard";
+import { useDashboardEntityViewPrefs } from "@/shared/lib/ui-view-prefs";
 
 type Entity = {
   id?: string;
@@ -100,9 +102,14 @@ type Area = {
 };
 
 type Device = {
-  id?: string;
-  name?: string;
-  area_id?: string;
+  id: string;
+  name: string;
+  manufacturer?: string | null;
+  model?: string | null;
+  area_id?: string | null;
+  platform?: string;
+  external_id?: string | null;
+  meta?: Record<string, unknown>;
 };
 
 type NodeStatus = {
@@ -587,9 +594,12 @@ function SortableWidgetCard({
 }) {
   const t = useTranslations("overview");
   const common = useTranslations("common");
+  const { prefs: dashPrefs, update: updateDashPrefs } = useDashboardEntityViewPrefs();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: widget.id,
   });
+  const showEntityViewOpts =
+    widget.kind === "entities" || widget.kind === "lights" || widget.kind === "area";
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -664,6 +674,19 @@ function SortableWidgetCard({
               <ArrowDown className="h-4 w-4" />
               {t("widgets.moveDown")}
             </DropdownMenuItem>
+            {showEntityViewOpts ? (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => updateDashPrefs({ groupByDevice: true })}>
+                  {t("widgets.groupByDevice")}
+                  {dashPrefs.groupByDevice ? <span className="ml-auto text-primary">✓</span> : null}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => updateDashPrefs({ groupByDevice: false })}>
+                  {t("widgets.ungroupDevices")}
+                  {!dashPrefs.groupByDevice ? <span className="ml-auto text-primary">✓</span> : null}
+                </DropdownMenuItem>
+              </>
+            ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={onEdit}>
               <Pencil className="h-4 w-4" />
@@ -691,6 +714,7 @@ function SortableWidgetCard({
           node={node}
           agentOnline={agentOnline}
           agentConnection={agentConnection}
+          groupByDevice={dashPrefs.groupByDevice}
         />
       </CardContent>
     </Card>
@@ -874,6 +898,7 @@ function WidgetBody({
   node,
   agentOnline,
   agentConnection,
+  groupByDevice = true,
 }: {
   widget: DashboardWidget;
   entities: Entity[];
@@ -882,6 +907,7 @@ function WidgetBody({
   node: NodeStatus | null;
   agentOnline: boolean;
   agentConnection: AgentConnection;
+  groupByDevice?: boolean;
 }) {
   const t = useTranslations("overview");
 
@@ -947,24 +973,94 @@ function WidgetBody({
     );
   }
 
-  return (
-    <div className="grid min-w-0 gap-1.5 overflow-hidden">
-      {source.slice(0, 8).map((entity) => (
-        <div
-          key={entityId(entity)}
-          className="flex min-w-0 items-center justify-between gap-2 overflow-hidden rounded-lg border border-white/[0.05] bg-white/[0.03] px-2.5 py-2"
-        >
-          <div className="min-w-0">
+  if (!groupByDevice) {
+    return (
+      <div className="grid min-w-0 gap-1.5 overflow-hidden">
+        {source.slice(0, 8).map((entity) => (
+          <div
+            key={entityId(entity)}
+            className="flex min-w-0 items-center justify-between gap-2 overflow-hidden rounded-lg border border-white/[0.05] bg-white/[0.03] px-2.5 py-2"
+          >
             <p className="truncate font-medium text-sm">{entityName(entity)}</p>
-            <p className="truncate text-xs text-muted-foreground">{entityId(entity)}</p>
+            <Badge variant={entity.state === "on" ? "default" : "secondary"}>
+              {String(entity.state ?? t("widgets.noData"))}
+            </Badge>
           </div>
-          <Badge variant={entity.state === "on" ? "default" : "secondary"}>
-            {entity.state ?? t("widgets.noData")}
-          </Badge>
-        </div>
-      ))}
-      {source.length > 8 ? (
-        <p className="text-xs text-muted-foreground">{t("widgets.andMore", { count: source.length - 8 })}</p>
+        ))}
+        {source.length > 8 ? (
+          <p className="text-xs text-muted-foreground">{t("widgets.andMore", { count: source.length - 8 })}</p>
+        ) : null}
+      </div>
+    )
+  }
+
+  const deviceModels = devices
+    .filter((d): d is Device & { id: string; name: string } => Boolean(d.id && d.name))
+    .map((d) => ({
+      id: d.id,
+      name: d.name,
+      manufacturer: d.manufacturer ?? null,
+      model: d.model ?? null,
+      area_id: d.area_id ?? null,
+      platform: d.platform ?? "iotvex",
+      external_id: d.external_id ?? null,
+      meta: d.meta || {},
+    }))
+
+  const normalized = source.map((entity) => ({
+    entity_id: entityId(entity),
+    domain: (entity.domain || "other") as import("@/entities/device/model/types").DeviceDomain,
+    name: entityName(entity),
+    state: String(entity.state ?? ""),
+    attributes: (entity.attributes as Record<string, unknown>) || {},
+    capabilities: [] as import("@/entities/device/model/types").EntityCapability[],
+    area: (entity.area ?? entity.area_id ?? undefined) || undefined,
+    device_id: entity.device_id ?? null,
+    available: entity.available !== false,
+  }))
+
+  const groups = groupEntitiesByDevice(normalized, deviceModels, t("widgets.ungroupedDevice"))
+  const flatLimit = 8
+  let shown = 0
+
+  return (
+    <div className="grid min-w-0 gap-2 overflow-hidden">
+      {groups.map((group) => {
+        const remaining = flatLimit - shown
+        if (remaining <= 0) return null
+        const slice = group.entities.slice(0, remaining)
+        shown += slice.length
+        return (
+          <div
+            key={group.key}
+            className="min-w-0 overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.03]"
+          >
+            <div className="border-b border-white/[0.06] px-2.5 py-1.5">
+              <p className="truncate text-xs font-semibold tracking-tight text-foreground/90">
+                {group.title}
+              </p>
+            </div>
+            <div className="divide-y divide-white/[0.05]">
+              {slice.map((entity) => (
+                <div
+                  key={entity.entity_id}
+                  className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2"
+                >
+                  <p className="truncate text-sm font-medium">{entity.name}</p>
+                  <Badge variant={entity.state === "on" ? "default" : "secondary"}>
+                    {entity.state || t("widgets.noData")}
+                    {entity.attributes.unit_of_measurement
+                      ? ` ${String(entity.attributes.unit_of_measurement)}`
+                      : ""}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })}
+      {source.length > flatLimit ? (
+        <p className="text-xs text-muted-foreground">{t("widgets.andMore", { count: source.length - flatLimit })}</p>
       ) : null}
     </div>
   );

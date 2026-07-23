@@ -227,7 +227,10 @@
       "andMore": "И ещё {count}",
       "moveLeft": "Левее",
       "moveRight": "Правее",
-      "dragAria": "Перетащить виджет"
+      "dragAria": "Перетащить виджет",
+      "groupByDevice": "Группировать по устройству",
+      "ungroupDevices": "Показывать отдельно",
+      "ungroupedDevice": "Прочее"
     },
     "statusWidget": {
       "controller": "Контроллер",
@@ -292,7 +295,11 @@
       "sortDomain": "По домену",
       "sortActive": "Сначала активные",
       "filterAria": "Фильтры",
-      "sortDevice": "По устройству"
+      "sortDevice": "По устройству",
+      "viewMenuAria": "Параметры вида",
+      "viewMenuLabel": "Вид",
+      "groupByDevice": "Группировать по устройству",
+      "ungroupDevices": "Показывать отдельно"
     },
     "areas": {
       "title": "Зоны",

@@ -227,7 +227,10 @@
       "menuAria": "विजेट क्रियाएँ",
       "moveLeft": "Move left",
       "moveRight": "Move right",
-      "dragAria": "Drag widget"
+      "dragAria": "Drag widget",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately",
+      "ungroupedDevice": "Other"
     },
     "statusWidget": {
       "controller": "कंट्रोलर",
@@ -292,7 +295,11 @@
       "sortDomain": "डोमेन के अनुसार",
       "sortActive": "पहले सक्रिय",
       "filterAria": "Filters",
-      "sortDevice": "डिवाइस से"
+      "sortDevice": "डिवाइस से",
+      "viewMenuAria": "View options",
+      "viewMenuLabel": "View",
+      "groupByDevice": "Group by device",
+      "ungroupDevices": "Show separately"
     },
     "areas": {
       "title": "ज़ोन",
