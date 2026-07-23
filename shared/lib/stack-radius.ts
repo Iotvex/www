@@ -10,10 +10,12 @@ const RADIUS_PX: Record<StackRadius, number> = {
   "2xl": 16,
 }
 
+/** Gap between stacked sections with sharp facing corners. */
+export const STACK_GAP_PX = 8
+
 /**
- * Exact stack corners from the sketch:
- * first → top only, last → bottom only, middle → sharp, single → all.
- * Inline styles beat any competing Tailwind rounded-* class.
+ * Stack corners: first → top only, last → bottom only, middle → sharp, single → all.
+ * Facing sharp edges keep a visible gap (see stackItemOffset*).
  */
 export function stackRadiusStyle(
   index: number,
@@ -48,7 +50,6 @@ export function stackRadiusStyle(
   }
 }
 
-/** Tailwind fallback (kept for places that only need classes). */
 export function stackRadiusClass(
   index: number,
   total: number,
@@ -67,11 +68,11 @@ export function stackRadiusClass(
   return "rounded-none"
 }
 
+/** Tailwind gap above items after the first (sharp-corner spacing). */
 export function stackItemOffsetClass(index: number): string {
-  return index > 0 ? "-mt-px" : ""
+  return index > 0 ? "mt-2" : ""
 }
 
-/** Inline overlap so adjacent borders share one pixel (beats margin utilities). */
 export function stackItemOffsetStyle(index: number): CSSProperties {
-  return index > 0 ? { marginTop: -1 } : {}
+  return index > 0 ? { marginTop: STACK_GAP_PX } : {}
 }

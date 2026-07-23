@@ -6,6 +6,7 @@ import { getLocale, getMessages, getTranslations } from "next-intl/server"
 import type { AppLocale } from "@/i18n/config"
 import type { Messages } from "@/i18n/messages"
 import { FC } from "react"
+import { BrandMark } from "@/shared/ui/brand-mark"
 
 const LoginPage: FC = async () => {
   const locale = (await getLocale()) as AppLocale
@@ -26,10 +27,8 @@ const LoginPage: FC = async () => {
         </div>
         <div className="relative w-full max-w-md animate-[iotvex-card-in_480ms_cubic-bezier(0.22,1,0.36,1)_both] rounded-xl border border-border/60 bg-card/70 p-6 shadow-2xl backdrop-blur-2xl dark:border-white/[0.08] dark:bg-card/50 sm:p-8">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current">
-                <path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8z" />
-              </svg>
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center">
+              <BrandMark size={56} priority />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">Iotvex</h1>
             <p className="mt-1.5 text-sm text-muted-foreground">{t("tagline")}</p>

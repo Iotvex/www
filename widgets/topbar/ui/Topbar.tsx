@@ -15,6 +15,7 @@ import { SidebarNav } from "@/widgets/sidebar/ui/AppSidebar"
 import { useUnit } from "effector-react"
 import { Menu } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { BrandMark } from "@/shared/ui/brand-mark"
 
 export function Topbar({
   title,
@@ -35,6 +36,7 @@ export function Topbar({
       {/* No pt-safe: apple statusBarStyle "black" already insets the webview. */}
       <div className="flex h-14 items-center justify-between gap-2 px-3 sm:px-4 md:px-6">
         <div className="flex min-w-0 items-center gap-2">
+          <BrandMark size={22} className="hidden sm:block opacity-90" />
           <Sheet open={navOpen} onOpenChange={onNavOpenChange}>
             <SheetTrigger asChild>
               <Button
