@@ -679,7 +679,9 @@
     },
     "unboundDevice": "Unassigned",
     "groupCount": "{count} in group",
-    "controlFailed": "Não foi possível atualizar a fita"
+    "controlFailed": "Não foi possível atualizar a fita",
+    "manualValueRequired": "Introduza um valor",
+    "manualValueRange": "Introduza um inteiro de 1 a 100"
   },
   "theme": {
     "ariaLabel": "Aparência",

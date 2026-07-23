@@ -679,7 +679,9 @@
     },
     "unboundDevice": "Без устройства",
     "groupCount": "{count} в группе",
-    "controlFailed": "Не удалось обновить ленту"
+    "controlFailed": "Не удалось обновить ленту",
+    "manualValueRequired": "Введите значение",
+    "manualValueRange": "Введите целое число от 1 до 100"
   },
   "theme": {
     "ariaLabel": "Оформление",

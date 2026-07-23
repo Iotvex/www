@@ -679,7 +679,9 @@
     },
     "unboundDevice": "未割当",
     "groupCount": "{count} 件",
-    "controlFailed": "ストリップを更新できませんでした"
+    "controlFailed": "ストリップを更新できませんでした",
+    "manualValueRequired": "値を入力してください",
+    "manualValueRange": "1〜100の整数を入力してください"
   },
   "theme": {
     "ariaLabel": "外観",

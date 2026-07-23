@@ -18,8 +18,21 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu"
 import { FieldSelect } from "@/shared/ui/page-toolbar"
+import { Input } from "@/shared/ui/input"
+import { Label } from "@/shared/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/ui/popover"
 import { Slider } from "@/shared/ui/slider"
 import { Switch } from "@/shared/ui/switch"
+import {
+  byteToPct,
+  effectSupportsColor,
+  effectSupportsSpeed,
+  pctToByte,
+} from "@/shared/lib/home/action-options"
 import { cn } from "@/shared/lib/utils"
 import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
 import {
@@ -35,6 +48,7 @@ import {
   Power,
   Sun,
   Thermometer,
+  Timer,
   ToggleLeft,
   Wind,
 } from "lucide-react"
@@ -81,6 +95,99 @@ function effectOptions(
   return [{ id: 0, name: fallbackEffect }]
 }
 
+function PercentValuePopover({
+  open,
+  onOpenChange,
+  icon,
+  label,
+  value,
+  disabled,
+  onApply,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  icon: ReactNode
+  label: string
+  value: number
+  disabled?: boolean
+  onApply: (pct: number) => void
+}) {
+  const t = useTranslations("entity")
+  const common = useTranslations("common")
+  const [draft, setDraft] = useState(String(value))
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      setDraft(String(value))
+      setError(null)
+    }
+  }, [open, value])
+
+  const submit = () => {
+    const trimmed = draft.trim()
+    if (!trimmed) {
+      setError(t("manualValueRequired"))
+      return
+    }
+    const n = Number(trimmed)
+    if (!Number.isFinite(n) || n < 1 || n > 100 || !Number.isInteger(n)) {
+      setError(t("manualValueRange"))
+      return
+    }
+    setError(null)
+    onApply(n)
+    onOpenChange(false)
+  }
+
+  return (
+    <Popover open={open} onOpenChange={onOpenChange}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          aria-label={label}
+          title={label}
+          className={cn(
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors",
+            "hover:border-white/20 hover:text-foreground",
+            "disabled:pointer-events-none disabled:opacity-40",
+          )}
+        >
+          {icon}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-52 space-y-2.5 p-3">
+        <div className="space-y-1.5">
+          <Label htmlFor={`pct-${label}`} className="text-xs">
+            {label}
+          </Label>
+          <Input
+            id={`pct-${label}`}
+            inputMode="numeric"
+            value={draft}
+            onChange={(e) => {
+              setDraft(e.target.value)
+              if (error) setError(null)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                submit()
+              }
+            }}
+            aria-invalid={Boolean(error)}
+          />
+          {error ? <p className="text-[11px] text-destructive">{error}</p> : null}
+        </div>
+        <Button type="button" size="sm" className="w-full" onClick={submit}>
+          {common("confirm")}
+        </Button>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 /** Single entity controls — used inside a device card or as a standalone card body. */
 export function EntityControls({
   entity,
@@ -96,16 +203,17 @@ export function EntityControls({
   const brightness = Number(entity.attributes.brightness ?? 128)
   const speed = Number(entity.attributes.speed ?? 128)
   const effect = Number(entity.attributes.effect ?? 0)
-  const [localBri, setLocalBri] = useState(brightness)
-  const [localSpeed, setLocalSpeed] = useState(speed)
+  const [localBriPct, setLocalBriPct] = useState(() => byteToPct(brightness))
+  const [localSpeedPct, setLocalSpeedPct] = useState(() => byteToPct(speed))
   const [localRgb, setLocalRgb] = useState<Rgb>([255, 255, 255])
   const [toggling, setToggling] = useState(false)
+  const [briOpen, setBriOpen] = useState(false)
+  const [speedOpen, setSpeedOpen] = useState(false)
   const on = entity.state === "on" || entity.state === "home" || entity.state === "open"
   const rgb = useMemo(() => {
     const c = (entity.attributes.rgb_color as number[]) || [255, 255, 255]
     return [c[0] ?? 255, c[1] ?? 255, c[2] ?? 255] as Rgb
   }, [entity.attributes.rgb_color])
-  const briPct = Math.round((localBri / 255) * 100)
   const fallbackEffect = t("fallbackEffect")
   const effects = useMemo(() => effectOptions(entity, fallbackEffect), [entity, fallbackEffect])
   const sensor = isSensorReading(entity)
@@ -113,9 +221,15 @@ export function EntityControls({
     hasCapability(entity, "brightness") ||
     hasCapability(entity, "color") ||
     hasCapability(entity, "effect")
+  const showColor =
+    hasCapability(entity, "color") && effectSupportsColor(effect)
+  const showSpeed =
+    hasCapability(entity, "speed") && effectSupportsSpeed(effect)
+  const showBrightness = hasCapability(entity, "brightness")
+  const showEffect = hasCapability(entity, "effect")
 
-  useEffect(() => setLocalBri(brightness), [brightness])
-  useEffect(() => setLocalSpeed(speed), [speed])
+  useEffect(() => setLocalBriPct(byteToPct(brightness)), [brightness])
+  useEffect(() => setLocalSpeedPct(byteToPct(speed)), [speed])
   useEffect(() => setLocalRgb(rgb), [rgb])
 
   const commitColor = (next: Rgb) => {
@@ -126,6 +240,26 @@ export function EntityControls({
       r: next[0],
       g: next[1],
       b: next[2],
+    })
+  }
+
+  const commitBrightnessPct = (pct: number) => {
+    const next = Math.max(1, Math.min(100, Math.round(pct)))
+    setLocalBriPct(next)
+    callEntity({
+      entity_id: entity.entity_id,
+      action: "set_brightness",
+      brightness: pctToByte(next),
+    })
+  }
+
+  const commitSpeedPct = (pct: number) => {
+    const next = Math.max(1, Math.min(100, Math.round(pct)))
+    setLocalSpeedPct(next)
+    callEntity({
+      entity_id: entity.entity_id,
+      action: "set_speed",
+      speed: pctToByte(next),
     })
   }
 
@@ -208,47 +342,88 @@ export function EntityControls({
       ) : null}
 
       {isLightStrip ? (
-        <div className={cn("space-y-3 pt-0.5", !on && "opacity-50")}>
-          {hasCapability(entity, "brightness") ? (
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{t("brightness")}</span>
-                <span className="tabular-nums text-foreground/80">{briPct}%</span>
-              </div>
-              <Slider
-                aria-label={tActions("set_brightness")}
-                min={1}
-                max={255}
-                step={1}
-                value={[localBri]}
-                disabled={!entity.available || toggling}
-                onValueChange={(v) => setLocalBri(v[0])}
-                onValueCommit={(v) =>
-                  callEntity({
-                    entity_id: entity.entity_id,
-                    action: "set_brightness",
-                    brightness: v[0],
-                  })
-                }
-              />
+        <div className={cn("space-y-2.5 pt-0.5", !on && "opacity-50")}>
+          {showBrightness || showSpeed ? (
+            <div
+              className={cn(
+                "grid gap-2.5",
+                showBrightness && showSpeed ? "grid-cols-2" : "grid-cols-1",
+              )}
+            >
+              {showBrightness ? (
+                <div className="min-w-0 space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <PercentValuePopover
+                      open={briOpen}
+                      onOpenChange={setBriOpen}
+                      icon={<Sun className="h-3.5 w-3.5" />}
+                      label={t("brightness")}
+                      value={localBriPct}
+                      disabled={!entity.available || toggling}
+                      onApply={commitBrightnessPct}
+                    />
+                    <span className="tabular-nums text-xs text-foreground/80">{localBriPct}%</span>
+                  </div>
+                  <Slider
+                    aria-label={tActions("set_brightness")}
+                    min={1}
+                    max={100}
+                    step={1}
+                    value={[localBriPct]}
+                    disabled={!entity.available || toggling}
+                    onValueChange={(v) => setLocalBriPct(v[0])}
+                    onValueCommit={(v) => commitBrightnessPct(v[0])}
+                  />
+                </div>
+              ) : null}
+              {showSpeed ? (
+                <div className="min-w-0 space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <PercentValuePopover
+                      open={speedOpen}
+                      onOpenChange={setSpeedOpen}
+                      icon={<Timer className="h-3.5 w-3.5" />}
+                      label={t("speed")}
+                      value={localSpeedPct}
+                      disabled={!entity.available || toggling}
+                      onApply={commitSpeedPct}
+                    />
+                    <span className="tabular-nums text-xs text-foreground/80">{localSpeedPct}%</span>
+                  </div>
+                  <Slider
+                    aria-label={tActions("set_speed")}
+                    min={1}
+                    max={100}
+                    step={1}
+                    value={[localSpeedPct]}
+                    disabled={!entity.available || toggling}
+                    onValueChange={(v) => setLocalSpeedPct(v[0])}
+                    onValueCommit={(v) => commitSpeedPct(v[0])}
+                  />
+                </div>
+              ) : null}
             </div>
           ) : null}
 
-          {hasCapability(entity, "color") ? (
-            <div className="space-y-1.5">
-              <div className="text-xs text-muted-foreground">{t("colorLabel")}</div>
-              <ColorPicker
-                value={localRgb}
-                disabled={!entity.available || toggling}
-                onChange={setLocalRgb}
-                onCommit={commitColor}
-              />
-            </div>
-          ) : null}
-
-          {hasCapability(entity, "effect") || hasCapability(entity, "speed") ? (
-            <div className="grid gap-2.5 sm:grid-cols-2">
-              {hasCapability(entity, "effect") ? (
+          {showColor || showEffect ? (
+            <div
+              className={cn(
+                "grid gap-2.5",
+                showColor && showEffect ? "grid-cols-2" : "grid-cols-1",
+              )}
+            >
+              {showColor ? (
+                <div className="min-w-0 space-y-1.5">
+                  <div className="text-xs text-muted-foreground">{t("colorLabel")}</div>
+                  <ColorPicker
+                    value={localRgb}
+                    disabled={!entity.available || toggling}
+                    onChange={setLocalRgb}
+                    onCommit={commitColor}
+                  />
+                </div>
+              ) : null}
+              {showEffect ? (
                 <div className="min-w-0 space-y-1.5">
                   <div className="text-xs text-muted-foreground">{t("effect")}</div>
                   <FieldSelect
@@ -259,7 +434,7 @@ export function EntityControls({
                         entity_id: entity.entity_id,
                         action: "set_effect",
                         effect: Number(v),
-                        speed: localSpeed,
+                        speed: pctToByte(localSpeedPct),
                       })
                     }
                   >
@@ -269,30 +444,6 @@ export function EntityControls({
                       </option>
                     ))}
                   </FieldSelect>
-                </div>
-              ) : null}
-              {hasCapability(entity, "speed") ? (
-                <div className="min-w-0 space-y-1.5">
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{t("speed")}</span>
-                    <span className="tabular-nums text-foreground/80">{localSpeed}</span>
-                  </div>
-                  <Slider
-                    aria-label={tActions("set_speed")}
-                    min={0}
-                    max={255}
-                    step={1}
-                    value={[localSpeed]}
-                    disabled={!entity.available || toggling}
-                    onValueChange={(v) => setLocalSpeed(v[0])}
-                    onValueCommit={(v) =>
-                      callEntity({
-                        entity_id: entity.entity_id,
-                        action: "set_speed",
-                        speed: v[0],
-                      })
-                    }
-                  />
                 </div>
               ) : null}
             </div>
@@ -435,15 +586,12 @@ function DeviceEntityCard({
       </div>
 
       <div className="flex flex-col">
-        {group.entities.map((entity, index) => (
-          <div
-            key={entity.entity_id}
-            className={cn(
-              "border-t border-white/[0.06] px-3 sm:px-3.5",
-              // Inner segments stay flush; outer card owns the stack radius.
-            )}
-          >
-            <EntityControls entity={entity} onEdit={onEdit} compact />
+        {group.entities.map((entity) => (
+          <div key={entity.entity_id} className="min-w-0">
+            <div className="h-px w-full bg-white/[0.08]" aria-hidden />
+            <div className="px-3 sm:px-3.5">
+              <EntityControls entity={entity} onEdit={onEdit} compact />
+            </div>
           </div>
         ))}
       </div>

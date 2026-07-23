@@ -679,7 +679,9 @@
     },
     "unboundDevice": "未分配",
     "groupCount": "{count} 个",
-    "controlFailed": "无法更新灯带"
+    "controlFailed": "无法更新灯带",
+    "manualValueRequired": "请输入数值",
+    "manualValueRange": "请输入 1 到 100 的整数"
   },
   "theme": {
     "ariaLabel": "外观",

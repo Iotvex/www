@@ -1049,17 +1049,16 @@ function WidgetBody({
             stackItemOffsetClass(groupIndex),
           )}
         >
-          <div className="border-b border-white/[0.06] px-2.5 py-1.5">
+          <div className="px-2.5 py-1.5">
             <p className="truncate text-xs font-semibold tracking-tight text-foreground/90">
               {group.title}
             </p>
           </div>
-          <div className="divide-y divide-white/[0.05]">
+          <div>
             {group.entities.map((entity) => (
-              <div
-                key={entity.entity_id}
-                className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2"
-              >
+              <div key={entity.entity_id} className="min-w-0">
+                <div className="h-px w-full bg-white/[0.08]" aria-hidden />
+                <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2">
                 <p className="truncate text-sm font-medium">{entity.name}</p>
                 <Badge variant={entity.state === "on" ? "default" : "secondary"}>
                   {entity.state || t("widgets.noData")}
@@ -1067,6 +1066,7 @@ function WidgetBody({
                     ? ` ${String(entity.attributes.unit_of_measurement)}`
                     : ""}
                 </Badge>
+                </div>
               </div>
             ))}
           </div>

@@ -145,6 +145,8 @@ entity.effect
 entity.emptyEntities
 entity.fallbackEffect
 entity.groupCount
+entity.manualValueRange
+entity.manualValueRequired
 entity.speed
 entity.states.off
 entity.states.offline

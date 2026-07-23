@@ -679,7 +679,9 @@
     },
     "unboundDevice": "Unassigned",
     "groupCount": "{count} in group",
-    "controlFailed": "Couldn't update the strip"
+    "controlFailed": "Couldn't update the strip",
+    "manualValueRequired": "Enter a value",
+    "manualValueRange": "Enter an integer from 1 to 100"
   },
   "theme": {
     "ariaLabel": "Appearance",

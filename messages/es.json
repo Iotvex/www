@@ -679,7 +679,9 @@
     },
     "unboundDevice": "Sin asignar",
     "groupCount": "{count} en el grupo",
-    "controlFailed": "No se pudo actualizar la tira"
+    "controlFailed": "No se pudo actualizar la tira",
+    "manualValueRequired": "Introduce un valor",
+    "manualValueRange": "Introduce un entero de 1 a 100"
   },
   "theme": {
     "ariaLabel": "Apariencia",

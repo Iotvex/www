@@ -679,7 +679,9 @@
     },
     "unboundDevice": "Unassigned",
     "groupCount": "{count} in group",
-    "controlFailed": "Impossible de mettre à jour le ruban"
+    "controlFailed": "Impossible de mettre à jour le ruban",
+    "manualValueRequired": "Saisissez une valeur",
+    "manualValueRange": "Saisissez un entier de 1 à 100"
   },
   "theme": {
     "ariaLabel": "Apparence",
