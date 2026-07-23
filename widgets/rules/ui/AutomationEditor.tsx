@@ -22,7 +22,10 @@ import {
   byteToPct,
   effectSupportsColor,
   effectSupportsSpeed,
+  isControllableEntity,
+  isObservableEntity,
   pctToByte,
+  sharedCapabilities,
   verbsForCapabilities,
 } from "@/shared/lib/home/action-options"
 import {
@@ -100,12 +103,15 @@ function entityName(entity: RuleEntity): string {
 }
 
 function capsOf(entity: RuleEntity | undefined): string[] {
-  if (!entity) return ["on_off"]
-  if (entity.capabilities?.length) return entity.capabilities
+  if (!entity) return []
+  if (entity.capabilities?.length) return [...entity.capabilities]
   const domain = entity.domain || entityId(entity).split(".")[0]
   if (domain === "light") return ["on_off", "brightness", "color", "effect", "speed"]
-  if (domain === "switch") return ["on_off"]
-  return ["on_off"]
+  if (domain === "switch" || domain === "fan" || domain === "lock") return ["on_off"]
+  if (domain === "climate") return ["on_off", "temperature"]
+  if (domain === "sensor" || domain === "weather") return ["value"]
+  if (domain === "binary_sensor") return ["binary"]
+  return []
 }
 
 function collectTargetIds(actions: AutomationAction[] | undefined): string[] {
@@ -233,21 +239,26 @@ export function AutomationEditor({
   const tActions = useTranslations("actions")
   const common = useTranslations("common")
   const requestError = useCallback((status: number) => t("requestError", { status }), [t])
-  const firstEntityId = entityId(entities[0] ?? {})
-  const lightIds = useMemo(
-    () =>
-      entities
-        .filter((e) => (e.domain || entityId(e).split(".")[0]) === "light")
-        .map(entityId)
-        .filter(Boolean),
+  const actionableEntities = useMemo(
+    () => entities.filter((e) => isControllableEntity({ ...e, capabilities: capsOf(e) })),
     [entities],
   )
+  const observableEntities = useMemo(
+    () => entities.filter((e) => isObservableEntity({ ...e, capabilities: capsOf(e) })),
+    [entities],
+  )
+  const actionableIds = useMemo(
+    () => actionableEntities.map(entityId).filter(Boolean),
+    [actionableEntities],
+  )
+  const firstActionableId = actionableIds[0] || ""
+  const firstObservableId = entityId(observableEntities[0] ?? {}) || firstActionableId
 
   const [name, setName] = useState("")
   const [triggerKind, setTriggerKind] = useState<TriggerKind>("time")
   const [time, setTime] = useState("08:00")
   const [weekdays, setWeekdays] = useState<string[]>([])
-  const [triggerEntity, setTriggerEntity] = useState(firstEntityId)
+  const [triggerEntity, setTriggerEntity] = useState(firstObservableId)
   const [triggerTo, setTriggerTo] = useState("on")
   const [triggerFrom, setTriggerFrom] = useState("")
   const [triggerAbove, setTriggerAbove] = useState("")
@@ -255,7 +266,7 @@ export function AutomationEditor({
   const [triggerAttribute, setTriggerAttribute] = useState("")
   const [conditions, setConditions] = useState<ConditionDraft[]>([])
   const [selectedEntities, setSelectedEntities] = useState<string[]>(
-    lightIds.length ? lightIds : firstEntityId ? [firstEntityId] : [],
+    actionableIds.length ? actionableIds : [],
   )
   const [verb, setVerb] = useState("turn_on")
   const [brightnessPct, setBrightnessPct] = useState(80)
@@ -266,11 +277,21 @@ export function AutomationEditor({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const primaryEntity = useMemo(() => {
-    const id = selectedEntities[0]
-    return entities.find((e) => entityId(e) === id)
-  }, [entities, selectedEntities])
-  const caps = capsOf(primaryEntity)
+  const selectedTargetEntities = useMemo(
+    () =>
+      selectedEntities
+        .map((id) => actionableEntities.find((e) => entityId(e) === id))
+        .filter((e): e is RuleEntity => Boolean(e)),
+    [actionableEntities, selectedEntities],
+  )
+  const primaryEntity = selectedTargetEntities[0]
+  const caps = useMemo(() => {
+    if (!selectedTargetEntities.length) return [] as string[]
+    // Prefer declared caps; fall back via capsOf then intersect across targets.
+    return sharedCapabilities(
+      selectedTargetEntities.map((e) => ({ ...e, capabilities: capsOf(e) })),
+    )
+  }, [selectedTargetEntities])
   const showColor =
     (verb === "turn_on" || verb === "set_color") &&
     caps.includes("color") &&
@@ -309,7 +330,7 @@ export function AutomationEditor({
     setTriggerKind(kind === "state" || kind === "numeric_state" ? kind : "time")
     setTime(String(trigger.at || trigger.time || "08:00").slice(0, 5))
     setWeekdays(Array.isArray(trigger.weekday) ? trigger.weekday.map(String) : [])
-    setTriggerEntity(String(trigger.entity_id || firstEntityId))
+    setTriggerEntity(String(trigger.entity_id || firstObservableId))
     setTriggerTo(String(trigger.to ?? "on"))
     setTriggerFrom(String(trigger.from ?? ""))
     setTriggerAbove(trigger.above != null ? String(trigger.above) : "")
@@ -323,7 +344,7 @@ export function AutomationEditor({
         return {
           id: Math.random().toString(36).slice(2, 9),
           kind: (String(row.condition || "state") as ConditionKind) || "state",
-          entity_id: String(row.entity_id || firstEntityId),
+          entity_id: String(row.entity_id || firstObservableId),
           state: String(row.state ?? "on"),
           above: row.above != null ? String(row.above) : "",
           below: row.below != null ? String(row.below) : "",
@@ -334,10 +355,9 @@ export function AutomationEditor({
       }),
     )
 
-    const targets = collectTargetIds(item?.actions)
+    const targets = collectTargetIds(item?.actions).filter((id) => actionableIds.includes(id))
     if (targets.length) setSelectedEntities(targets)
-    else if (lightIds.length) setSelectedEntities(lightIds)
-    else if (firstEntityId) setSelectedEntities([firstEntityId])
+    else if (actionableIds.length) setSelectedEntities(actionableIds)
     else setSelectedEntities([])
 
     const rawAction = String(
@@ -376,6 +396,7 @@ export function AutomationEditor({
   }
 
   const toggleTarget = (id: string) => {
+    if (!actionableIds.includes(id)) return
     setSelectedEntities((prev) => {
       if (prev.includes(id)) {
         if (prev.length <= 1) return prev
@@ -386,9 +407,17 @@ export function AutomationEditor({
   }
 
   const selectAllTargets = () => {
-    const all = entities.map(entityId).filter(Boolean)
-    if (all.length) setSelectedEntities(all)
+    if (actionableIds.length) setSelectedEntities(actionableIds)
   }
+
+  // Drop any non-controllable ids if the catalog refreshes while the dialog is open.
+  useEffect(() => {
+    setSelectedEntities((prev) => {
+      const next = prev.filter((id) => actionableIds.includes(id))
+      if (next.length === prev.length) return prev
+      return next.length ? next : actionableIds.slice(0, 1)
+    })
+  }, [actionableIds])
 
   const buildTrigger = (): Record<string, unknown> => {
     if (triggerKind === "time") {
@@ -499,10 +528,24 @@ export function AutomationEditor({
     }
   }
 
-  const entityOptions = entities.map((entity) => ({
+  const triggerEntityOptions = observableEntities.map((entity) => ({
     value: entityId(entity),
     label: entityName(entity),
   }))
+  const numericEntityOptions = observableEntities
+    .filter((e) => {
+      const caps = capsOf(e)
+      return caps.includes("value") || caps.includes("temperature") || caps.includes("humidity")
+    })
+    .map((entity) => ({
+      value: entityId(entity),
+      label: entityName(entity),
+    }))
+  const conditionEntityOptions = triggerEntityOptions
+  const targetHint =
+    actionableEntities.length === 0
+      ? t("noControllableTargets")
+      : t("targetsHint", { count: selectedEntities.length })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -576,7 +619,7 @@ export function AutomationEditor({
                   label={t("entityLabel")}
                   value={triggerEntity}
                   onValueChange={setTriggerEntity}
-                  options={entityOptions}
+                  options={conditionEntityOptions}
                 />
                 <div className="grid gap-2">
                   <Label>{t("becomesLabel")}</Label>
@@ -603,7 +646,7 @@ export function AutomationEditor({
                   label={t("entityLabel")}
                   value={triggerEntity}
                   onValueChange={setTriggerEntity}
-                  options={entityOptions}
+                  options={numericEntityOptions.length ? numericEntityOptions : triggerEntityOptions}
                 />
                 <div className="grid gap-2">
                   <Label>{t("attributeLabel")}</Label>
@@ -644,7 +687,7 @@ export function AutomationEditor({
                 type="button"
                 size="sm"
                 variant="secondary"
-                onClick={() => setConditions((c) => [...c, newCondition(firstEntityId)])}
+                onClick={() => setConditions((c) => [...c, newCondition(firstObservableId)])}
               >
                 {t("addCondition")}
               </Button>
@@ -691,7 +734,7 @@ export function AutomationEditor({
                         list.map((row) => (row.id === c.id ? { ...row, entity_id: v } : row)),
                       )
                     }
-                    options={entityOptions}
+                    options={conditionEntityOptions}
                   />
                 ) : null}
                 {c.kind === "state" ? (
@@ -816,30 +859,32 @@ export function AutomationEditor({
                 </Button>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {entities.map((entity) => {
-                  const id = entityId(entity)
-                  if (!id) return null
-                  const active = selectedEntities.includes(id)
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => toggleTarget(id)}
-                      className={cn(
-                        "inline-flex min-h-9 items-center rounded-lg border px-2.5 text-xs font-medium transition",
-                        active
-                          ? "border-primary/40 bg-primary/12 text-primary"
-                          : "border-border/70 text-muted-foreground hover:bg-accent/40",
-                      )}
-                    >
-                      {entityName(entity)}
-                    </button>
-                  )
-                })}
+                {actionableEntities.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">{t("noControllableTargets")}</p>
+                ) : (
+                  actionableEntities.map((entity) => {
+                    const id = entityId(entity)
+                    if (!id) return null
+                    const active = selectedEntities.includes(id)
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => toggleTarget(id)}
+                        className={cn(
+                          "inline-flex min-h-9 items-center rounded-lg border px-2.5 text-xs font-medium transition",
+                          active
+                            ? "border-primary/40 bg-primary/12 text-primary"
+                            : "border-border/70 text-muted-foreground hover:bg-accent/40",
+                        )}
+                      >
+                        {entityName(entity)}
+                      </button>
+                    )
+                  })
+                )}
               </div>
-              <p className="text-[11px] text-muted-foreground">
-                {t("targetsHint", { count: selectedEntities.length })}
-              </p>
+              <p className="text-[11px] text-muted-foreground">{targetHint}</p>
             </div>
 
             <FieldSelect

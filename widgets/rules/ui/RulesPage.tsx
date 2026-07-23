@@ -33,6 +33,7 @@ import {
 } from "@/shared/ui/page-toolbar";
 import { PageListSkeleton } from "@/shared/ui/skeleton";
 import { cn } from "@/shared/lib/utils";
+import { isControllableEntity } from "@/shared/lib/home/action-options";
 import {
   stackItemOffsetClass,
   stackItemOffsetStyle,
@@ -465,15 +466,20 @@ function SceneDialog({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const controllable = useMemo(
+    () => entities.filter((e) => isControllableEntity(e)),
+    [entities],
+  );
+
   useEffect(() => {
     if (open) {
       setName("");
       setMode("manual");
-      setSelectedEntity(entityId(entities[0] ?? {}));
+      setSelectedEntity(entityId(controllable[0] ?? {}));
       setCapturedIds([]);
       setError(null);
     }
-  }, [entities, open]);
+  }, [controllable, open]);
 
   const toggleCaptured = (id: string, checked: boolean) => {
     setCapturedIds((current) =>
@@ -543,17 +549,17 @@ function SceneDialog({
               label={t("scenes.sceneDevice")}
               value={selectedEntity}
               onValueChange={setSelectedEntity}
-              options={entities.map((entity) => ({
+              options={controllable.map((entity) => ({
                 value: entityId(entity),
                 label: entityName(entity),
               }))}
             />
           ) : (
             <div className="grid max-h-72 gap-2 overflow-auto rounded-lg border p-3">
-              {entities.length === 0 ? (
+              {controllable.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t("scenes.noAvailableEntities")}</p>
               ) : null}
-              {entities.map((entity) => {
+              {controllable.map((entity) => {
                 const id = entityId(entity);
                 return (
                   <label
@@ -714,14 +720,19 @@ function ScriptDialog({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const controllable = useMemo(
+    () => entities.filter((e) => isControllableEntity(e)),
+    [entities],
+  );
+
   useEffect(() => {
     if (open) {
       setName("");
-      setSelectedEntity(entityId(entities[0] ?? {}));
+      setSelectedEntity(entityId(controllable[0] ?? {}));
       setAction("toggle");
       setError(null);
     }
-  }, [entities, open]);
+  }, [controllable, open]);
 
   const save = async () => {
     setSaving(true);
@@ -773,7 +784,7 @@ function ScriptDialog({
             label={t("scripts.entityLabel")}
             value={selectedEntity}
             onValueChange={setSelectedEntity}
-            options={entities.map((entity) => ({
+            options={controllable.map((entity) => ({
               value: entityId(entity),
               label: entityName(entity),
             }))}

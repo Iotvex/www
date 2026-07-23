@@ -100,6 +100,83 @@ export function effectSupportsSpeed(effectId: number): boolean {
   return effectAffordances(effectId).speed
 }
 
+/** Caps that mean the entity can be commanded (not a read-only sensor). */
+export const CONTROLLABLE_CAPS = [
+  "on_off",
+  "brightness",
+  "color",
+  "effect",
+  "speed",
+] as const
+
+const CONTROLLABLE_DOMAINS = new Set([
+  "light",
+  "switch",
+  "fan",
+  "lock",
+  "climate",
+  "cover",
+  "media_player",
+])
+
+const OBSERVABLE_DOMAINS = new Set([
+  "sensor",
+  "binary_sensor",
+  "weather",
+  "person",
+])
+
+type CapEntityLike = {
+  id?: string
+  entity_id?: string
+  domain?: string
+  capabilities?: readonly string[]
+}
+
+function domainOf(entity: CapEntityLike): string {
+  return entity.domain || String(entity.entity_id || entity.id || "").split(".")[0] || ""
+}
+
+/** True when the entity accepts commands (turn on, brightness, …). Sensors are never controllable. */
+export function isControllableEntity(entity: CapEntityLike): boolean {
+  const domain = domainOf(entity)
+  if (OBSERVABLE_DOMAINS.has(domain)) return false
+  const caps = entity.capabilities || []
+  if (caps.some((c) => (CONTROLLABLE_CAPS as readonly string[]).includes(c))) return true
+  return CONTROLLABLE_DOMAINS.has(domain)
+}
+
+/** Entities usable in triggers/conditions (state / numeric / binary readings). */
+export function isObservableEntity(entity: CapEntityLike): boolean {
+  const domain = domainOf(entity)
+  if (OBSERVABLE_DOMAINS.has(domain)) return true
+  const caps = entity.capabilities || []
+  if (caps.includes("value") || caps.includes("binary") || caps.includes("temperature") || caps.includes("humidity")) {
+    return true
+  }
+  // Controllable devices can still appear in state conditions (e.g. light is on).
+  return isControllableEntity(entity)
+}
+
+/** Intersection of capability lists across selected targets. */
+export function sharedCapabilities(entities: CapEntityLike[]): string[] {
+  if (!entities.length) return []
+  let shared: Set<string> | null = null
+  for (const entity of entities) {
+    const caps = new Set(
+      (entity.capabilities?.length
+        ? entity.capabilities
+        : CONTROLLABLE_DOMAINS.has(domainOf(entity))
+          ? domainOf(entity) === "light"
+            ? ["on_off", "brightness", "color", "effect", "speed"]
+            : ["on_off"]
+          : []) as string[],
+    )
+    shared = shared == null ? caps : new Set([...shared].filter((c) => caps.has(c)))
+  }
+  return shared ? [...shared] : []
+}
+
 /** Map 1..100% UI ↔ 1..255 wire byte. */
 export function pctToByte(pct: number): number {
   const p = Math.max(1, Math.min(100, Math.round(pct)))

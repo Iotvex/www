@@ -451,7 +451,8 @@
     "targetsLabel": "Цели",
     "selectAllTargets": "Выбрать все",
     "targetsHint": "{count, plural, one {Выбрано # устройство} few {Выбрано # устройства} many {Выбрано # устройств} other {Выбрано # устройств}}",
-    "targetsRequired": "Выберите хотя бы одну цель"
+    "targetsRequired": "Выберите хотя бы одну цель",
+    "noControllableTargets": "Нет устройств, которыми можно управлять. Датчики доступны только в триггерах и условиях."
   },
   "settings": {
     "account": {
