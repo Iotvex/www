@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "未割当",
-    "groupCount": "{count} 件"
+    "groupCount": "{count} 件",
+    "controlFailed": "ストリップを更新できませんでした"
   },
   "theme": {
     "ariaLabel": "外観",

@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "Без устройства",
-    "groupCount": "{count} в группе"
+    "groupCount": "{count} в группе",
+    "controlFailed": "Не удалось обновить ленту"
   },
   "theme": {
     "ariaLabel": "Оформление",

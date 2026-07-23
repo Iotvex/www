@@ -35,6 +35,22 @@ export const catalogLoaded = createEvent<{
   entities: EntityState[]
 }>()
 
+/** Pause agent→entity merges while strip commands / fades are in flight. */
+export const pauseStripLiveMerge = createEvent()
+export const resumeStripLiveMerge = createEvent()
+export const $stripLiveMergePaused = createStore(false)
+  .on(pauseStripLiveMerge, () => true)
+  .on(resumeStripLiveMerge, () => false)
+
+let stripMergeResumeTimer: ReturnType<typeof setTimeout> | null = null
+function scheduleStripLiveMergeResume(delayMs = 900) {
+  if (stripMergeResumeTimer) clearTimeout(stripMergeResumeTimer)
+  stripMergeResumeTimer = setTimeout(() => {
+    stripMergeResumeTimer = null
+    resumeStripLiveMerge()
+  }, delayMs)
+}
+
 type StripPatch = { index: number } & Partial<StripState>
 
 export type EntityCommand =
@@ -364,7 +380,9 @@ export const setStripFx = createEffect(async (payload: StripPatch) => {
 export const callEntityFx = createEffect(
   async ({ entities, cmd }: { entities: EntityState[]; cmd: EntityCommand }) => {
     const patch = commandToStripPatch(entities, cmd)
-    if (!patch) return null
+    if (!patch) {
+      throw new Error(`Strip control unavailable for ${cmd.entity_id}`)
+    }
     const { index, ...body } = patch
     const res = await fetch(`/api/iotvex/strips/${index}`, {
       method: "POST",
@@ -476,6 +494,7 @@ export const $sensors = $entities.map((list) =>
 export const callEntityRequested = createEvent<EntityCommand>()
 
 export function callEntity(cmd: EntityCommand) {
+  pauseStripLiveMerge()
   callEntityRequested(cmd)
 }
 
@@ -504,6 +523,8 @@ export async function smoothToggleEntity(entityId: string, turnOn: boolean) {
     callEntity({ entity_id: entityId, action: turnOn ? "turn_on" : "turn_off" })
     return
   }
+
+  pauseStripLiveMerge()
 
   const savedBri = Math.max(1, Number(entity.attributes.brightness ?? 128))
   const stepMs = Math.round(RAMP_MS / RAMP_STEPS)
@@ -547,6 +568,7 @@ export async function smoothToggleEntity(entityId: string, turnOn: boolean) {
     })
   } finally {
     rampingEntities.delete(entityId)
+    scheduleStripLiveMergeResume(1200)
   }
 }
 
@@ -630,15 +652,17 @@ sample({
 
 sample({
   clock: fetchNodeFx.doneData,
-  source: $entities,
-  fn: (prev, payload) => mergeLiveOntoCatalog(prev, payload.nodes),
+  source: combine($entities, $stripLiveMergePaused),
+  filter: ([, paused]) => !paused,
+  fn: ([prev], payload) => mergeLiveOntoCatalog(prev, payload.nodes),
   target: setEntities,
 })
 
 sample({
   clock: fetchNodeFx.doneData,
-  source: $devices,
-  fn: (prev, payload) => mergeLiveDevicesOntoCatalog(prev, payload.nodes),
+  source: combine($devices, $stripLiveMergePaused),
+  filter: ([, paused]) => !paused,
+  fn: ([prev], payload) => mergeLiveDevicesOntoCatalog(prev, payload.nodes),
   target: setDevices,
 })
 
@@ -700,4 +724,11 @@ sample({
 sample({
   clock: [setStripFx.fail, callEntityFx.fail],
   target: fetchNodeFx,
+})
+
+callEntityFx.finally.watch(() => {
+  scheduleStripLiveMergeResume()
+})
+setStripFx.finally.watch(() => {
+  scheduleStripLiveMergeResume()
 })

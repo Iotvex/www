@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "Sin asignar",
-    "groupCount": "{count} en el grupo"
+    "groupCount": "{count} en el grupo",
+    "controlFailed": "No se pudo actualizar la tira"
   },
   "theme": {
     "ariaLabel": "Apariencia",

@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "Unassigned",
-    "groupCount": "{count} in group"
+    "groupCount": "{count} in group",
+    "controlFailed": "تعذر تحديث الشريط"
   },
   "theme": {
     "ariaLabel": "المظهر",

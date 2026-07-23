@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "असाइन नहीं",
-    "groupCount": "{count} समूह में"
+    "groupCount": "{count} समूह में",
+    "controlFailed": "स्ट्रिप अपडेट नहीं हो सकी"
   },
   "theme": {
     "ariaLabel": "दिखावट",

@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "Unassigned",
-    "groupCount": "{count} in group"
+    "groupCount": "{count} in group",
+    "controlFailed": "Tidak dapat memperbarui strip"
   },
   "theme": {
     "ariaLabel": "Tampilan",

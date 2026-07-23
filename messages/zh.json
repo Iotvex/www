@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "未分配",
-    "groupCount": "{count} 个"
+    "groupCount": "{count} 个",
+    "controlFailed": "无法更新灯带"
   },
   "theme": {
     "ariaLabel": "外观",

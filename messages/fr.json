@@ -677,7 +677,8 @@
       }
     },
     "unboundDevice": "Unassigned",
-    "groupCount": "{count} in group"
+    "groupCount": "{count} in group",
+    "controlFailed": "Impossible de mettre à jour le ruban"
   },
   "theme": {
     "ariaLabel": "Apparence",

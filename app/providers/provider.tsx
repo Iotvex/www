@@ -7,6 +7,8 @@ import { FC, PropsWithChildren } from "react"
 import { AuthProvider } from "./auth-provider"
 import { LocaleProvider } from "./locale-provider"
 import { ThemeProvider } from "./theme-provider"
+import { Toaster } from "@/shared/ui/sonner"
+import { CommandFeedback } from "@/features/entity-control/ui/CommandFeedback"
 
 const RootProvider: FC<
   PropsWithChildren<{
@@ -18,7 +20,11 @@ const RootProvider: FC<
   return (
     <LocaleProvider initialLocale={locale} initialMessages={messages}>
       <ThemeProvider>
-        <AuthProvider user={user}>{children}</AuthProvider>
+        <AuthProvider user={user}>
+          {children}
+          <CommandFeedback />
+          <Toaster richColors position="top-center" />
+        </AuthProvider>
       </ThemeProvider>
     </LocaleProvider>
   )
