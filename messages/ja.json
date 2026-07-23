@@ -1,0 +1,696 @@
+{
+  "meta": {
+    "title": "Iotvex Home",
+    "description": "Iotvex コントロールパネル",
+    "panelControl": "コントロールパネル"
+  },
+  "common": {
+    "save": "保存",
+    "saving": "保存中...",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "create": "作成",
+    "creating": "作成中...",
+    "edit": "編集",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "online": "オンライン",
+    "offline": "オフライン",
+    "search": "検索",
+    "actions": "操作",
+    "yes": "はい",
+    "yesCascade": "はい、すべてに適用",
+    "no": "いいえ",
+    "back": "戻る",
+    "retry": "再試行",
+    "confirm": "確認",
+    "name": "名前",
+    "email": "メール",
+    "password": "パスワード",
+    "enabled": "有効",
+    "disabled": "無効",
+    "add": "追加",
+    "remove": "削除",
+    "run": "実行",
+    "activate": "有効化",
+    "empty": "空",
+    "unknown": "不明",
+    "notSpecified": "未指定",
+    "copied": "コピーしました",
+    "copy": "コピー",
+    "export": "エクスポート",
+    "import": "インポート",
+    "refresh": "更新",
+    "show": "表示",
+    "skip": "スキップ",
+    "clear": "クリア",
+    "all": "すべて",
+    "local": "ローカル",
+    "notConfigured": "未設定"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Русский",
+    "ja": "日本語",
+    "zh": "中文",
+    "es": "Español",
+    "hi": "हिन्दी",
+    "ar": "العربية",
+    "fr": "Français",
+    "pt": "Português",
+    "id": "Bahasa Indonesia"
+  },
+  "nav": {
+    "sections": {
+      "home": "ホーム",
+      "automation": "自動化",
+      "system": "システム",
+      "settings": "設定"
+    },
+    "items": {
+      "dashboard": "概要",
+      "home-devices": "デバイス",
+      "home-entities": "エンティティ",
+      "home-areas": "部屋",
+      "auto-scenarios": "オートメーション",
+      "auto-scenes": "シーン",
+      "auto-scripts": "スクリプト",
+      "activity": "アクティビティ",
+      "modules": "拡張機能",
+      "settings-account": "アカウント",
+      "settings-appearance": "外観",
+      "settings-services": "サービス",
+      "settings-users": "ユーザー",
+      "settings-backup": "バックアップ",
+      "settings-tools": "ツール"
+    },
+    "mobile": {
+      "overview": "概要",
+      "home": "ホーム",
+      "auto": "自動",
+      "more": "その他"
+    }
+  },
+  "views": {
+    "dashboard": {
+      "title": "概要",
+      "subtitle": "ご自宅のワークスペース"
+    },
+    "home-devices": {
+      "title": "デバイス",
+      "subtitle": "カタログ内の機器"
+    },
+    "home-entities": {
+      "title": "エンティティ",
+      "subtitle": "制御可能なホームエンティティ"
+    },
+    "home-areas": {
+      "title": "部屋",
+      "subtitle": "ゾーンと割り当て"
+    },
+    "auto-scenarios": {
+      "title": "オートメーション",
+      "subtitle": "時刻と状態で実行"
+    },
+    "auto-scenes": {
+      "title": "シーン",
+      "subtitle": "保存済みの状態セット"
+    },
+    "auto-scripts": {
+      "title": "スクリプト",
+      "subtitle": "手動のアクションチェーン"
+    },
+    "activity": {
+      "title": "アクティビティ",
+      "subtitle": "イベントと操作の履歴"
+    },
+    "modules": {
+      "title": "拡張機能",
+      "subtitle": "接続可能なモジュール"
+    },
+    "settings-account": {
+      "title": "アカウント",
+      "subtitle": "現在のセッションプロフィール"
+    },
+    "settings-appearance": {
+      "title": "外観",
+      "subtitle": "テーマとアクセントカラー"
+    },
+    "settings-services": {
+      "title": "サービス",
+      "subtitle": "コンポーネントの状態"
+    },
+    "settings-users": {
+      "title": "ユーザー",
+      "subtitle": "パネルへのアクセス"
+    },
+    "settings-backup": {
+      "title": "バックアップ",
+      "subtitle": "エクスポートと復元"
+    },
+    "settings-tools": {
+      "title": "ツール",
+      "subtitle": "メンテナンス操作"
+    }
+  },
+  "login": {
+    "tagline": "スマートホームを管理するにはサインインしてください",
+    "emailLabel": "メール",
+    "passwordLabel": "パスワード",
+    "submit": "サインイン",
+    "pending": "サインイン中...",
+    "invalidCredentialsError": "サインインできませんでした。入力内容を確認して、もう一度お試しください。",
+    "connectionError": "サーバーに接続できません。もう一度お試しください。"
+  },
+  "overview": {
+    "toolbar": {
+      "title": "ワークスペース",
+      "description": "日常のホーム操作に便利な画面を作成できます。",
+      "addWidget": "ウィジェットを追加"
+    },
+    "requestError": "リクエストエラー {status}",
+    "stats": {
+      "devices": "デバイス",
+      "devicesInCatalog": "カタログ内",
+      "devicesAddInHome": "ホームで追加",
+      "entities": "エンティティ",
+      "entitiesOn": "{count} 件オン",
+      "entitiesWaitingDiscovery": "検出待ち",
+      "rooms": "部屋",
+      "roomExample": "例: {name}",
+      "roomsUnassigned": "未割り当て",
+      "connection": "接続",
+      "onlineValue": "オンライン",
+      "offlineValue": "オフライン",
+      "channels": "{count} チャンネル",
+      "controllerAvailable": "コントローラー利用可能",
+      "agentNoResponse": "エージェントが応答していません",
+      "checkingValue": "…",
+      "checkingHint": "接続を確認中"
+    },
+    "widgets": {
+      "emptyTitle": "最初のウィジェットから始めましょう",
+      "emptyDescription": "照明、部屋、システム状態、イベントログのウィジェットを追加できます。",
+      "addFirstWidget": "最初のウィジェットを追加",
+      "newTitle": "新しいウィジェット",
+      "editTitle": "ウィジェットを編集",
+      "nameLabel": "名前",
+      "namePlaceholder": "リビング",
+      "typeLabel": "タイプ",
+      "roomLabel": "部屋",
+      "moveUpAria": "ウィジェットを上へ移動",
+      "moveDownAria": "ウィジェットを下へ移動",
+      "deleteConfirm": "ウィジェット「{title}」を削除しますか？",
+      "loadError": "ウィジェットを読み込めませんでした",
+      "deleteError": "ウィジェットを削除できませんでした",
+      "orderError": "順序を変更できませんでした",
+      "saveError": "ウィジェットを保存できませんでした",
+      "kinds": {
+        "entities": "エンティティ",
+        "lights": "照明",
+        "area": "部屋",
+        "status": "状態",
+        "activity": "アクティビティ"
+      },
+      "kindArea": "部屋: {room}",
+      "noRoomSelected": "未選択",
+      "unnamed": "無題",
+      "noMatchingTitle": "一致するエンティティはありません",
+      "noMatchingAreaDescription": "「{room}」にはまだエンティティがありません。",
+      "noMatchingGenericDescription": "フィルターを変更するか、ホームでデバイスを追加してください。",
+      "noData": "データなし",
+      "andMore": "ほか {count} 件",
+      "moveUp": "上へ",
+      "moveDown": "下へ",
+      "menuAria": "ウィジェット操作"
+    },
+    "statusWidget": {
+      "controller": "コントローラー",
+      "localAgent": "ローカルエージェント",
+      "noConnection": "接続なし",
+      "catalog": "カタログ",
+      "active": "アクティブ",
+      "channels": "チャンネル",
+      "roomsCount": "部屋: {count}",
+      "devicesAbbrev": "デバイス"
+    },
+    "activityWidget": {
+      "loadError": "イベントを読み込めませんでした",
+      "emptyTitle": "まだイベントはありません",
+      "emptyDescription": "最近のシステムアクティビティがここに表示されます。",
+      "fallbackTitle": "イベント"
+    }
+  },
+  "inventory": {
+    "devices": {
+      "title": "デバイス",
+      "description": "カタログ内の機器",
+      "count": "{count} 台のデバイス",
+      "controllerOnline": "コントローラーはオンライン",
+      "channels": "チャンネル: {count}",
+      "controllerUnavailable": "コントローラーは利用できません",
+      "discover": "デバイスを検索",
+      "discoverError": "デバイスを検索できませんでした",
+      "discoverSuccess": "検出されたエンティティ: {count}。名前と割り当てを保存しました。",
+      "emptyTitle": "まだデバイスが追加されていません",
+      "emptyDescription": "ネットワークで検出を開始してください。見つかったデバイスがここに表示されます。名前と割り当ては保持されます。",
+      "onCount": "{on}/{total} オン",
+      "areaLabel": "エリア",
+      "unassignedArea": "未割り当て",
+      "settingsTitle": "デバイス設定",
+      "nameLabel": "名前",
+      "areaSelectLabel": "エリア",
+      "noArea": "エリアなし",
+      "cascadeArea": "部屋をデバイスのすべてのエンティティに適用",
+      "nodesOnline": "オンラインノード: {count}"
+    },
+    "entities": {
+      "title": "エンティティ",
+      "description": "制御可能なホームエンティティ",
+      "searchPlaceholder": "検索…",
+      "allAreas": "すべてのエリア",
+      "noArea": "エリアなし",
+      "allDomains": "すべてのドメイン",
+      "unboundNotice": "エリア未設定のエンティティがあります。",
+      "emptyTitle": "まだエンティティが見つかっていません",
+      "emptyDescription": "デバイス検出後、制御エンティティが自動的に表示されます。",
+      "controlHeading": "制御",
+      "settingsTitle": "エンティティ設定",
+      "nameLabel": "名前",
+      "deviceLabel": "デバイス",
+      "areaLabel": "エリア",
+      "noDevice": "デバイスなし",
+      "areaSuffixNone": "エリアなし"
+    },
+    "areas": {
+      "title": "部屋",
+      "description": "ゾーンと割り当て",
+      "count": "{count} 件のエリア",
+      "add": "エリアを追加",
+      "emptyTitle": "まだ部屋が作成されていません",
+      "emptyDescription": "部屋を作成してデバイスを割り当ててください。再検出時も割り当ては保持されます。",
+      "devicesAbbrev": "デバイス",
+      "entitiesAbbrev": "エンティティ",
+      "onAbbrev": "オン",
+      "nothingAssigned": "この部屋にはまだ何も割り当てられていません",
+      "editTitle": "エリア",
+      "newTitle": "新しいエリア",
+      "nameLabel": "名前",
+      "namePlaceholder": "例: リビング",
+      "assignDevice": "デバイスを割り当て",
+      "assignEntity": "エンティティを割り当て",
+      "skip": "スキップ"
+    }
+  },
+  "rules": {
+    "requestError": "リクエストエラー {status}",
+    "automations": {
+      "title": "オートメーション",
+      "description": "スケジュールまたはデバイス状態の変化に応じてアクションを実行します。",
+      "emptyTitle": "まだオートメーションが作成されていません",
+      "emptyDescription": "ホームの自動化を始める準備ができたら、オートメーションを追加してください。",
+      "create": "オートメーションを作成",
+      "active": "アクティブ",
+      "inactive": "オフ",
+      "enableAria": "オートメーションを有効化",
+      "deleteConfirm": "オートメーション「{name}」を削除しますか？",
+      "loadError": "読み込めませんでした",
+      "updateError": "更新できませんでした",
+      "deleteError": "削除できませんでした"
+    },
+    "scenes": {
+      "title": "シーン",
+      "description": "保存済みのデバイス状態をワンタップで有効化できます。",
+      "emptyTitle": "まだシーンが作成されていません",
+      "emptyDescription": "すばやく起動できるデバイス状態のセットを保存してください。",
+      "create": "シーンを作成",
+      "newTitle": "新しいシーン",
+      "entityCount": "{count} 件のエンティティ",
+      "deleteConfirm": "シーン「{name}」を削除しますか？",
+      "loadError": "読み込めませんでした",
+      "deleteError": "削除できませんでした",
+      "activateError": "シーンを開始できませんでした",
+      "saveError": "シーンを保存できませんでした",
+      "modeManual": "デバイスを選択",
+      "modeCapture": "現在の状態を保存",
+      "sceneDevice": "シーンデバイス",
+      "noAvailableEntities": "利用可能なエンティティはまだありません。",
+      "namePlaceholder": "イブニングモード"
+    },
+    "scripts": {
+      "title": "スクリプト",
+      "description": "いつでも手動で実行できるアクションチェーンです。",
+      "emptyTitle": "まだスクリプトが作成されていません",
+      "emptyDescription": "手動起動用のアクションシーケンスを追加してください。",
+      "create": "スクリプトを作成",
+      "newTitle": "新しいスクリプト",
+      "loadError": "読み込めませんでした",
+      "runError": "スクリプトを実行できませんでした",
+      "saveError": "保存できませんでした",
+      "deleteError": "削除できませんでした",
+      "deleteConfirm": "スクリプト「{name}」を削除しますか？",
+      "namePlaceholder": "照明を確認",
+      "entityLabel": "エンティティ",
+      "actionLabel": "アクション"
+    }
+  },
+  "automationEditor": {
+    "newTitle": "新しいオートメーション",
+    "editTitle": "オートメーションを編集",
+    "nameLabel": "名前",
+    "namePlaceholder": "例: 夕方の照明",
+    "triggerSection": "トリガー",
+    "triggerKinds": {
+      "time": "時刻",
+      "state": "状態",
+      "numeric_state": "数値"
+    },
+    "timeLabel": "時刻",
+    "weekdaysLabel": "曜日（空欄 = 毎日）",
+    "weekdays": {
+      "mon": "月",
+      "tue": "火",
+      "wed": "水",
+      "thu": "木",
+      "fri": "金",
+      "sat": "土",
+      "sun": "日"
+    },
+    "entityLabel": "エンティティ",
+    "becomesLabel": "変更後",
+    "wasOptionalLabel": "変更前（任意）",
+    "attributeLabel": "属性",
+    "attributeOptionalLabel": "属性（任意）",
+    "attributePlaceholder": "brightness",
+    "numericAttributePlaceholder": "brightness / 空欄 = state",
+    "aboveLabel": "より大きい",
+    "belowLabel": "より小さい",
+    "abovePlaceholder": "例 200",
+    "belowPlaceholder": "例 50",
+    "conditionsSection": "条件",
+    "addCondition": "条件を追加",
+    "noConditions": "追加条件がない場合、オートメーションはトリガー直後に実行されます。",
+    "conditionLabel": "条件 {index}",
+    "conditionKinds": {
+      "state": "状態",
+      "numeric_state": "数値",
+      "time": "時間帯"
+    },
+    "equalsLabel": "等しい",
+    "afterLabel": "以後",
+    "beforeLabel": "以前",
+    "actionSection": "アクション",
+    "commandLabel": "コマンド",
+    "brightnessLabel": "明るさ, %",
+    "colorLabel": "色",
+    "effectLabel": "エフェクト",
+    "speedLabel": "エフェクト速度 (0–255)",
+    "capabilitiesLine": "機能: {capabilities} · domain {domain}",
+    "emptyCapabilities": "—",
+    "unknownDomain": "?",
+    "saveError": "保存できませんでした",
+    "requestError": "リクエストエラー {status}",
+    "triggerLabels": {
+      "timeAt": "時刻 {time}{days}",
+      "timeFallback": "時刻トリガー",
+      "state": "状態 {entity} → {to}",
+      "numeric": "数値 {entity} {range}",
+      "undefined": "開始条件が設定されていません"
+    },
+    "actionLabels": {
+      "undefined": "アクションが設定されていません",
+      "fallbackAction": "アクション",
+      "fallbackTarget": "エンティティ"
+    }
+  },
+  "settings": {
+    "account": {
+      "title": "アカウント",
+      "description": "このインストールの現在のユーザーです。",
+      "profileTitle": "プロフィール",
+      "profileDescription": "データはお客様のサーバー上にのみ保存されます。",
+      "idLabel": "ID"
+    },
+    "appearance": {
+      "title": "外観",
+      "description": "このブラウザーでのパネルテーマと色です。"
+    },
+    "services": {
+      "title": "Services",
+      "description": "Deployment settings moved here — WWW/DB modes.",
+      "agentTitle": "Iotvex agent",
+      "localAgent": "Local agent",
+      "ready": "Ready",
+      "errorStatus": "error",
+      "checkingStatus": "checking…",
+      "localStatus": "local",
+      "remoteStatus": "remote",
+      "lanStatus": "LAN",
+      "publishedStatus": "published",
+      "homeSchedulerStatus": "home timer",
+      "alwaysLocal": "Always on the home machine",
+      "databaseTitle": "Database",
+      "databaseDescription": "Local Supabase catalog and auth",
+      "databaseDetail": "Automation configs stored here; data stays on this server",
+      "databaseRemoteDescription": "Your remote Supabase project",
+      "databaseRemoteDetail": "User-owned remote DB (RLS/keys are your responsibility)",
+      "otbrTitle": "OTBR",
+      "otbrDescription": "Thread Border Router",
+      "otbrDetail": "USB radio + container on this host",
+      "wwwTitle": "Web panel",
+      "wwwLanDescription": "Reachable on LAN / mDNS",
+      "wwwLanDetail": "Optional Avahi name",
+      "wwwPublishedDescription": "Port-forward + your domain/TLS",
+      "wwwPublishedDetail": "You publish :8443; agent stays private on localhost",
+      "automationsTitle": "Automations runner",
+      "automationsDescription": "Config in DB; ticks only on this host",
+      "automationsDetail": "systemd → 127.0.0.1:3100 → local agent"
+    },
+    "users": {
+      "title": "ユーザー",
+      "description": "ローカルパネルアカウントです。",
+      "newTitle": "新しいユーザー",
+      "newDescription": "メールとパスワード（6文字以上）。",
+      "emailPlaceholder": "user@example.local",
+      "create": "作成",
+      "loadError": "ユーザーを読み込めませんでした",
+      "createError": "ユーザーを作成できませんでした",
+      "emptyTitle": "ユーザーはいません",
+      "emptyDescription": "パネルにアクセスするための最初のアカウントを作成してください。",
+      "defaultRole": "user"
+    },
+    "backup": {
+      "title": "バックアップ",
+      "description": "ローカルカタログのエクスポートとインポートです。",
+      "exportTitle": "エクスポート",
+      "exportDescription": "カタログJSONをダウンロードします。",
+      "downloadJson": "JSONをダウンロード",
+      "importTitle": "インポート",
+      "importDescription": "以前保存したJSONをアップロードします。",
+      "publicUrlTitle": "公開URL",
+      "publicUrlDescription": "外部連携用のアドレスです。",
+      "urlNotConfigured": "URLが設定されていません",
+      "loadPublicUrlError": "公開URLを取得できませんでした",
+      "exportStarted": "カタログのエクスポートを開始しました。",
+      "exportError": "カタログをエクスポートできませんでした",
+      "imported": "カタログをインポートしました。",
+      "importError": "カタログをインポートできませんでした"
+    },
+    "tools": {
+      "title": "ツール",
+      "description": "パネルのメンテナンス操作です。",
+      "commandError": "コマンドを実行できませんでした",
+      "discoverTitle": "検出",
+      "discoverDescription": "ローカルデバイスを検索します。",
+      "discoverAction": "検索",
+      "discoverStarted": "デバイス検索を開始しました。",
+      "catalogTitle": "カタログ",
+      "catalogDescription": "エンティティとデバイスを更新します。",
+      "catalogRefreshed": "カタログを更新しました。",
+      "publicUrlTitle": "公開URL",
+      "publicUrlDescription": "現在のアドレスを表示します。",
+      "publicUrlReceived": "公開URLを取得しました。",
+      "publicUrlNotConfigured": "公開URLが設定されていません。",
+      "busy": "…"
+    },
+    "requestError": "リクエストエラー {status}",
+    "language": {
+      "title": "言語",
+      "description": "このブラウザのインターフェース言語。",
+      "label": "インターフェース言語"
+    },
+    "deployment": {
+      "title": "Deployment",
+      "description": "WWW reachability and database backend. Device plane (agent/OTBR) stays local.",
+      "loadError": "Failed to load runtime config",
+      "saveError": "Failed to save",
+      "saved": "Saved. mDNS/publish providers updated in config/runtime.json.",
+      "wwwTitle": "Web panel",
+      "wwwDescription": "How you open the UI. Local modes always include IP:port and mDNS.",
+      "wwwModeLabel": "WWW mode",
+      "wwwModes": {
+        "local": "Local",
+        "local_published": "Local + published",
+        "cloud": "Cloud"
+      },
+      "wwwModeHelp": {
+        "local": "Self-hosted on this machine. HTTP + HTTPS on LAN/mDNS.",
+        "local_published": "Same as local, plus public HTTPS (port-forward, domain, Pinggy, Cloudflare, ngrok, Tailscale…).",
+        "cloud": "UI in the cloud; home keeps agent/OTBR. With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
+      },
+      "mdnsLabel": "mDNS name",
+      "customDomainLabel": "Custom domain",
+      "cloudWwwLabel": "Cloud WWW base URL",
+      "accessLabel": "Access URLs",
+      "accessHint": "Replace <lan-ip> with this host’s LAN address. Public HTTPS needs port-forward or an enabled tunnel provider.",
+      "providersLabel": "Publish / tunnel providers",
+      "saveWww": "Save WWW settings",
+      "dbTitle": "Database",
+      "dbDescription": "Catalog, auth, automation configs. Switch hot-reloads after probe + merge.",
+      "activeDb": "Active",
+      "dbModeLabel": "DB mode",
+      "dbModes": {
+        "local": "Local",
+        "cloud_public": "Cloud public",
+        "cloud_private": "Cloud private"
+      },
+      "dbModeHelp": {
+        "local": "Bundled Supabase. Also usable by cloud WWW via home bridge tunnel.",
+        "cloud_public": "Shared Iotvex-hosted Supabase (multi-tenant).",
+        "cloud_private": "Your own Supabase project."
+      },
+      "targetUrl": "Supabase URL",
+      "targetAnon": "Anon key",
+      "targetService": "Service role key",
+      "optionalIfLocal": "Optional if already in secrets",
+      "mergeLabel": "Merge before switch",
+      "mergeHelp": "Copy/upsert catalog from current DB into the target, then swap.",
+      "probe": "Probe target",
+      "probeOk": "Target DB reachable and schema OK.",
+      "probeFail": "Probe failed",
+      "switch": "Merge & switch",
+      "switching": "Switching…",
+      "switched": "Switched. Merged {imported} rows. Reloading…",
+      "switchError": "Switch failed",
+      "matrixTitle": "WWW × DB matrix",
+      "matrixDescription": "Every WWW mode works with every DB mode. Cloud UI + local DB automatically bridges Supabase + agent.",
+      "matrixCurrent": "Current: {www} × {db}",
+      "applyPublish": "Apply tunnels",
+      "stopPublish": "Stop tunnels",
+      "refreshPublish": "Refresh status",
+      "publishing": "Working…",
+      "publishQueued": "Queued on home host — tunnels reconcile shortly.",
+      "publishStatus": "Active tunnels: {tunnels}",
+      "publishError": "Publish manager error"
+    }
+  },
+  "activity": {
+    "metaCount": "{count} 件",
+    "metaEmpty": "システムの稼働に合わせてログが蓄積されます",
+    "refresh": "更新",
+    "clearJournal": "ログをクリア",
+    "filterAll": "すべて",
+    "emptyTitle": "ログは空です",
+    "emptyDescription": "デバイス操作、オートメーション実行、機器検出の後にイベントが表示されます。"
+  },
+  "modules": {
+    "metaCount": "{count} 件の拡張機能",
+    "metaEmpty": "パネルに機能を追加できます",
+    "refresh": "更新",
+    "connect": "接続",
+    "emptyTitle": "まだ拡張機能が接続されていません",
+    "emptyDescription": "拡張機能マニフェストのアドレスを入力すると、システムが説明を読み込みます。",
+    "enabledShort": "オン",
+    "disabledShort": "オフ",
+    "enable": "有効化",
+    "disable": "無効化",
+    "dialogTitle": "拡張機能を接続",
+    "nameLabel": "名前",
+    "idOptionalLabel": "ID（任意）",
+    "idPlaceholder": "my-panel",
+    "manifestUrlLabel": "マニフェストアドレス",
+    "manifestUrlPlaceholder": "https://…/module.json",
+    "register": "登録"
+  },
+  "entity": {
+    "states": {
+      "offline": "offline",
+      "on": "on",
+      "off": "off"
+    },
+    "brightness": "明るさ",
+    "colorLabel": "色",
+    "effect": "エフェクト",
+    "speed": "速度",
+    "emptyEntities": "エンティティはありません。",
+    "fallbackEffect": "solid",
+    "colorPicker": {
+      "title": "色",
+      "done": "完了",
+      "hue": "色相",
+      "saturation": "彩度",
+      "value": "明度",
+      "hex": "Hex",
+      "quickAccess": "クイックアクセス",
+      "saveCurrent": "色を保存",
+      "managePresets": "プリセット管理",
+      "moveUp": "上へ",
+      "moveDown": "下へ",
+      "remove": "削除",
+      "noPresets": "保存された色はまだありません。",
+      "tabs": {
+        "wheel": "ホイール",
+        "sliders": "スライダー",
+        "hex": "Hex",
+        "presets": "プリセット"
+      }
+    }
+  },
+  "theme": {
+    "ariaLabel": "外観",
+    "buttonLabel": "外観",
+    "modeLabel": "モード",
+    "colorLabel": "色",
+    "colorCurrent": "色 · 現在 {color}",
+    "themeTitle": "テーマ",
+    "accentColor": "アクセントカラー",
+    "resolvedDark": "dark",
+    "resolvedLight": "light",
+    "modes": {
+      "light": "ライト",
+      "dark": "ダーク",
+      "system": "システム"
+    },
+    "colors": {
+      "default": "ターコイズ",
+      "blue": "ブルー",
+      "green": "グリーン",
+      "orange": "オレンジ",
+      "rose": "ローズ",
+      "violet": "バイオレット",
+      "yellow": "イエロー",
+      "red": "レッド",
+      "zinc": "グレー"
+    }
+  },
+  "actions": {
+    "turn_on": "オンにする",
+    "turn_off": "オフにする",
+    "toggle": "切り替え",
+    "set_brightness": "明るさを設定",
+    "set_color": "色を設定",
+    "set_effect": "エフェクトを設定",
+    "set_speed": "速度を設定"
+  },
+  "topbar": {
+    "menu": "メニュー",
+    "logout": "ログアウト",
+    "navigation": "ナビゲーション",
+    "onlineBadge": "online",
+    "documentTitle": "{title} · Iotvex"
+  },
+  "sidebar": {
+    "panelControlSubtitle": "コントロールパネル"
+  }
+}

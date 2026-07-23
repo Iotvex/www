@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "wwwMode": "local_published",
+  "mdnsName": "iotvex.local",
+  "timezone": "Europe/Saratov",
+  "publish": {
+    "httpPort": 3100,
+    "httpsPort": 8443,
+    "customDomain": "",
+    "providers": {
+      "caddy_local": {
+        "enabled": true,
+        "note": "LAN/WAN TLS on :8443 via install-https.sh"
+      },
+      "pinggy": {
+        "enabled": false,
+        "authtoken": "",
+        "subdomain": "",
+        "region": ""
+      },
+      "cloudflare_tunnel": {
+        "enabled": false,
+        "tunnelToken": "",
+        "hostname": ""
+      },
+      "ngrok": {
+        "enabled": false,
+        "authtoken": "",
+        "domain": ""
+      },
+      "tailscale_funnel": {
+        "enabled": false,
+        "hostname": ""
+      }
+    }
+  },
+  "cloudWww": {
+    "baseUrl": "",
+    "note": "When wwwMode=cloud, UI is hosted externally; home keeps agent/OTBR."
+  },
+  "db": {
+    "mode": "local",
+    "local": {
+      "url": "http://host.docker.internal:54321",
+      "browserUrl": "/supabase",
+      "publicUrl": ""
+    },
+    "cloudPublic": {
+      "url": "",
+      "anonKey": ""
+    },
+    "cloudPrivate": {
+      "url": "",
+      "anonKey": ""
+    }
+  },
+  "bridge": {
+    "exposeLocalDb": false,
+    "exposeAgent": false,
+    "autoFromMatrix": true,
+    "localDbPublicUrl": "",
+    "agentPublicUrl": "",
+    "wwwPublicUrl": "https://<lan-or-wan-ip>:8443",
+    "preferredProvider": "cloudflare_tunnel"
+  }
+}

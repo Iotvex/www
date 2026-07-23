@@ -1,0 +1,9 @@
+node_modules
+.next
+.env.local
+.env*.local
+.env.cron
+dist
+supabase/.temp
+supabase/.branches
+config/runtime.secrets.json

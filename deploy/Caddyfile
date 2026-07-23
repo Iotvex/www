@@ -1,0 +1,15 @@
+# Iotvex WWW — HTTPS on :8443 for ANY Host/IP.
+# Install: sudo ./scripts/install-https.sh
+# Router: forward WAN TCP 8443 → this machine:8443.
+{
+	auto_https off
+}
+
+:8443 {
+	tls /var/lib/iotvex/tls/cert.pem /var/lib/iotvex/tls/key.pem
+	encode gzip
+	reverse_proxy 127.0.0.1:3100 {
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Host {http.request.hostport}
+	}
+}

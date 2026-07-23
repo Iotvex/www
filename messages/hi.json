@@ -1,0 +1,696 @@
+{
+  "meta": {
+    "title": "Iotvex Home",
+    "description": "Iotvex नियंत्रण पैनल",
+    "panelControl": "नियंत्रण पैनल"
+  },
+  "common": {
+    "save": "सहेजें",
+    "saving": "सहेजा जा रहा है...",
+    "cancel": "रद्द करें",
+    "delete": "हटाएँ",
+    "create": "बनाएँ",
+    "creating": "बनाया जा रहा है...",
+    "edit": "संपादित करें",
+    "close": "बंद करें",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "online": "ऑनलाइन",
+    "offline": "ऑफलाइन",
+    "search": "खोजें",
+    "actions": "कार्रवाइयाँ",
+    "yes": "हाँ",
+    "yesCascade": "हाँ, सभी पर लागू करें",
+    "no": "नहीं",
+    "back": "वापस",
+    "retry": "फिर कोशिश करें",
+    "confirm": "पुष्टि करें",
+    "name": "नाम",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "enabled": "सक्षम",
+    "disabled": "अक्षम",
+    "add": "जोड़ें",
+    "remove": "हटाएँ",
+    "run": "चलाएँ",
+    "activate": "सक्रिय करें",
+    "empty": "खाली",
+    "unknown": "अज्ञात",
+    "notSpecified": "निर्दिष्ट नहीं",
+    "copied": "कॉपी किया गया",
+    "copy": "कॉपी करें",
+    "export": "निर्यात",
+    "import": "आयात",
+    "refresh": "रीफ़्रेश",
+    "show": "दिखाएँ",
+    "skip": "छोड़ें",
+    "clear": "साफ़ करें",
+    "all": "सभी",
+    "local": "स्थानीय",
+    "notConfigured": "कॉन्फ़िगर नहीं"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Русский",
+    "ja": "日本語",
+    "zh": "中文",
+    "es": "Español",
+    "hi": "हिन्दी",
+    "ar": "العربية",
+    "fr": "Français",
+    "pt": "Português",
+    "id": "Bahasa Indonesia"
+  },
+  "nav": {
+    "sections": {
+      "home": "घर",
+      "automation": "ऑटोमेशन",
+      "system": "सिस्टम",
+      "settings": "सेटिंग्स"
+    },
+    "items": {
+      "dashboard": "अवलोकन",
+      "home-devices": "डिवाइस",
+      "home-entities": "एंटिटी",
+      "home-areas": "कमरे",
+      "auto-scenarios": "ऑटोमेशन",
+      "auto-scenes": "सीन",
+      "auto-scripts": "स्क्रिप्ट",
+      "activity": "गतिविधि",
+      "modules": "एक्सटेंशन",
+      "settings-account": "खाता",
+      "settings-appearance": "दिखावट",
+      "settings-services": "सेवाएँ",
+      "settings-users": "उपयोगकर्ता",
+      "settings-backup": "बैकअप",
+      "settings-tools": "टूल"
+    },
+    "mobile": {
+      "overview": "अवलोकन",
+      "home": "घर",
+      "auto": "ऑटो",
+      "more": "अधिक"
+    }
+  },
+  "views": {
+    "dashboard": {
+      "title": "अवलोकन",
+      "subtitle": "आपके घर का कार्यक्षेत्र"
+    },
+    "home-devices": {
+      "title": "डिवाइस",
+      "subtitle": "कैटलॉग में उपकरण"
+    },
+    "home-entities": {
+      "title": "एंटिटी",
+      "subtitle": "नियंत्रित की जा सकने वाली होम एंटिटी"
+    },
+    "home-areas": {
+      "title": "कमरे",
+      "subtitle": "ज़ोन और असाइनमेंट"
+    },
+    "auto-scenarios": {
+      "title": "ऑटोमेशन",
+      "subtitle": "समय और स्थितियों से चलाएँ"
+    },
+    "auto-scenes": {
+      "title": "सीन",
+      "subtitle": "तैयार स्थिति सेट"
+    },
+    "auto-scripts": {
+      "title": "स्क्रिप्ट",
+      "subtitle": "मैनुअल एक्शन चेन"
+    },
+    "activity": {
+      "title": "गतिविधि",
+      "subtitle": "इवेंट और कार्रवाई इतिहास"
+    },
+    "modules": {
+      "title": "एक्सटेंशन",
+      "subtitle": "कनेक्ट किए जा सकने वाले मॉड्यूल"
+    },
+    "settings-account": {
+      "title": "खाता",
+      "subtitle": "वर्तमान सत्र प्रोफ़ाइल"
+    },
+    "settings-appearance": {
+      "title": "दिखावट",
+      "subtitle": "थीम और एक्सेंट रंग"
+    },
+    "settings-services": {
+      "title": "सेवाएँ",
+      "subtitle": "कंपोनेंट स्थिति"
+    },
+    "settings-users": {
+      "title": "उपयोगकर्ता",
+      "subtitle": "पैनल एक्सेस"
+    },
+    "settings-backup": {
+      "title": "बैकअप",
+      "subtitle": "निर्यात और पुनर्स्थापना"
+    },
+    "settings-tools": {
+      "title": "टूल",
+      "subtitle": "मेंटेनेंस कार्रवाइयाँ"
+    }
+  },
+  "login": {
+    "tagline": "अपने स्मार्ट होम को प्रबंधित करने के लिए साइन इन करें",
+    "emailLabel": "ईमेल",
+    "passwordLabel": "पासवर्ड",
+    "submit": "साइन इन",
+    "pending": "साइन इन हो रहा है...",
+    "invalidCredentialsError": "साइन इन नहीं हो सका। कृपया विवरण जाँचें और फिर कोशिश करें।",
+    "connectionError": "सर्वर से कनेक्शन नहीं है। फिर कोशिश करें।"
+  },
+  "overview": {
+    "toolbar": {
+      "title": "कार्यक्षेत्र",
+      "description": "रोज़मर्रा के घरेलू नियंत्रण के लिए सुविधाजनक स्क्रीन बनाएँ।",
+      "addWidget": "विजेट जोड़ें"
+    },
+    "requestError": "अनुरोध त्रुटि {status}",
+    "stats": {
+      "devices": "डिवाइस",
+      "devicesInCatalog": "कैटलॉग में",
+      "devicesAddInHome": "घर में जोड़ें",
+      "entities": "एंटिटी",
+      "entitiesOn": "{count} चालू",
+      "entitiesWaitingDiscovery": "डिस्कवरी की प्रतीक्षा",
+      "rooms": "कमरे",
+      "roomExample": "जैसे {name}",
+      "roomsUnassigned": "असाइन नहीं",
+      "connection": "कनेक्शन",
+      "onlineValue": "ऑनलाइन",
+      "offlineValue": "ऑफलाइन",
+      "channels": "{count} चैनल",
+      "controllerAvailable": "कंट्रोलर उपलब्ध",
+      "agentNoResponse": "एजेंट जवाब नहीं दे रहा",
+      "checkingValue": "…",
+      "checkingHint": "कनेक्शन जाँच"
+    },
+    "widgets": {
+      "emptyTitle": "अपने पहले विजेट से शुरू करें",
+      "emptyDescription": "लाइटिंग, कमरे, सिस्टम स्थिति या इवेंट लॉग विजेट जोड़ें।",
+      "addFirstWidget": "पहला विजेट जोड़ें",
+      "newTitle": "नया विजेट",
+      "editTitle": "विजेट संपादित करें",
+      "nameLabel": "नाम",
+      "namePlaceholder": "लिविंग रूम",
+      "typeLabel": "प्रकार",
+      "roomLabel": "कमरा",
+      "moveUpAria": "विजेट ऊपर ले जाएँ",
+      "moveDownAria": "विजेट नीचे ले जाएँ",
+      "deleteConfirm": "विजेट “{title}” हटाएँ?",
+      "loadError": "विजेट लोड नहीं हो सके",
+      "deleteError": "विजेट हटाया नहीं जा सका",
+      "orderError": "क्रम बदला नहीं जा सका",
+      "saveError": "विजेट सहेजा नहीं जा सका",
+      "kinds": {
+        "entities": "एंटिटी",
+        "lights": "लाइटें",
+        "area": "कमरा",
+        "status": "स्थिति",
+        "activity": "गतिविधि"
+      },
+      "kindArea": "कमरा: {room}",
+      "noRoomSelected": "चयनित नहीं",
+      "unnamed": "शीर्षकहीन",
+      "noMatchingTitle": "कोई मिलती-जुलती एंटिटी नहीं",
+      "noMatchingAreaDescription": "“{room}” में अभी कोई एंटिटी नहीं है।",
+      "noMatchingGenericDescription": "फ़िल्टर बदलें या घर में डिवाइस जोड़ें।",
+      "noData": "कोई डेटा नहीं",
+      "andMore": "और {count} अधिक",
+      "moveUp": "ऊपर ले जाएँ",
+      "moveDown": "नीचे ले जाएँ",
+      "menuAria": "विजेट क्रियाएँ"
+    },
+    "statusWidget": {
+      "controller": "कंट्रोलर",
+      "localAgent": "स्थानीय एजेंट",
+      "noConnection": "कोई कनेक्शन नहीं",
+      "catalog": "कैटलॉग",
+      "active": "सक्रिय",
+      "channels": "चैनल",
+      "roomsCount": "कमरे: {count}",
+      "devicesAbbrev": "डिव."
+    },
+    "activityWidget": {
+      "loadError": "इवेंट लोड नहीं हो सके",
+      "emptyTitle": "अभी कोई इवेंट नहीं",
+      "emptyDescription": "हाल की सिस्टम गतिविधि यहाँ दिखाई देगी।",
+      "fallbackTitle": "इवेंट"
+    }
+  },
+  "inventory": {
+    "devices": {
+      "title": "डिवाइस",
+      "description": "कैटलॉग में उपकरण",
+      "count": "{count} डिवाइस",
+      "controllerOnline": "कंट्रोलर ऑनलाइन",
+      "channels": "चैनल: {count}",
+      "controllerUnavailable": "कंट्रोलर उपलब्ध नहीं",
+      "discover": "डिवाइस खोजें",
+      "discoverError": "डिवाइस खोजे नहीं जा सके",
+      "discoverSuccess": "एंटिटी मिलीं: {count}। नाम और असाइनमेंट सहेजे गए।",
+      "emptyTitle": "अभी कोई डिवाइस नहीं जोड़ा गया",
+      "emptyDescription": "नेटवर्क पर डिस्कवरी शुरू करें — मिले हुए डिवाइस यहाँ दिखाई देंगे। आपके नाम और असाइनमेंट सुरक्षित रहेंगे।",
+      "onCount": "{on}/{total} चालू",
+      "areaLabel": "क्षेत्र",
+      "unassignedArea": "असाइन नहीं",
+      "settingsTitle": "डिवाइस सेटिंग्स",
+      "nameLabel": "नाम",
+      "areaSelectLabel": "क्षेत्र",
+      "noArea": "कोई क्षेत्र नहीं",
+      "cascadeArea": "कमरे को डिवाइस की सभी एंटिटी पर लागू करें",
+      "nodesOnline": "ऑनलाइन नोड: {count}"
+    },
+    "entities": {
+      "title": "एंटिटी",
+      "description": "नियंत्रित की जा सकने वाली होम एंटिटी",
+      "searchPlaceholder": "खोजें…",
+      "allAreas": "सभी क्षेत्र",
+      "noArea": "कोई क्षेत्र नहीं",
+      "allDomains": "सभी डोमेन",
+      "unboundNotice": "कुछ एंटिटी बिना क्षेत्र के हैं।",
+      "emptyTitle": "अभी कोई एंटिटी नहीं मिली",
+      "emptyDescription": "डिवाइस डिस्कवरी के बाद नियंत्रण एंटिटी अपने-आप दिखाई देंगी।",
+      "controlHeading": "नियंत्रण",
+      "settingsTitle": "एंटिटी सेटिंग्स",
+      "nameLabel": "नाम",
+      "deviceLabel": "डिवाइस",
+      "areaLabel": "क्षेत्र",
+      "noDevice": "कोई डिवाइस नहीं",
+      "areaSuffixNone": "कोई क्षेत्र नहीं"
+    },
+    "areas": {
+      "title": "कमरे",
+      "description": "ज़ोन और असाइनमेंट",
+      "count": "{count} क्षेत्र",
+      "add": "क्षेत्र जोड़ें",
+      "emptyTitle": "अभी कोई कमरा नहीं बनाया गया",
+      "emptyDescription": "एक कमरा बनाएँ और डिवाइस असाइन करें। फिर से खोजने पर असाइनमेंट सुरक्षित रहेंगे।",
+      "devicesAbbrev": "डिव.",
+      "entitiesAbbrev": "एंट.",
+      "onAbbrev": "चालू",
+      "nothingAssigned": "इस कमरे को अभी कुछ भी असाइन नहीं किया गया है",
+      "editTitle": "क्षेत्र",
+      "newTitle": "नया क्षेत्र",
+      "nameLabel": "नाम",
+      "namePlaceholder": "उदाहरण के लिए, लिविंग रूम",
+      "assignDevice": "डिवाइस असाइन करें",
+      "assignEntity": "एंटिटी असाइन करें",
+      "skip": "छोड़ें"
+    }
+  },
+  "rules": {
+    "requestError": "अनुरोध त्रुटि {status}",
+    "automations": {
+      "title": "ऑटोमेशन",
+      "description": "शेड्यूल पर या डिवाइस स्थितियाँ बदलने पर कार्रवाइयाँ चलाएँ।",
+      "emptyTitle": "अभी कोई ऑटोमेशन नहीं बनाया गया",
+      "emptyDescription": "जब आप अपने घर को ऑटोमेट करने के लिए तैयार हों, तो ऑटोमेशन जोड़ें।",
+      "create": "ऑटोमेशन बनाएँ",
+      "active": "सक्रिय",
+      "inactive": "बंद",
+      "enableAria": "ऑटोमेशन सक्षम करें",
+      "deleteConfirm": "ऑटोमेशन “{name}” हटाएँ?",
+      "loadError": "लोड नहीं हो सका",
+      "updateError": "अपडेट नहीं हो सका",
+      "deleteError": "हटाया नहीं जा सका"
+    },
+    "scenes": {
+      "title": "सीन",
+      "description": "तैयार डिवाइस स्थितियाँ सहेजें और उन्हें एक टैप से सक्रिय करें।",
+      "emptyTitle": "अभी कोई सीन नहीं बनाया गया",
+      "emptyDescription": "त्वरित लॉन्च के लिए डिवाइस स्थितियों का सेट सहेजें।",
+      "create": "सीन बनाएँ",
+      "newTitle": "नया सीन",
+      "entityCount": "{count} एंटिटी",
+      "deleteConfirm": "सीन “{name}” हटाएँ?",
+      "loadError": "लोड नहीं हो सका",
+      "deleteError": "हटाया नहीं जा सका",
+      "activateError": "सीन शुरू नहीं हो सका",
+      "saveError": "सीन सहेजा नहीं जा सका",
+      "modeManual": "डिवाइस चुनें",
+      "modeCapture": "वर्तमान सहेजें",
+      "sceneDevice": "सीन डिवाइस",
+      "noAvailableEntities": "अभी कोई उपलब्ध एंटिटी नहीं है।",
+      "namePlaceholder": "शाम मोड"
+    },
+    "scripts": {
+      "title": "स्क्रिप्ट",
+      "description": "कार्रवाई चेन जिन्हें किसी भी समय मैनुअल रूप से चलाया जा सकता है।",
+      "emptyTitle": "अभी कोई स्क्रिप्ट नहीं बनाई गई",
+      "emptyDescription": "मैनुअल लॉन्च के लिए कार्रवाई क्रम जोड़ें।",
+      "create": "स्क्रिप्ट बनाएँ",
+      "newTitle": "नई स्क्रिप्ट",
+      "loadError": "लोड नहीं हो सका",
+      "runError": "स्क्रिप्ट चल नहीं सकी",
+      "saveError": "सहेजा नहीं जा सका",
+      "deleteError": "हटाया नहीं जा सका",
+      "deleteConfirm": "स्क्रिप्ट “{name}” हटाएँ?",
+      "namePlaceholder": "लाइटें जाँचें",
+      "entityLabel": "एंटिटी",
+      "actionLabel": "कार्रवाई"
+    }
+  },
+  "automationEditor": {
+    "newTitle": "नया ऑटोमेशन",
+    "editTitle": "ऑटोमेशन संपादित करें",
+    "nameLabel": "नाम",
+    "namePlaceholder": "उदाहरण के लिए, शाम की लाइट",
+    "triggerSection": "ट्रिगर",
+    "triggerKinds": {
+      "time": "समय",
+      "state": "स्थिति",
+      "numeric_state": "संख्या"
+    },
+    "timeLabel": "समय",
+    "weekdaysLabel": "सप्ताह के दिन (खाली = हर दिन)",
+    "weekdays": {
+      "mon": "सोम",
+      "tue": "मंगल",
+      "wed": "बुध",
+      "thu": "गुरु",
+      "fri": "शुक्र",
+      "sat": "शनि",
+      "sun": "रवि"
+    },
+    "entityLabel": "एंटिटी",
+    "becomesLabel": "बनता है",
+    "wasOptionalLabel": "पहले था (वैकल्पिक)",
+    "attributeLabel": "एट्रिब्यूट",
+    "attributeOptionalLabel": "एट्रिब्यूट (वैकल्पिक)",
+    "attributePlaceholder": "brightness",
+    "numericAttributePlaceholder": "brightness / खाली = state",
+    "aboveLabel": "से ऊपर",
+    "belowLabel": "से नीचे",
+    "abovePlaceholder": "उदाहरण 200",
+    "belowPlaceholder": "उदाहरण 50",
+    "conditionsSection": "शर्तें",
+    "addCondition": "शर्त जोड़ें",
+    "noConditions": "अतिरिक्त शर्तों के बिना, ऑटोमेशन ट्रिगर होते ही तुरंत चलेगा।",
+    "conditionLabel": "शर्त {index}",
+    "conditionKinds": {
+      "state": "स्थिति",
+      "numeric_state": "संख्या",
+      "time": "समय अंतराल"
+    },
+    "equalsLabel": "बराबर",
+    "afterLabel": "इसके बाद",
+    "beforeLabel": "इसके पहले",
+    "actionSection": "कार्रवाई",
+    "commandLabel": "कमांड",
+    "brightnessLabel": "ब्राइटनेस, %",
+    "colorLabel": "रंग",
+    "effectLabel": "इफ़ेक्ट",
+    "speedLabel": "इफ़ेक्ट गति (0–255)",
+    "capabilitiesLine": "क्षमताएँ: {capabilities} · domain {domain}",
+    "emptyCapabilities": "—",
+    "unknownDomain": "?",
+    "saveError": "सहेजा नहीं जा सका",
+    "requestError": "अनुरोध त्रुटि {status}",
+    "triggerLabels": {
+      "timeAt": "समय {time}{days}",
+      "timeFallback": "समय ट्रिगर",
+      "state": "स्थिति {entity} → {to}",
+      "numeric": "संख्या {entity} {range}",
+      "undefined": "शुरुआती शर्त सेट नहीं है"
+    },
+    "actionLabels": {
+      "undefined": "कार्रवाई सेट नहीं है",
+      "fallbackAction": "कार्रवाई",
+      "fallbackTarget": "एंटिटी"
+    }
+  },
+  "settings": {
+    "account": {
+      "title": "खाता",
+      "description": "इस इंस्टॉलेशन का वर्तमान उपयोगकर्ता।",
+      "profileTitle": "प्रोफ़ाइल",
+      "profileDescription": "डेटा केवल आपके सर्वर पर।",
+      "idLabel": "ID"
+    },
+    "appearance": {
+      "title": "दिखावट",
+      "description": "इस ब्राउज़र में पैनल थीम और रंग।"
+    },
+    "services": {
+      "title": "Services",
+      "description": "Deployment settings moved here — WWW/DB modes.",
+      "agentTitle": "Iotvex agent",
+      "localAgent": "Local agent",
+      "ready": "Ready",
+      "errorStatus": "error",
+      "checkingStatus": "checking…",
+      "localStatus": "local",
+      "remoteStatus": "remote",
+      "lanStatus": "LAN",
+      "publishedStatus": "published",
+      "homeSchedulerStatus": "home timer",
+      "alwaysLocal": "Always on the home machine",
+      "databaseTitle": "Database",
+      "databaseDescription": "Local Supabase catalog and auth",
+      "databaseDetail": "Automation configs stored here; data stays on this server",
+      "databaseRemoteDescription": "Your remote Supabase project",
+      "databaseRemoteDetail": "User-owned remote DB (RLS/keys are your responsibility)",
+      "otbrTitle": "OTBR",
+      "otbrDescription": "Thread Border Router",
+      "otbrDetail": "USB radio + container on this host",
+      "wwwTitle": "Web panel",
+      "wwwLanDescription": "Reachable on LAN / mDNS",
+      "wwwLanDetail": "Optional Avahi name",
+      "wwwPublishedDescription": "Port-forward + your domain/TLS",
+      "wwwPublishedDetail": "You publish :8443; agent stays private on localhost",
+      "automationsTitle": "Automations runner",
+      "automationsDescription": "Config in DB; ticks only on this host",
+      "automationsDetail": "systemd → 127.0.0.1:3100 → local agent"
+    },
+    "users": {
+      "title": "उपयोगकर्ता",
+      "description": "स्थानीय पैनल खाते।",
+      "newTitle": "नया उपयोगकर्ता",
+      "newDescription": "ईमेल और पासवर्ड (कम से कम 6 अक्षर)।",
+      "emailPlaceholder": "user@example.local",
+      "create": "बनाएँ",
+      "loadError": "उपयोगकर्ता लोड नहीं हो सके",
+      "createError": "उपयोगकर्ता बनाया नहीं जा सका",
+      "emptyTitle": "कोई उपयोगकर्ता नहीं",
+      "emptyDescription": "पैनल तक पहुँचने के लिए पहला खाता बनाएँ।",
+      "defaultRole": "user"
+    },
+    "backup": {
+      "title": "बैकअप",
+      "description": "स्थानीय कैटलॉग का निर्यात और आयात।",
+      "exportTitle": "निर्यात",
+      "exportDescription": "कैटलॉग JSON डाउनलोड करें।",
+      "downloadJson": "JSON डाउनलोड करें",
+      "importTitle": "आयात",
+      "importDescription": "पहले सहेजा गया JSON अपलोड करें।",
+      "publicUrlTitle": "सार्वजनिक URL",
+      "publicUrlDescription": "बाहरी इंटीग्रेशन के लिए पता।",
+      "urlNotConfigured": "URL कॉन्फ़िगर नहीं है",
+      "loadPublicUrlError": "सार्वजनिक URL नहीं मिल सका",
+      "exportStarted": "कैटलॉग निर्यात शुरू हो गया।",
+      "exportError": "कैटलॉग निर्यात नहीं हो सका",
+      "imported": "कैटलॉग आयात हो गया।",
+      "importError": "कैटलॉग आयात नहीं हो सका"
+    },
+    "tools": {
+      "title": "टूल",
+      "description": "पैनल मेंटेनेंस कार्रवाइयाँ।",
+      "commandError": "कमांड नहीं चली",
+      "discoverTitle": "डिस्कवरी",
+      "discoverDescription": "स्थानीय डिवाइस खोजें।",
+      "discoverAction": "खोजें",
+      "discoverStarted": "डिवाइस खोज शुरू हो गई।",
+      "catalogTitle": "कैटलॉग",
+      "catalogDescription": "एंटिटी और डिवाइस रीफ़्रेश करें।",
+      "catalogRefreshed": "कैटलॉग रीफ़्रेश हो गया।",
+      "publicUrlTitle": "सार्वजनिक URL",
+      "publicUrlDescription": "वर्तमान पता दिखाएँ।",
+      "publicUrlReceived": "सार्वजनिक URL मिला।",
+      "publicUrlNotConfigured": "सार्वजनिक URL कॉन्फ़िगर नहीं है।",
+      "busy": "…"
+    },
+    "requestError": "अनुरोध त्रुटि {status}",
+    "language": {
+      "title": "भाषा",
+      "description": "इस ब्राउज़र के लिए इंटरफ़ेस भाषा।",
+      "label": "इंटरफ़ेस भाषा"
+    },
+    "deployment": {
+      "title": "Deployment",
+      "description": "WWW reachability and database backend. Device plane (agent/OTBR) stays local.",
+      "loadError": "Failed to load runtime config",
+      "saveError": "Failed to save",
+      "saved": "Saved. mDNS/publish providers updated in config/runtime.json.",
+      "wwwTitle": "Web panel",
+      "wwwDescription": "How you open the UI. Local modes always include IP:port and mDNS.",
+      "wwwModeLabel": "WWW mode",
+      "wwwModes": {
+        "local": "Local",
+        "local_published": "Local + published",
+        "cloud": "Cloud"
+      },
+      "wwwModeHelp": {
+        "local": "Self-hosted on this machine. HTTP + HTTPS on LAN/mDNS.",
+        "local_published": "Same as local, plus public HTTPS (port-forward, domain, Pinggy, Cloudflare, ngrok, Tailscale…).",
+        "cloud": "UI in the cloud; home keeps agent/OTBR. With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
+      },
+      "mdnsLabel": "mDNS name",
+      "customDomainLabel": "Custom domain",
+      "cloudWwwLabel": "Cloud WWW base URL",
+      "accessLabel": "Access URLs",
+      "accessHint": "Replace <lan-ip> with this host’s LAN address. Public HTTPS needs port-forward or an enabled tunnel provider.",
+      "providersLabel": "Publish / tunnel providers",
+      "saveWww": "Save WWW settings",
+      "dbTitle": "Database",
+      "dbDescription": "Catalog, auth, automation configs. Switch hot-reloads after probe + merge.",
+      "activeDb": "Active",
+      "dbModeLabel": "DB mode",
+      "dbModes": {
+        "local": "Local",
+        "cloud_public": "Cloud public",
+        "cloud_private": "Cloud private"
+      },
+      "dbModeHelp": {
+        "local": "Bundled Supabase. Also usable by cloud WWW via home bridge tunnel.",
+        "cloud_public": "Shared Iotvex-hosted Supabase (multi-tenant).",
+        "cloud_private": "Your own Supabase project."
+      },
+      "targetUrl": "Supabase URL",
+      "targetAnon": "Anon key",
+      "targetService": "Service role key",
+      "optionalIfLocal": "Optional if already in secrets",
+      "mergeLabel": "Merge before switch",
+      "mergeHelp": "Copy/upsert catalog from current DB into the target, then swap.",
+      "probe": "Probe target",
+      "probeOk": "Target DB reachable and schema OK.",
+      "probeFail": "Probe failed",
+      "switch": "Merge & switch",
+      "switching": "Switching…",
+      "switched": "Switched. Merged {imported} rows. Reloading…",
+      "switchError": "Switch failed",
+      "matrixTitle": "WWW × DB matrix",
+      "matrixDescription": "Every WWW mode works with every DB mode. Cloud UI + local DB automatically bridges Supabase + agent.",
+      "matrixCurrent": "Current: {www} × {db}",
+      "applyPublish": "Apply tunnels",
+      "stopPublish": "Stop tunnels",
+      "refreshPublish": "Refresh status",
+      "publishing": "Working…",
+      "publishQueued": "Queued on home host — tunnels reconcile shortly.",
+      "publishStatus": "Active tunnels: {tunnels}",
+      "publishError": "Publish manager error"
+    }
+  },
+  "activity": {
+    "metaCount": "{count} प्रविष्टियाँ",
+    "metaEmpty": "सिस्टम चलने के साथ लॉग भरता जाएगा",
+    "refresh": "रीफ़्रेश",
+    "clearJournal": "लॉग साफ़ करें",
+    "filterAll": "सभी",
+    "emptyTitle": "लॉग खाली है",
+    "emptyDescription": "डिवाइस नियंत्रित करने, ऑटोमेशन चलाने या उपकरण खोजने के बाद इवेंट दिखाई देंगे।"
+  },
+  "modules": {
+    "metaCount": "{count} एक्सटेंशन",
+    "metaEmpty": "पैनल की अतिरिक्त क्षमताएँ कनेक्ट करें",
+    "refresh": "रीफ़्रेश",
+    "connect": "कनेक्ट करें",
+    "emptyTitle": "अभी कोई एक्सटेंशन कनेक्ट नहीं है",
+    "emptyDescription": "एक्सटेंशन मैनिफ़ेस्ट का पता दर्ज करें — सिस्टम उसका विवरण लोड करेगा।",
+    "enabledShort": "चालू",
+    "disabledShort": "बंद",
+    "enable": "सक्षम करें",
+    "disable": "अक्षम करें",
+    "dialogTitle": "एक्सटेंशन कनेक्ट करें",
+    "nameLabel": "नाम",
+    "idOptionalLabel": "ID (वैकल्पिक)",
+    "idPlaceholder": "my-panel",
+    "manifestUrlLabel": "मैनिफ़ेस्ट पता",
+    "manifestUrlPlaceholder": "https://…/module.json",
+    "register": "रजिस्टर करें"
+  },
+  "entity": {
+    "states": {
+      "offline": "offline",
+      "on": "on",
+      "off": "off"
+    },
+    "brightness": "ब्राइटनेस",
+    "colorLabel": "रंग",
+    "effect": "इफ़ेक्ट",
+    "speed": "गति",
+    "emptyEntities": "कोई एंटिटी नहीं।",
+    "fallbackEffect": "solid",
+    "colorPicker": {
+      "title": "रंग",
+      "done": "पूर्ण",
+      "hue": "ह्यू",
+      "saturation": "संतृप्ति",
+      "value": "चमक",
+      "hex": "Hex",
+      "quickAccess": "त्वरित पहुँच",
+      "saveCurrent": "रंग सहेजें",
+      "managePresets": "प्रीसेट प्रबंधित करें",
+      "moveUp": "ऊपर",
+      "moveDown": "नीचे",
+      "remove": "हटाएँ",
+      "noPresets": "अभी कोई रंग सहेजा नहीं गया।",
+      "tabs": {
+        "wheel": "व्हील",
+        "sliders": "स्लाइडर",
+        "hex": "Hex",
+        "presets": "प्रीसेट"
+      }
+    }
+  },
+  "theme": {
+    "ariaLabel": "दिखावट",
+    "buttonLabel": "दिखावट",
+    "modeLabel": "मोड",
+    "colorLabel": "रंग",
+    "colorCurrent": "रंग · अभी {color}",
+    "themeTitle": "थीम",
+    "accentColor": "एक्सेंट रंग",
+    "resolvedDark": "dark",
+    "resolvedLight": "light",
+    "modes": {
+      "light": "लाइट",
+      "dark": "डार्क",
+      "system": "सिस्टम"
+    },
+    "colors": {
+      "default": "फ़िरोज़ी",
+      "blue": "नीला",
+      "green": "हरा",
+      "orange": "नारंगी",
+      "rose": "गुलाबी",
+      "violet": "बैंगनी",
+      "yellow": "पीला",
+      "red": "लाल",
+      "zinc": "स्लेटी"
+    }
+  },
+  "actions": {
+    "turn_on": "चालू करें",
+    "turn_off": "बंद करें",
+    "toggle": "टॉगल करें",
+    "set_brightness": "ब्राइटनेस सेट करें",
+    "set_color": "रंग सेट करें",
+    "set_effect": "इफ़ेक्ट सेट करें",
+    "set_speed": "गति सेट करें"
+  },
+  "topbar": {
+    "menu": "मेनू",
+    "logout": "लॉग आउट",
+    "navigation": "नेविगेशन",
+    "onlineBadge": "online",
+    "documentTitle": "{title} · Iotvex"
+  },
+  "sidebar": {
+    "panelControlSubtitle": "नियंत्रण पैनल"
+  }
+}

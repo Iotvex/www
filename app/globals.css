@@ -1,0 +1,565 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 193 89% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 193 89% 42%;
+    --radius: 0.75rem;
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-border: 220 13% 91%;
+    --topbar: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 193 89% 52%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 58%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 193 89% 52%;
+    --sidebar: 0 0% 3%;
+    --sidebar-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 12%;
+    --topbar: 0 0% 2%;
+  }
+
+  /* Color themes — primary/ring/accent overrides */
+  [data-color="default"] {
+    --primary: 193 89% 42%;
+    --ring: 193 89% 42%;
+  }
+  .dark[data-color="default"] {
+    --primary: 193 89% 52%;
+    --ring: 193 89% 52%;
+    --primary-foreground: 210 40% 6%;
+  }
+
+  [data-color="blue"] {
+    --primary: 221.2 83.2% 53.3%;
+    --ring: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+  }
+  .dark[data-color="blue"] {
+    --primary: 217.2 91.2% 59.8%;
+    --ring: 224.3 76.3% 48%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+  }
+
+  [data-color="green"] {
+    --primary: 142.1 76.2% 36.3%;
+    --ring: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+  }
+  .dark[data-color="green"] {
+    --primary: 142.1 70.6% 45.3%;
+    --ring: 142.1 76.2% 36.3%;
+    --primary-foreground: 144.9 80.4% 10%;
+  }
+
+  [data-color="orange"] {
+    --primary: 24.6 95% 53.1%;
+    --ring: 24.6 95% 53.1%;
+    --primary-foreground: 60 9.1% 97.8%;
+  }
+  .dark[data-color="orange"] {
+    --primary: 20.5 90.2% 48.2%;
+    --ring: 20.5 90.2% 48.2%;
+    --primary-foreground: 60 9.1% 97.8%;
+  }
+
+  [data-color="rose"] {
+    --primary: 346.8 77.2% 49.8%;
+    --ring: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+  }
+  .dark[data-color="rose"] {
+    --primary: 346.8 77.2% 49.8%;
+    --ring: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+  }
+
+  [data-color="violet"] {
+    --primary: 262.1 83.3% 57.8%;
+    --ring: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 20% 98%;
+  }
+  .dark[data-color="violet"] {
+    --primary: 263.4 70% 50.4%;
+    --ring: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+  }
+
+  [data-color="yellow"] {
+    --primary: 47.9 95.8% 53.1%;
+    --ring: 47.9 95.8% 53.1%;
+    --primary-foreground: 26 83.3% 14.1%;
+  }
+  .dark[data-color="yellow"] {
+    --primary: 47.9 95.8% 53.1%;
+    --ring: 47.9 95.8% 53.1%;
+    --primary-foreground: 26 83.3% 14.1%;
+  }
+
+  [data-color="red"] {
+    --primary: 0 72.2% 50.6%;
+    --ring: 0 72.2% 50.6%;
+    --primary-foreground: 0 85.7% 97.3%;
+  }
+  .dark[data-color="red"] {
+    --primary: 0 72.2% 50.6%;
+    --ring: 0 72.2% 50.6%;
+    --primary-foreground: 0 85.7% 97.3%;
+  }
+
+  [data-color="zinc"] {
+    --primary: 240 5.9% 10%;
+    --ring: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+  }
+  .dark[data-color="zinc"] {
+    --primary: 0 0% 98%;
+    --ring: 240 4.9% 83.9%;
+    --primary-foreground: 240 5.9% 10%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html, body {
+    overscroll-behavior-x: none;
+    /*
+     * PWA safe-area strategy (do not mix):
+     * apple-mobile-web-app-status-bar-style=black + viewport-fit=cover
+     * → system already places content below the status bar.
+     * → NEVER pad html/body/Topbar/main with env(safe-area-inset-top)
+     *   (that value stays non-zero under cover and paints a second black band).
+     * → MobileNav: pb-safe only (home indicator).
+     */
+    padding: 0;
+    margin: 0;
+  }
+
+  /*
+   * Standalone iOS PWA: pin the document to the layout viewport.
+   *
+   * Without this, the first paint can leave a phantom top offset (status bar →
+   * black band → Topbar). Opening the hamburger Sheet runs Radix RemoveScroll
+   * (body overflow:hidden + position:relative), and unlocking on close forces a
+   * reflow that clears the offset — so the header "jumps up" only after a
+   * sidebar toggle. Pinning matches that stable post-reflow state from boot.
+   * Shell uses .iotvex-shell { height:100% } (not 100dvh) under this pin.
+   */
+  @media (display-mode: standalone) {
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+    html,
+    body {
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+    body {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+    /* Opaque status bar already insets the webview — kill leftover pt-safe. */
+    .pt-safe {
+      padding-top: 0 !important;
+    }
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: none;
+  }
+}
+
+@media (pointer: coarse) {
+  button:focus,
+  button:focus-visible,
+  [role="button"]:focus,
+  [role="button"]:focus-visible,
+  a:focus,
+  a:focus-visible,
+  summary:focus,
+  summary:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+  }
+}
+
+@layer utilities {
+  .iotvex-shell {
+    /* Browser tab: dynamic viewport. */
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+  /* Must live in utilities so it wins over the 100dvh rule above (layer order). */
+  @media (display-mode: standalone) {
+    .iotvex-shell {
+      height: 100%;
+      max-height: 100%;
+    }
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .px-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .safe-area-pad {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+}
+
+
+@layer utilities {
+  .iotvex-view-hidden {
+    display: none !important;
+  }
+  .iotvex-view-active {
+    display: block;
+    animation: iotvex-view-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .iotvex-page {
+    animation: iotvex-page-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .iotvex-card-in {
+    animation: iotvex-card-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .iotvex-row-in {
+    animation: iotvex-row-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .iotvex-nav-item {
+    animation: iotvex-nav-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .iotvex-sidebar-enter {
+    animation: iotvex-sidebar-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes iotvex-view-in {
+  from {
+    opacity: 0;
+    transform: translate3d(8px, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes iotvex-page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes iotvex-card-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes iotvex-row-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-8px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes iotvex-nav-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-6px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes iotvex-sidebar-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-12px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes iotvex-sheet-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes iotvex-sheet-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes iotvex-sheet-left-in {
+  from { transform: translate3d(-100%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes iotvex-sheet-left-out {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-100%, 0, 0); }
+}
+
+@keyframes iotvex-sheet-right-in {
+  from { transform: translate3d(100%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes iotvex-sheet-right-out {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(100%, 0, 0); }
+}
+
+.iotvex-sheet-overlay[data-state="open"] {
+  animation: iotvex-sheet-overlay-in 220ms ease-out both;
+}
+.iotvex-sheet-overlay[data-state="closed"] {
+  animation: iotvex-sheet-overlay-out 180ms ease-in both;
+}
+.iotvex-sheet-left[data-state="open"] {
+  animation: iotvex-sheet-left-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.iotvex-sheet-left[data-state="closed"] {
+  animation: iotvex-sheet-left-out 220ms ease-in both;
+}
+.iotvex-sheet-right[data-state="open"] {
+  animation: iotvex-sheet-right-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.iotvex-sheet-right[data-state="closed"] {
+  animation: iotvex-sheet-right-out 220ms ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iotvex-view-active,
+  .iotvex-page,
+  .iotvex-card-in,
+  .iotvex-row-in,
+  .iotvex-nav-item,
+  .iotvex-sidebar-enter,
+  .iotvex-sheet-overlay,
+  .iotvex-sheet-left,
+  .iotvex-sheet-right {
+    animation: none !important;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}
+
+@keyframes iotvex-pop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes iotvex-pop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes iotvex-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes iotvex-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+
+@layer utilities {
+  .iotvex-stat-tile {
+    animation: iotvex-stat-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .iotvex-stat-value {
+    animation: iotvex-stat-value 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes iotvex-stat-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes iotvex-stat-value {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iotvex-stat-tile,
+  .iotvex-stat-value {
+    animation: none !important;
+  }
+}
+
+@layer utilities {
+  .iotvex-glass {
+    border: 1px solid color-mix(in oklab, hsl(var(--primary)) 14%, hsl(0 0% 100% / 0.08));
+    background:
+      linear-gradient(145deg, hsl(var(--primary) / 0.07), transparent 42%),
+      linear-gradient(325deg, hsl(var(--primary) / 0.03), transparent 55%),
+      hsl(0 0% 0% / 0.48);
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.05);
+  }
+  :root:not(.dark) .iotvex-glass {
+    border-color: color-mix(in oklab, hsl(var(--primary)) 16%, hsl(0 0% 0% / 0.08));
+    background:
+      linear-gradient(145deg, hsl(var(--primary) / 0.06), transparent 45%),
+      linear-gradient(325deg, hsl(var(--primary) / 0.03), transparent 58%),
+      hsl(0 0% 100% / 0.72);
+    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.55);
+  }
+  .iotvex-glass-muted {
+    border: 1px solid color-mix(in oklab, hsl(var(--primary)) 10%, hsl(0 0% 100% / 0.06));
+    background:
+      linear-gradient(145deg, hsl(var(--primary) / 0.05), transparent 50%),
+      hsl(0 0% 0% / 0.3);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  }
+  :root:not(.dark) .iotvex-glass-muted {
+    border-color: color-mix(in oklab, hsl(var(--primary)) 12%, hsl(0 0% 0% / 0.06));
+    background:
+      linear-gradient(145deg, hsl(var(--primary) / 0.04), transparent 50%),
+      hsl(0 0% 100% / 0.52);
+  }
+
+  .iotvex-hue-range {
+    background: linear-gradient(
+      90deg,
+      #ff0000,
+      #ffff00,
+      #00ff00,
+      #00ffff,
+      #0000ff,
+      #ff00ff,
+      #ff0000
+    );
+  }
+  .iotvex-hue-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    background: #fff;
+    border: 1px solid hsl(0 0% 0% / 0.25);
+    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.25);
+  }
+  .iotvex-hue-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    background: #fff;
+    border: 1px solid hsl(0 0% 0% / 0.25);
+  }
+}
+
+@layer utilities {
+  .iotvex-stat-panel {
+    animation: iotvex-stat-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .iotvex-stat-cell {
+    animation: iotvex-stat-in 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}

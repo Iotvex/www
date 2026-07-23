@@ -1,0 +1,696 @@
+{
+  "meta": {
+    "title": "Iotvex Home",
+    "description": "Iotvex control panel",
+    "panelControl": "Control panel"
+  },
+  "common": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "create": "Create",
+    "creating": "Creating...",
+    "edit": "Edit",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "online": "online",
+    "offline": "offline",
+    "search": "Search",
+    "actions": "Actions",
+    "yes": "Yes",
+    "yesCascade": "Yes, apply to all",
+    "no": "No",
+    "back": "Back",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "add": "Add",
+    "remove": "Remove",
+    "run": "Run",
+    "activate": "Activate",
+    "empty": "Empty",
+    "unknown": "unknown",
+    "notSpecified": "not specified",
+    "copied": "Copied",
+    "copy": "Copy",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh",
+    "show": "Show",
+    "skip": "Skip",
+    "clear": "Clear",
+    "all": "All",
+    "local": "local",
+    "notConfigured": "not configured"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Русский",
+    "ja": "日本語",
+    "zh": "中文",
+    "es": "Español",
+    "hi": "हिन्दी",
+    "ar": "العربية",
+    "fr": "Français",
+    "pt": "Português",
+    "id": "Bahasa Indonesia"
+  },
+  "nav": {
+    "sections": {
+      "home": "Home",
+      "automation": "Automation",
+      "system": "System",
+      "settings": "Settings"
+    },
+    "items": {
+      "dashboard": "Overview",
+      "home-devices": "Devices",
+      "home-entities": "Entities",
+      "home-areas": "Rooms",
+      "auto-scenarios": "Automations",
+      "auto-scenes": "Scenes",
+      "auto-scripts": "Scripts",
+      "activity": "Activity",
+      "modules": "Extensions",
+      "settings-account": "Account",
+      "settings-appearance": "Appearance",
+      "settings-services": "Services",
+      "settings-users": "Users",
+      "settings-backup": "Backup",
+      "settings-tools": "Tools"
+    },
+    "mobile": {
+      "overview": "Overview",
+      "home": "Home",
+      "auto": "Auto",
+      "more": "More"
+    }
+  },
+  "views": {
+    "dashboard": {
+      "title": "Overview",
+      "subtitle": "Your home workspace"
+    },
+    "home-devices": {
+      "title": "Devices",
+      "subtitle": "Equipment in the catalog"
+    },
+    "home-entities": {
+      "title": "Entities",
+      "subtitle": "Controllable home entities"
+    },
+    "home-areas": {
+      "title": "Rooms",
+      "subtitle": "Zones and assignments"
+    },
+    "auto-scenarios": {
+      "title": "Automations",
+      "subtitle": "Run by time and states"
+    },
+    "auto-scenes": {
+      "title": "Scenes",
+      "subtitle": "Ready-made state sets"
+    },
+    "auto-scripts": {
+      "title": "Scripts",
+      "subtitle": "Manual action chains"
+    },
+    "activity": {
+      "title": "Activity",
+      "subtitle": "Event and action history"
+    },
+    "modules": {
+      "title": "Extensions",
+      "subtitle": "Connectable modules"
+    },
+    "settings-account": {
+      "title": "Account",
+      "subtitle": "Current session profile"
+    },
+    "settings-appearance": {
+      "title": "Appearance",
+      "subtitle": "Theme and accent color"
+    },
+    "settings-services": {
+      "title": "Services",
+      "subtitle": "Component status"
+    },
+    "settings-users": {
+      "title": "Users",
+      "subtitle": "Panel access"
+    },
+    "settings-backup": {
+      "title": "Backup",
+      "subtitle": "Export and restore"
+    },
+    "settings-tools": {
+      "title": "Tools",
+      "subtitle": "Maintenance operations"
+    }
+  },
+  "login": {
+    "tagline": "Sign in to manage your smart home",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "submit": "Sign in",
+    "pending": "Signing in...",
+    "invalidCredentialsError": "Could not sign in. Check your details and try again.",
+    "connectionError": "No connection to the server. Try again."
+  },
+  "overview": {
+    "toolbar": {
+      "title": "Workspace",
+      "description": "Build a convenient screen for everyday home control.",
+      "addWidget": "Add widget"
+    },
+    "requestError": "Request error {status}",
+    "stats": {
+      "devices": "Devices",
+      "devicesInCatalog": "in catalog",
+      "devicesAddInHome": "add in Home",
+      "entities": "Entities",
+      "entitiesOn": "{count} on",
+      "entitiesWaitingDiscovery": "waiting for discovery",
+      "rooms": "Rooms",
+      "roomExample": "e.g. {name}",
+      "roomsUnassigned": "unassigned",
+      "connection": "Connection",
+      "onlineValue": "Online",
+      "offlineValue": "Offline",
+      "checkingValue": "…",
+      "checkingHint": "checking connection",
+      "channels": "{count} channels",
+      "controllerAvailable": "controller available",
+      "agentNoResponse": "agent is not responding"
+    },
+    "widgets": {
+      "emptyTitle": "Start with your first widget",
+      "emptyDescription": "Add lighting, room, system status, or event log widgets.",
+      "addFirstWidget": "Add first widget",
+      "newTitle": "New widget",
+      "editTitle": "Edit widget",
+      "nameLabel": "Name",
+      "namePlaceholder": "Living room",
+      "typeLabel": "Type",
+      "roomLabel": "Room",
+      "moveUpAria": "Move widget up",
+      "moveDownAria": "Move widget down",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "menuAria": "Widget actions",
+      "deleteConfirm": "Delete widget “{title}”?",
+      "loadError": "Could not load widgets",
+      "deleteError": "Could not delete widget",
+      "orderError": "Could not change order",
+      "saveError": "Could not save widget",
+      "kinds": {
+        "entities": "Entities",
+        "lights": "Lights",
+        "area": "Room",
+        "status": "Status",
+        "activity": "Activity"
+      },
+      "kindArea": "Room: {room}",
+      "noRoomSelected": "not selected",
+      "unnamed": "Untitled",
+      "noMatchingTitle": "No matching entities",
+      "noMatchingAreaDescription": "There are no entities in “{room}” yet.",
+      "noMatchingGenericDescription": "Change the filter or add devices in Home.",
+      "noData": "no data",
+      "andMore": "And {count} more"
+    },
+    "statusWidget": {
+      "controller": "Controller",
+      "localAgent": "Local agent",
+      "noConnection": "No connection",
+      "catalog": "Catalog",
+      "active": "Active",
+      "channels": "Channels",
+      "roomsCount": "Rooms: {count}",
+      "devicesAbbrev": "dev."
+    },
+    "activityWidget": {
+      "loadError": "Could not load events",
+      "emptyTitle": "No events yet",
+      "emptyDescription": "Recent system activity will appear here.",
+      "fallbackTitle": "Event"
+    }
+  },
+  "inventory": {
+    "devices": {
+      "title": "Devices",
+      "description": "Equipment in the catalog",
+      "count": "{count} devices",
+      "controllerOnline": "controller online",
+      "nodesOnline": "nodes online: {count}",
+      "channels": "channels: {count}",
+      "controllerUnavailable": "controller unavailable",
+      "discover": "Find devices",
+      "discoverError": "Could not search for devices",
+      "discoverSuccess": "Found entities: {count}. Names and assignments were saved.",
+      "emptyTitle": "No devices added yet",
+      "emptyDescription": "Start discovery on the network — found devices will appear here. Your names and assignments will be preserved.",
+      "onCount": "{on}/{total} on",
+      "areaLabel": "area",
+      "unassignedArea": "unassigned",
+      "settingsTitle": "Device settings",
+      "nameLabel": "Name",
+      "areaSelectLabel": "Area",
+      "noArea": "No area",
+      "cascadeArea": "Apply room to all device entities"
+    },
+    "entities": {
+      "title": "Entities",
+      "description": "Controllable home entities",
+      "searchPlaceholder": "Search…",
+      "allAreas": "All areas",
+      "noArea": "No area",
+      "allDomains": "All domains",
+      "unboundNotice": "There are entities without an area.",
+      "emptyTitle": "No entities found yet",
+      "emptyDescription": "Control entities will appear automatically after device discovery.",
+      "controlHeading": "Control",
+      "settingsTitle": "Entity settings",
+      "nameLabel": "Name",
+      "deviceLabel": "Device",
+      "areaLabel": "Area",
+      "noDevice": "No device",
+      "areaSuffixNone": "no area"
+    },
+    "areas": {
+      "title": "Rooms",
+      "description": "Zones and assignments",
+      "count": "{count} areas",
+      "add": "Add area",
+      "emptyTitle": "No rooms created yet",
+      "emptyDescription": "Create a room and assign devices. Assignments are preserved during rediscovery.",
+      "devicesAbbrev": "dev.",
+      "entitiesAbbrev": "ent.",
+      "onAbbrev": "on",
+      "nothingAssigned": "Nothing is assigned to this room yet",
+      "editTitle": "Area",
+      "newTitle": "New area",
+      "nameLabel": "Name",
+      "namePlaceholder": "For example, Living room",
+      "assignDevice": "Assign device",
+      "assignEntity": "Assign entity",
+      "skip": "Skip"
+    }
+  },
+  "rules": {
+    "requestError": "Request error {status}",
+    "automations": {
+      "title": "Automations",
+      "description": "Run actions on a schedule or when device states change.",
+      "emptyTitle": "No automations created yet",
+      "emptyDescription": "Add an automation when you are ready to automate your home.",
+      "create": "Create automation",
+      "active": "Active",
+      "inactive": "Off",
+      "enableAria": "Enable automation",
+      "deleteConfirm": "Delete automation “{name}”?",
+      "loadError": "Could not load",
+      "updateError": "Could not update",
+      "deleteError": "Could not delete"
+    },
+    "scenes": {
+      "title": "Scenes",
+      "description": "Save ready-made device states and activate them with one tap.",
+      "emptyTitle": "No scenes created yet",
+      "emptyDescription": "Save a set of device states for quick launch.",
+      "create": "Create scene",
+      "newTitle": "New scene",
+      "entityCount": "{count} entities",
+      "deleteConfirm": "Delete scene “{name}”?",
+      "loadError": "Could not load",
+      "deleteError": "Could not delete",
+      "activateError": "Could not start scene",
+      "saveError": "Could not save scene",
+      "modeManual": "Choose device",
+      "modeCapture": "Save current",
+      "sceneDevice": "Scene device",
+      "noAvailableEntities": "No available entities yet.",
+      "namePlaceholder": "Evening mode"
+    },
+    "scripts": {
+      "title": "Scripts",
+      "description": "Action chains that can be run manually at any moment.",
+      "emptyTitle": "No scripts created yet",
+      "emptyDescription": "Add an action sequence for manual launch.",
+      "create": "Create script",
+      "newTitle": "New script",
+      "loadError": "Could not load",
+      "runError": "Could not run script",
+      "saveError": "Could not save",
+      "deleteError": "Could not delete",
+      "deleteConfirm": "Delete script “{name}”?",
+      "namePlaceholder": "Check lights",
+      "entityLabel": "Entity",
+      "actionLabel": "Action"
+    }
+  },
+  "automationEditor": {
+    "newTitle": "New automation",
+    "editTitle": "Edit automation",
+    "nameLabel": "Name",
+    "namePlaceholder": "For example, Evening light",
+    "triggerSection": "Trigger",
+    "triggerKinds": {
+      "time": "Time",
+      "state": "State",
+      "numeric_state": "Number"
+    },
+    "timeLabel": "Time",
+    "weekdaysLabel": "Weekdays (empty = every day)",
+    "weekdays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "entityLabel": "Entity",
+    "becomesLabel": "Becomes",
+    "wasOptionalLabel": "Was (optional)",
+    "attributeLabel": "Attribute",
+    "attributeOptionalLabel": "Attribute (optional)",
+    "attributePlaceholder": "brightness",
+    "numericAttributePlaceholder": "brightness / empty = state",
+    "aboveLabel": "Above",
+    "belowLabel": "Below",
+    "abovePlaceholder": "for example 200",
+    "belowPlaceholder": "for example 50",
+    "conditionsSection": "Conditions",
+    "addCondition": "Add condition",
+    "noConditions": "Without additional conditions, the automation will run immediately after triggering.",
+    "conditionLabel": "Condition {index}",
+    "conditionKinds": {
+      "state": "State",
+      "numeric_state": "Number",
+      "time": "Time interval"
+    },
+    "equalsLabel": "Equals",
+    "afterLabel": "After",
+    "beforeLabel": "Before",
+    "actionSection": "Action",
+    "commandLabel": "Command",
+    "brightnessLabel": "Brightness, %",
+    "colorLabel": "Color",
+    "effectLabel": "Effect",
+    "speedLabel": "Effect speed (0–255)",
+    "capabilitiesLine": "Capabilities: {capabilities} · domain {domain}",
+    "emptyCapabilities": "—",
+    "unknownDomain": "?",
+    "saveError": "Could not save",
+    "requestError": "Request error {status}",
+    "triggerLabels": {
+      "timeAt": "Time {time}{days}",
+      "timeFallback": "Time trigger",
+      "state": "State {entity} → {to}",
+      "numeric": "Number {entity} {range}",
+      "undefined": "Start condition is not set"
+    },
+    "actionLabels": {
+      "undefined": "Action is not set",
+      "fallbackAction": "action",
+      "fallbackTarget": "entity"
+    }
+  },
+  "settings": {
+    "account": {
+      "title": "Account",
+      "description": "Current user of this installation.",
+      "profileTitle": "Profile",
+      "profileDescription": "Data only on your server.",
+      "idLabel": "ID"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Panel theme and color in this browser."
+    },
+    "services": {
+      "title": "Services",
+      "description": "Deployment settings moved here — WWW/DB modes.",
+      "agentTitle": "Iotvex agent",
+      "localAgent": "Local agent",
+      "ready": "Ready",
+      "errorStatus": "error",
+      "checkingStatus": "checking…",
+      "localStatus": "local",
+      "remoteStatus": "remote",
+      "lanStatus": "LAN",
+      "publishedStatus": "published",
+      "homeSchedulerStatus": "home timer",
+      "alwaysLocal": "Always on the home machine",
+      "databaseTitle": "Database",
+      "databaseDescription": "Local Supabase catalog and auth",
+      "databaseDetail": "Automation configs stored here; data stays on this server",
+      "databaseRemoteDescription": "Your remote Supabase project",
+      "databaseRemoteDetail": "User-owned remote DB (RLS/keys are your responsibility)",
+      "otbrTitle": "OTBR",
+      "otbrDescription": "Thread Border Router",
+      "otbrDetail": "USB radio + container on this host",
+      "wwwTitle": "Web panel",
+      "wwwLanDescription": "Reachable on LAN / mDNS",
+      "wwwLanDetail": "Optional Avahi name",
+      "wwwPublishedDescription": "Port-forward + your domain/TLS",
+      "wwwPublishedDetail": "You publish :8443; agent stays private on localhost",
+      "automationsTitle": "Automations runner",
+      "automationsDescription": "Config in DB; ticks only on this host",
+      "automationsDetail": "systemd → 127.0.0.1:3100 → local agent"
+    },
+    "users": {
+      "title": "Users",
+      "description": "Local panel accounts.",
+      "newTitle": "New user",
+      "newDescription": "Email and password (minimum 6 characters).",
+      "emailPlaceholder": "user@example.local",
+      "create": "Create",
+      "loadError": "Could not load users",
+      "createError": "Could not create user",
+      "emptyTitle": "No users",
+      "emptyDescription": "Create the first account to access the panel.",
+      "defaultRole": "user"
+    },
+    "backup": {
+      "title": "Backup",
+      "description": "Export and import the local catalog.",
+      "exportTitle": "Export",
+      "exportDescription": "Download catalog JSON.",
+      "downloadJson": "Download JSON",
+      "importTitle": "Import",
+      "importDescription": "Upload a previously saved JSON.",
+      "publicUrlTitle": "Public URL",
+      "publicUrlDescription": "Address for external integrations.",
+      "urlNotConfigured": "URL is not configured",
+      "loadPublicUrlError": "Could not get public URL",
+      "exportStarted": "Catalog export started.",
+      "exportError": "Could not export catalog",
+      "imported": "Catalog imported.",
+      "importError": "Could not import catalog"
+    },
+    "tools": {
+      "title": "Tools",
+      "description": "Panel maintenance actions.",
+      "commandError": "Command did not run",
+      "discoverTitle": "Discovery",
+      "discoverDescription": "Search for local devices.",
+      "discoverAction": "Find",
+      "discoverStarted": "Device search started.",
+      "catalogTitle": "Catalog",
+      "catalogDescription": "Refresh entities and devices.",
+      "catalogRefreshed": "Catalog refreshed.",
+      "publicUrlTitle": "Public URL",
+      "publicUrlDescription": "Show current address.",
+      "publicUrlReceived": "Public URL received.",
+      "publicUrlNotConfigured": "Public URL is not configured.",
+      "busy": "…"
+    },
+    "requestError": "Request error {status}",
+    "language": {
+      "title": "Language",
+      "description": "Interface language for this browser.",
+      "label": "Interface language"
+    },
+    "deployment": {
+      "title": "Deployment",
+      "description": "WWW reachability and database backend. Device plane (agent/OTBR) stays local.",
+      "loadError": "Failed to load runtime config",
+      "saveError": "Failed to save",
+      "saved": "Saved. mDNS/publish providers updated in config/runtime.json.",
+      "wwwTitle": "Web panel",
+      "wwwDescription": "How you open the UI. Local modes always include IP:port and mDNS.",
+      "wwwModeLabel": "WWW mode",
+      "wwwModes": {
+        "local": "Local",
+        "local_published": "Local + published",
+        "cloud": "Cloud"
+      },
+      "wwwModeHelp": {
+        "local": "Self-hosted on this machine. HTTP + HTTPS on LAN/mDNS.",
+        "local_published": "Same as local, plus public HTTPS (port-forward, domain, Pinggy, Cloudflare, ngrok, Tailscale…).",
+        "cloud": "UI in the cloud; home keeps agent/OTBR. With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
+      },
+      "mdnsLabel": "mDNS name",
+      "customDomainLabel": "Custom domain",
+      "cloudWwwLabel": "Cloud WWW base URL",
+      "accessLabel": "Access URLs",
+      "accessHint": "Replace <lan-ip> with this host’s LAN address. Public HTTPS needs port-forward or an enabled tunnel provider.",
+      "providersLabel": "Publish / tunnel providers",
+      "saveWww": "Save WWW settings",
+      "dbTitle": "Database",
+      "dbDescription": "Catalog, auth, automation configs. Switch hot-reloads after probe + merge.",
+      "activeDb": "Active",
+      "dbModeLabel": "DB mode",
+      "dbModes": {
+        "local": "Local",
+        "cloud_public": "Cloud public",
+        "cloud_private": "Cloud private"
+      },
+      "dbModeHelp": {
+        "local": "Bundled Supabase. Also usable by cloud WWW via home bridge tunnel.",
+        "cloud_public": "Shared Iotvex-hosted Supabase (multi-tenant).",
+        "cloud_private": "Your own Supabase project."
+      },
+      "targetUrl": "Supabase URL",
+      "targetAnon": "Anon key",
+      "targetService": "Service role key",
+      "optionalIfLocal": "Optional if already in secrets",
+      "mergeLabel": "Merge before switch",
+      "mergeHelp": "Copy/upsert catalog from current DB into the target, then swap.",
+      "probe": "Probe target",
+      "probeOk": "Target DB reachable and schema OK.",
+      "probeFail": "Probe failed",
+      "switch": "Merge & switch",
+      "switching": "Switching…",
+      "switched": "Switched. Merged {imported} rows. Reloading…",
+      "switchError": "Switch failed",
+      "matrixTitle": "WWW × DB matrix",
+      "matrixDescription": "Every WWW mode works with every DB mode. Cloud UI + local DB automatically bridges Supabase + agent.",
+      "matrixCurrent": "Current: {www} × {db}",
+      "applyPublish": "Apply tunnels",
+      "stopPublish": "Stop tunnels",
+      "refreshPublish": "Refresh status",
+      "publishing": "Working…",
+      "publishQueued": "Queued on home host — tunnels reconcile shortly.",
+      "publishStatus": "Active tunnels: {tunnels}",
+      "publishError": "Publish manager error"
+    }
+  },
+  "activity": {
+    "metaCount": "{count} entries",
+    "metaEmpty": "The log will fill as the system runs",
+    "refresh": "Refresh",
+    "clearJournal": "Clear log",
+    "filterAll": "All",
+    "emptyTitle": "Log is empty",
+    "emptyDescription": "Events will appear after controlling devices, running automations, or discovering equipment."
+  },
+  "modules": {
+    "metaCount": "{count} extensions",
+    "metaEmpty": "Connect additional panel capabilities",
+    "refresh": "Refresh",
+    "connect": "Connect",
+    "emptyTitle": "No extensions connected yet",
+    "emptyDescription": "Enter an extension manifest address — the system will load its description.",
+    "enabledShort": "on",
+    "disabledShort": "off",
+    "enable": "Enable",
+    "disable": "Disable",
+    "dialogTitle": "Connect extension",
+    "nameLabel": "Name",
+    "idOptionalLabel": "ID (optional)",
+    "idPlaceholder": "my-panel",
+    "manifestUrlLabel": "Manifest address",
+    "manifestUrlPlaceholder": "https://…/module.json",
+    "register": "Register"
+  },
+  "entity": {
+    "states": {
+      "offline": "offline",
+      "on": "on",
+      "off": "off"
+    },
+    "brightness": "Brightness",
+    "colorLabel": "Color",
+    "effect": "Effect",
+    "speed": "Speed",
+    "emptyEntities": "No entities.",
+    "fallbackEffect": "solid",
+    "colorPicker": {
+      "title": "Color",
+      "done": "Done",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "value": "Brightness",
+      "hex": "Hex",
+      "quickAccess": "Quick access",
+      "saveCurrent": "Save color",
+      "managePresets": "Manage presets",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "remove": "Remove",
+      "noPresets": "No saved colors yet.",
+      "tabs": {
+        "wheel": "Wheel",
+        "sliders": "Sliders",
+        "hex": "Hex",
+        "presets": "Presets"
+      }
+    }
+  },
+  "theme": {
+    "ariaLabel": "Appearance",
+    "buttonLabel": "Appearance",
+    "modeLabel": "Mode",
+    "colorLabel": "Color",
+    "colorCurrent": "Color · now {color}",
+    "themeTitle": "Theme",
+    "accentColor": "Accent color",
+    "resolvedDark": "dark",
+    "resolvedLight": "light",
+    "modes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "colors": {
+      "default": "Turquoise",
+      "blue": "Blue",
+      "green": "Green",
+      "orange": "Orange",
+      "rose": "Rose",
+      "violet": "Violet",
+      "yellow": "Yellow",
+      "red": "Red",
+      "zinc": "Gray"
+    }
+  },
+  "actions": {
+    "turn_on": "Turn on",
+    "turn_off": "Turn off",
+    "toggle": "Toggle",
+    "set_brightness": "Set brightness",
+    "set_color": "Set color",
+    "set_effect": "Set effect",
+    "set_speed": "Set speed"
+  },
+  "topbar": {
+    "menu": "Menu",
+    "logout": "Log out",
+    "navigation": "Navigation",
+    "onlineBadge": "online",
+    "documentTitle": "{title} · Iotvex"
+  },
+  "sidebar": {
+    "panelControlSubtitle": "Control panel"
+  }
+}

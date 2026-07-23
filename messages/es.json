@@ -1,0 +1,696 @@
+{
+  "meta": {
+    "title": "Iotvex Home",
+    "description": "Panel de control de Iotvex",
+    "panelControl": "Panel de control"
+  },
+  "common": {
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "create": "Crear",
+    "creating": "Creando...",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "online": "en línea",
+    "offline": "sin conexión",
+    "search": "Buscar",
+    "actions": "Acciones",
+    "yes": "Sí",
+    "yesCascade": "Sí, aplicar a todo",
+    "no": "No",
+    "back": "Atrás",
+    "retry": "Reintentar",
+    "confirm": "Confirmar",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "enabled": "habilitado",
+    "disabled": "deshabilitado",
+    "add": "Agregar",
+    "remove": "Quitar",
+    "run": "Ejecutar",
+    "activate": "Activar",
+    "empty": "Vacío",
+    "unknown": "desconocido",
+    "notSpecified": "no especificado",
+    "copied": "Copiado",
+    "copy": "Copiar",
+    "export": "Exportar",
+    "import": "Importar",
+    "refresh": "Actualizar",
+    "show": "Mostrar",
+    "skip": "Omitir",
+    "clear": "Limpiar",
+    "all": "Todo",
+    "local": "local",
+    "notConfigured": "sin configurar"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Русский",
+    "ja": "日本語",
+    "zh": "中文",
+    "es": "Español",
+    "hi": "हिन्दी",
+    "ar": "العربية",
+    "fr": "Français",
+    "pt": "Português",
+    "id": "Bahasa Indonesia"
+  },
+  "nav": {
+    "sections": {
+      "home": "Hogar",
+      "automation": "Automatización",
+      "system": "Sistema",
+      "settings": "Configuración"
+    },
+    "items": {
+      "dashboard": "Resumen",
+      "home-devices": "Dispositivos",
+      "home-entities": "Entidades",
+      "home-areas": "Habitaciones",
+      "auto-scenarios": "Automatizaciones",
+      "auto-scenes": "Escenas",
+      "auto-scripts": "Scripts",
+      "activity": "Actividad",
+      "modules": "Extensiones",
+      "settings-account": "Cuenta",
+      "settings-appearance": "Apariencia",
+      "settings-services": "Servicios",
+      "settings-users": "Usuarios",
+      "settings-backup": "Copia de seguridad",
+      "settings-tools": "Herramientas"
+    },
+    "mobile": {
+      "overview": "Resumen",
+      "home": "Hogar",
+      "auto": "Auto",
+      "more": "Más"
+    }
+  },
+  "views": {
+    "dashboard": {
+      "title": "Resumen",
+      "subtitle": "El espacio de trabajo de su hogar"
+    },
+    "home-devices": {
+      "title": "Dispositivos",
+      "subtitle": "Equipos en el catálogo"
+    },
+    "home-entities": {
+      "title": "Entidades",
+      "subtitle": "Entidades del hogar controlables"
+    },
+    "home-areas": {
+      "title": "Habitaciones",
+      "subtitle": "Zonas y asignaciones"
+    },
+    "auto-scenarios": {
+      "title": "Automatizaciones",
+      "subtitle": "Ejecución por hora y estados"
+    },
+    "auto-scenes": {
+      "title": "Escenas",
+      "subtitle": "Conjuntos de estados listos"
+    },
+    "auto-scripts": {
+      "title": "Scripts",
+      "subtitle": "Cadenas de acciones manuales"
+    },
+    "activity": {
+      "title": "Actividad",
+      "subtitle": "Historial de eventos y acciones"
+    },
+    "modules": {
+      "title": "Extensiones",
+      "subtitle": "Módulos conectables"
+    },
+    "settings-account": {
+      "title": "Cuenta",
+      "subtitle": "Perfil de la sesión actual"
+    },
+    "settings-appearance": {
+      "title": "Apariencia",
+      "subtitle": "Tema y color de acento"
+    },
+    "settings-services": {
+      "title": "Servicios",
+      "subtitle": "Estado de los componentes"
+    },
+    "settings-users": {
+      "title": "Usuarios",
+      "subtitle": "Acceso al panel"
+    },
+    "settings-backup": {
+      "title": "Copia de seguridad",
+      "subtitle": "Exportar y restaurar"
+    },
+    "settings-tools": {
+      "title": "Herramientas",
+      "subtitle": "Operaciones de mantenimiento"
+    }
+  },
+  "login": {
+    "tagline": "Inicie sesión para gestionar su hogar inteligente",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contraseña",
+    "submit": "Iniciar sesión",
+    "pending": "Iniciando sesión...",
+    "invalidCredentialsError": "No se pudo iniciar sesión. Revise sus datos e inténtelo de nuevo.",
+    "connectionError": "No hay conexión con el servidor. Inténtelo de nuevo."
+  },
+  "overview": {
+    "toolbar": {
+      "title": "Espacio de trabajo",
+      "description": "Cree una pantalla cómoda para el control diario del hogar.",
+      "addWidget": "Agregar widget"
+    },
+    "requestError": "Error de solicitud {status}",
+    "stats": {
+      "devices": "Dispositivos",
+      "devicesInCatalog": "en el catálogo",
+      "devicesAddInHome": "agregar en Hogar",
+      "entities": "Entidades",
+      "entitiesOn": "{count} encendidas",
+      "entitiesWaitingDiscovery": "en espera de descubrimiento",
+      "rooms": "Habitaciones",
+      "roomExample": "p. ej., {name}",
+      "roomsUnassigned": "sin asignar",
+      "connection": "Conexión",
+      "onlineValue": "En línea",
+      "offlineValue": "Sin conexión",
+      "channels": "{count} canales",
+      "controllerAvailable": "controlador disponible",
+      "agentNoResponse": "el agente no responde",
+      "checkingValue": "…",
+      "checkingHint": "comprobando conexión"
+    },
+    "widgets": {
+      "emptyTitle": "Comience con su primer widget",
+      "emptyDescription": "Agregue widgets de iluminación, habitación, estado del sistema o registro de eventos.",
+      "addFirstWidget": "Agregar primer widget",
+      "newTitle": "Nuevo widget",
+      "editTitle": "Editar widget",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Sala",
+      "typeLabel": "Tipo",
+      "roomLabel": "Habitación",
+      "moveUpAria": "Mover widget hacia arriba",
+      "moveDownAria": "Mover widget hacia abajo",
+      "deleteConfirm": "¿Eliminar el widget “{title}”?",
+      "loadError": "No se pudieron cargar los widgets",
+      "deleteError": "No se pudo eliminar el widget",
+      "orderError": "No se pudo cambiar el orden",
+      "saveError": "No se pudo guardar el widget",
+      "kinds": {
+        "entities": "Entidades",
+        "lights": "Luces",
+        "area": "Habitación",
+        "status": "Estado",
+        "activity": "Actividad"
+      },
+      "kindArea": "Habitación: {room}",
+      "noRoomSelected": "sin seleccionar",
+      "unnamed": "Sin título",
+      "noMatchingTitle": "No hay entidades coincidentes",
+      "noMatchingAreaDescription": "Aún no hay entidades en “{room}”.",
+      "noMatchingGenericDescription": "Cambie el filtro o agregue dispositivos en Hogar.",
+      "noData": "sin datos",
+      "andMore": "Y {count} más",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "menuAria": "Acciones del widget"
+    },
+    "statusWidget": {
+      "controller": "Controlador",
+      "localAgent": "Agente local",
+      "noConnection": "Sin conexión",
+      "catalog": "Catálogo",
+      "active": "Activo",
+      "channels": "Canales",
+      "roomsCount": "Habitaciones: {count}",
+      "devicesAbbrev": "disp."
+    },
+    "activityWidget": {
+      "loadError": "No se pudieron cargar los eventos",
+      "emptyTitle": "Aún no hay eventos",
+      "emptyDescription": "La actividad reciente del sistema aparecerá aquí.",
+      "fallbackTitle": "Evento"
+    }
+  },
+  "inventory": {
+    "devices": {
+      "title": "Dispositivos",
+      "description": "Equipos en el catálogo",
+      "count": "{count} dispositivos",
+      "controllerOnline": "controlador en línea",
+      "channels": "canales: {count}",
+      "controllerUnavailable": "controlador no disponible",
+      "discover": "Buscar dispositivos",
+      "discoverError": "No se pudieron buscar dispositivos",
+      "discoverSuccess": "Entidades encontradas: {count}. Se guardaron los nombres y las asignaciones.",
+      "emptyTitle": "Aún no se agregaron dispositivos",
+      "emptyDescription": "Inicie el descubrimiento en la red; los dispositivos encontrados aparecerán aquí. Sus nombres y asignaciones se conservarán.",
+      "onCount": "{on}/{total} encendidos",
+      "areaLabel": "área",
+      "unassignedArea": "sin asignar",
+      "settingsTitle": "Configuración del dispositivo",
+      "nameLabel": "Nombre",
+      "areaSelectLabel": "Área",
+      "noArea": "Sin área",
+      "cascadeArea": "Aplicar habitación a todas las entidades del dispositivo",
+      "nodesOnline": "nodos en línea: {count}"
+    },
+    "entities": {
+      "title": "Entidades",
+      "description": "Entidades del hogar controlables",
+      "searchPlaceholder": "Buscar…",
+      "allAreas": "Todas las áreas",
+      "noArea": "Sin área",
+      "allDomains": "Todos los dominios",
+      "unboundNotice": "Hay entidades sin área.",
+      "emptyTitle": "Aún no se encontraron entidades",
+      "emptyDescription": "Las entidades de control aparecerán automáticamente después del descubrimiento de dispositivos.",
+      "controlHeading": "Control",
+      "settingsTitle": "Configuración de la entidad",
+      "nameLabel": "Nombre",
+      "deviceLabel": "Dispositivo",
+      "areaLabel": "Área",
+      "noDevice": "Sin dispositivo",
+      "areaSuffixNone": "sin área"
+    },
+    "areas": {
+      "title": "Habitaciones",
+      "description": "Zonas y asignaciones",
+      "count": "{count} áreas",
+      "add": "Agregar área",
+      "emptyTitle": "Aún no se crearon habitaciones",
+      "emptyDescription": "Cree una habitación y asigne dispositivos. Las asignaciones se conservan durante el redescubrimiento.",
+      "devicesAbbrev": "disp.",
+      "entitiesAbbrev": "ent.",
+      "onAbbrev": "enc.",
+      "nothingAssigned": "Aún no hay nada asignado a esta habitación",
+      "editTitle": "Área",
+      "newTitle": "Nueva área",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Por ejemplo, Sala",
+      "assignDevice": "Asignar dispositivo",
+      "assignEntity": "Asignar entidad",
+      "skip": "Omitir"
+    }
+  },
+  "rules": {
+    "requestError": "Error de solicitud {status}",
+    "automations": {
+      "title": "Automatizaciones",
+      "description": "Ejecute acciones según un horario o cuando cambien los estados de los dispositivos.",
+      "emptyTitle": "Aún no se crearon automatizaciones",
+      "emptyDescription": "Agregue una automatización cuando esté listo para automatizar su hogar.",
+      "create": "Crear automatización",
+      "active": "Activa",
+      "inactive": "Apagada",
+      "enableAria": "Habilitar automatización",
+      "deleteConfirm": "¿Eliminar la automatización “{name}”?",
+      "loadError": "No se pudo cargar",
+      "updateError": "No se pudo actualizar",
+      "deleteError": "No se pudo eliminar"
+    },
+    "scenes": {
+      "title": "Escenas",
+      "description": "Guarde estados de dispositivos listos y actívelos con un toque.",
+      "emptyTitle": "Aún no se crearon escenas",
+      "emptyDescription": "Guarde un conjunto de estados de dispositivos para iniciarlo rápidamente.",
+      "create": "Crear escena",
+      "newTitle": "Nueva escena",
+      "entityCount": "{count} entidades",
+      "deleteConfirm": "¿Eliminar la escena “{name}”?",
+      "loadError": "No se pudo cargar",
+      "deleteError": "No se pudo eliminar",
+      "activateError": "No se pudo iniciar la escena",
+      "saveError": "No se pudo guardar la escena",
+      "modeManual": "Elegir dispositivo",
+      "modeCapture": "Guardar actual",
+      "sceneDevice": "Dispositivo de escena",
+      "noAvailableEntities": "Aún no hay entidades disponibles.",
+      "namePlaceholder": "Modo noche"
+    },
+    "scripts": {
+      "title": "Scripts",
+      "description": "Cadenas de acciones que se pueden ejecutar manualmente en cualquier momento.",
+      "emptyTitle": "Aún no se crearon scripts",
+      "emptyDescription": "Agregue una secuencia de acciones para ejecución manual.",
+      "create": "Crear script",
+      "newTitle": "Nuevo script",
+      "loadError": "No se pudo cargar",
+      "runError": "No se pudo ejecutar el script",
+      "saveError": "No se pudo guardar",
+      "deleteError": "No se pudo eliminar",
+      "deleteConfirm": "¿Eliminar el script “{name}”?",
+      "namePlaceholder": "Revisar luces",
+      "entityLabel": "Entidad",
+      "actionLabel": "Acción"
+    }
+  },
+  "automationEditor": {
+    "newTitle": "Nueva automatización",
+    "editTitle": "Editar automatización",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Por ejemplo, Luz de la tarde",
+    "triggerSection": "Disparador",
+    "triggerKinds": {
+      "time": "Hora",
+      "state": "Estado",
+      "numeric_state": "Número"
+    },
+    "timeLabel": "Hora",
+    "weekdaysLabel": "Días de la semana (vacío = todos los días)",
+    "weekdays": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb",
+      "sun": "Dom"
+    },
+    "entityLabel": "Entidad",
+    "becomesLabel": "Pasa a",
+    "wasOptionalLabel": "Era (opcional)",
+    "attributeLabel": "Atributo",
+    "attributeOptionalLabel": "Atributo (opcional)",
+    "attributePlaceholder": "brightness",
+    "numericAttributePlaceholder": "brightness / vacío = state",
+    "aboveLabel": "Por encima de",
+    "belowLabel": "Por debajo de",
+    "abovePlaceholder": "por ejemplo 200",
+    "belowPlaceholder": "por ejemplo 50",
+    "conditionsSection": "Condiciones",
+    "addCondition": "Agregar condición",
+    "noConditions": "Sin condiciones adicionales, la automatización se ejecutará inmediatamente después del disparador.",
+    "conditionLabel": "Condición {index}",
+    "conditionKinds": {
+      "state": "Estado",
+      "numeric_state": "Número",
+      "time": "Intervalo de tiempo"
+    },
+    "equalsLabel": "Igual a",
+    "afterLabel": "Después de",
+    "beforeLabel": "Antes de",
+    "actionSection": "Acción",
+    "commandLabel": "Comando",
+    "brightnessLabel": "Brillo, %",
+    "colorLabel": "Color",
+    "effectLabel": "Efecto",
+    "speedLabel": "Velocidad del efecto (0–255)",
+    "capabilitiesLine": "Capacidades: {capabilities} · domain {domain}",
+    "emptyCapabilities": "—",
+    "unknownDomain": "?",
+    "saveError": "No se pudo guardar",
+    "requestError": "Error de solicitud {status}",
+    "triggerLabels": {
+      "timeAt": "Hora {time}{days}",
+      "timeFallback": "Disparador por hora",
+      "state": "Estado {entity} → {to}",
+      "numeric": "Número {entity} {range}",
+      "undefined": "La condición de inicio no está definida"
+    },
+    "actionLabels": {
+      "undefined": "La acción no está definida",
+      "fallbackAction": "acción",
+      "fallbackTarget": "entidad"
+    }
+  },
+  "settings": {
+    "account": {
+      "title": "Cuenta",
+      "description": "Usuario actual de esta instalación.",
+      "profileTitle": "Perfil",
+      "profileDescription": "Datos solo en su servidor.",
+      "idLabel": "ID"
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "description": "Tema y color del panel en este navegador."
+    },
+    "services": {
+      "title": "Services",
+      "description": "Deployment settings moved here — WWW/DB modes.",
+      "agentTitle": "Iotvex agent",
+      "localAgent": "Local agent",
+      "ready": "Ready",
+      "errorStatus": "error",
+      "checkingStatus": "checking…",
+      "localStatus": "local",
+      "remoteStatus": "remote",
+      "lanStatus": "LAN",
+      "publishedStatus": "published",
+      "homeSchedulerStatus": "home timer",
+      "alwaysLocal": "Always on the home machine",
+      "databaseTitle": "Database",
+      "databaseDescription": "Local Supabase catalog and auth",
+      "databaseDetail": "Automation configs stored here; data stays on this server",
+      "databaseRemoteDescription": "Your remote Supabase project",
+      "databaseRemoteDetail": "User-owned remote DB (RLS/keys are your responsibility)",
+      "otbrTitle": "OTBR",
+      "otbrDescription": "Thread Border Router",
+      "otbrDetail": "USB radio + container on this host",
+      "wwwTitle": "Web panel",
+      "wwwLanDescription": "Reachable on LAN / mDNS",
+      "wwwLanDetail": "Optional Avahi name",
+      "wwwPublishedDescription": "Port-forward + your domain/TLS",
+      "wwwPublishedDetail": "You publish :8443; agent stays private on localhost",
+      "automationsTitle": "Automations runner",
+      "automationsDescription": "Config in DB; ticks only on this host",
+      "automationsDetail": "systemd → 127.0.0.1:3100 → local agent"
+    },
+    "users": {
+      "title": "Usuarios",
+      "description": "Cuentas locales del panel.",
+      "newTitle": "Nuevo usuario",
+      "newDescription": "Correo electrónico y contraseña (mínimo 6 caracteres).",
+      "emailPlaceholder": "user@example.local",
+      "create": "Crear",
+      "loadError": "No se pudieron cargar los usuarios",
+      "createError": "No se pudo crear el usuario",
+      "emptyTitle": "No hay usuarios",
+      "emptyDescription": "Cree la primera cuenta para acceder al panel.",
+      "defaultRole": "user"
+    },
+    "backup": {
+      "title": "Copia de seguridad",
+      "description": "Exporte e importe el catálogo local.",
+      "exportTitle": "Exportar",
+      "exportDescription": "Descargue el JSON del catálogo.",
+      "downloadJson": "Descargar JSON",
+      "importTitle": "Importar",
+      "importDescription": "Suba un JSON guardado anteriormente.",
+      "publicUrlTitle": "URL pública",
+      "publicUrlDescription": "Dirección para integraciones externas.",
+      "urlNotConfigured": "La URL no está configurada",
+      "loadPublicUrlError": "No se pudo obtener la URL pública",
+      "exportStarted": "Se inició la exportación del catálogo.",
+      "exportError": "No se pudo exportar el catálogo",
+      "imported": "Catálogo importado.",
+      "importError": "No se pudo importar el catálogo"
+    },
+    "tools": {
+      "title": "Herramientas",
+      "description": "Acciones de mantenimiento del panel.",
+      "commandError": "El comando no se ejecutó",
+      "discoverTitle": "Descubrimiento",
+      "discoverDescription": "Buscar dispositivos locales.",
+      "discoverAction": "Buscar",
+      "discoverStarted": "Se inició la búsqueda de dispositivos.",
+      "catalogTitle": "Catálogo",
+      "catalogDescription": "Actualizar entidades y dispositivos.",
+      "catalogRefreshed": "Catálogo actualizado.",
+      "publicUrlTitle": "URL pública",
+      "publicUrlDescription": "Mostrar la dirección actual.",
+      "publicUrlReceived": "URL pública recibida.",
+      "publicUrlNotConfigured": "La URL pública no está configurada.",
+      "busy": "…"
+    },
+    "requestError": "Error de solicitud {status}",
+    "language": {
+      "title": "Idioma",
+      "description": "Idioma de la interfaz en este navegador.",
+      "label": "Idioma de la interfaz"
+    },
+    "deployment": {
+      "title": "Deployment",
+      "description": "WWW reachability and database backend. Device plane (agent/OTBR) stays local.",
+      "loadError": "Failed to load runtime config",
+      "saveError": "Failed to save",
+      "saved": "Saved. mDNS/publish providers updated in config/runtime.json.",
+      "wwwTitle": "Web panel",
+      "wwwDescription": "How you open the UI. Local modes always include IP:port and mDNS.",
+      "wwwModeLabel": "WWW mode",
+      "wwwModes": {
+        "local": "Local",
+        "local_published": "Local + published",
+        "cloud": "Cloud"
+      },
+      "wwwModeHelp": {
+        "local": "Self-hosted on this machine. HTTP + HTTPS on LAN/mDNS.",
+        "local_published": "Same as local, plus public HTTPS (port-forward, domain, Pinggy, Cloudflare, ngrok, Tailscale…).",
+        "cloud": "UI in the cloud; home keeps agent/OTBR. With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
+      },
+      "mdnsLabel": "mDNS name",
+      "customDomainLabel": "Custom domain",
+      "cloudWwwLabel": "Cloud WWW base URL",
+      "accessLabel": "Access URLs",
+      "accessHint": "Replace <lan-ip> with this host’s LAN address. Public HTTPS needs port-forward or an enabled tunnel provider.",
+      "providersLabel": "Publish / tunnel providers",
+      "saveWww": "Save WWW settings",
+      "dbTitle": "Database",
+      "dbDescription": "Catalog, auth, automation configs. Switch hot-reloads after probe + merge.",
+      "activeDb": "Active",
+      "dbModeLabel": "DB mode",
+      "dbModes": {
+        "local": "Local",
+        "cloud_public": "Cloud public",
+        "cloud_private": "Cloud private"
+      },
+      "dbModeHelp": {
+        "local": "Bundled Supabase. Also usable by cloud WWW via home bridge tunnel.",
+        "cloud_public": "Shared Iotvex-hosted Supabase (multi-tenant).",
+        "cloud_private": "Your own Supabase project."
+      },
+      "targetUrl": "Supabase URL",
+      "targetAnon": "Anon key",
+      "targetService": "Service role key",
+      "optionalIfLocal": "Optional if already in secrets",
+      "mergeLabel": "Merge before switch",
+      "mergeHelp": "Copy/upsert catalog from current DB into the target, then swap.",
+      "probe": "Probe target",
+      "probeOk": "Target DB reachable and schema OK.",
+      "probeFail": "Probe failed",
+      "switch": "Merge & switch",
+      "switching": "Switching…",
+      "switched": "Switched. Merged {imported} rows. Reloading…",
+      "switchError": "Switch failed",
+      "matrixTitle": "WWW × DB matrix",
+      "matrixDescription": "Every WWW mode works with every DB mode. Cloud UI + local DB automatically bridges Supabase + agent.",
+      "matrixCurrent": "Current: {www} × {db}",
+      "applyPublish": "Apply tunnels",
+      "stopPublish": "Stop tunnels",
+      "refreshPublish": "Refresh status",
+      "publishing": "Working…",
+      "publishQueued": "Queued on home host — tunnels reconcile shortly.",
+      "publishStatus": "Active tunnels: {tunnels}",
+      "publishError": "Publish manager error"
+    }
+  },
+  "activity": {
+    "metaCount": "{count} entradas",
+    "metaEmpty": "El registro se completará a medida que el sistema funcione",
+    "refresh": "Actualizar",
+    "clearJournal": "Limpiar registro",
+    "filterAll": "Todo",
+    "emptyTitle": "El registro está vacío",
+    "emptyDescription": "Los eventos aparecerán después de controlar dispositivos, ejecutar automatizaciones o descubrir equipos."
+  },
+  "modules": {
+    "metaCount": "{count} extensiones",
+    "metaEmpty": "Conecte capacidades adicionales al panel",
+    "refresh": "Actualizar",
+    "connect": "Conectar",
+    "emptyTitle": "Aún no hay extensiones conectadas",
+    "emptyDescription": "Ingrese la dirección del manifiesto de la extensión; el sistema cargará su descripción.",
+    "enabledShort": "act.",
+    "disabledShort": "des.",
+    "enable": "Habilitar",
+    "disable": "Deshabilitar",
+    "dialogTitle": "Conectar extensión",
+    "nameLabel": "Nombre",
+    "idOptionalLabel": "ID (opcional)",
+    "idPlaceholder": "my-panel",
+    "manifestUrlLabel": "Dirección del manifiesto",
+    "manifestUrlPlaceholder": "https://…/module.json",
+    "register": "Registrar"
+  },
+  "entity": {
+    "states": {
+      "offline": "offline",
+      "on": "on",
+      "off": "off"
+    },
+    "brightness": "Brillo",
+    "colorLabel": "Color",
+    "effect": "Efecto",
+    "speed": "Velocidad",
+    "emptyEntities": "No hay entidades.",
+    "fallbackEffect": "solid",
+    "colorPicker": {
+      "title": "Color",
+      "done": "Listo",
+      "hue": "Tono",
+      "saturation": "Saturación",
+      "value": "Brillo",
+      "hex": "Hex",
+      "quickAccess": "Acceso rápido",
+      "saveCurrent": "Guardar color",
+      "managePresets": "Gestionar presets",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "remove": "Eliminar",
+      "noPresets": "Aún no hay colores guardados.",
+      "tabs": {
+        "wheel": "Rueda",
+        "sliders": "Deslizadores",
+        "hex": "Hex",
+        "presets": "Presets"
+      }
+    }
+  },
+  "theme": {
+    "ariaLabel": "Apariencia",
+    "buttonLabel": "Apariencia",
+    "modeLabel": "Modo",
+    "colorLabel": "Color",
+    "colorCurrent": "Color · ahora {color}",
+    "themeTitle": "Tema",
+    "accentColor": "Color de acento",
+    "resolvedDark": "dark",
+    "resolvedLight": "light",
+    "modes": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
+    "colors": {
+      "default": "Turquesa",
+      "blue": "Azul",
+      "green": "Verde",
+      "orange": "Naranja",
+      "rose": "Rosa",
+      "violet": "Violeta",
+      "yellow": "Amarillo",
+      "red": "Rojo",
+      "zinc": "Gris"
+    }
+  },
+  "actions": {
+    "turn_on": "Encender",
+    "turn_off": "Apagar",
+    "toggle": "Alternar",
+    "set_brightness": "Ajustar brillo",
+    "set_color": "Ajustar color",
+    "set_effect": "Ajustar efecto",
+    "set_speed": "Ajustar velocidad"
+  },
+  "topbar": {
+    "menu": "Menú",
+    "logout": "Cerrar sesión",
+    "navigation": "Navegación",
+    "onlineBadge": "online",
+    "documentTitle": "{title} · Iotvex"
+  },
+  "sidebar": {
+    "panelControlSubtitle": "Panel de control"
+  }
+}

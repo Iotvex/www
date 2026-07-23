@@ -1,0 +1,696 @@
+{
+  "meta": {
+    "title": "Iotvex Home",
+    "description": "Панель управления Iotvex",
+    "panelControl": "Панель управления"
+  },
+  "common": {
+    "save": "Сохранить",
+    "saving": "Сохранение...",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "create": "Создать",
+    "creating": "Создание...",
+    "edit": "Изменить",
+    "close": "Закрыть",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "online": "онлайн",
+    "offline": "офлайн",
+    "search": "Поиск",
+    "actions": "Действия",
+    "yes": "Да",
+    "yesCascade": "Да, применить ко всем",
+    "no": "Нет",
+    "back": "Назад",
+    "retry": "Повторить",
+    "confirm": "Подтвердить",
+    "name": "Название",
+    "email": "Email",
+    "password": "Пароль",
+    "enabled": "включено",
+    "disabled": "выключено",
+    "add": "Добавить",
+    "remove": "Удалить",
+    "run": "Выполнить",
+    "activate": "Активировать",
+    "empty": "Пусто",
+    "unknown": "неизвестен",
+    "notSpecified": "не указан",
+    "copied": "Скопировано",
+    "copy": "Копировать",
+    "export": "Экспорт",
+    "import": "Импорт",
+    "refresh": "Обновить",
+    "show": "Показать",
+    "skip": "Пропустить",
+    "clear": "Очистить",
+    "all": "Все",
+    "local": "локально",
+    "notConfigured": "не настроен"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Русский",
+    "ja": "日本語",
+    "zh": "中文",
+    "es": "Español",
+    "hi": "हिन्दी",
+    "ar": "العربية",
+    "fr": "Français",
+    "pt": "Português",
+    "id": "Bahasa Indonesia"
+  },
+  "nav": {
+    "sections": {
+      "home": "Дом",
+      "automation": "Автоматизация",
+      "system": "Система",
+      "settings": "Настройки"
+    },
+    "items": {
+      "dashboard": "Обзор",
+      "home-devices": "Устройства",
+      "home-entities": "Объекты",
+      "home-areas": "Комнаты",
+      "auto-scenarios": "Сценарии",
+      "auto-scenes": "Сцены",
+      "auto-scripts": "Последовательности",
+      "activity": "Журнал",
+      "modules": "Расширения",
+      "settings-account": "Аккаунт",
+      "settings-appearance": "Оформление",
+      "settings-services": "Сервисы",
+      "settings-users": "Пользователи",
+      "settings-backup": "Бэкап",
+      "settings-tools": "Сервис"
+    },
+    "mobile": {
+      "overview": "Обзор",
+      "home": "Дом",
+      "auto": "Авто",
+      "more": "Ещё"
+    }
+  },
+  "views": {
+    "dashboard": {
+      "title": "Обзор",
+      "subtitle": "Рабочее пространство вашего дома"
+    },
+    "home-devices": {
+      "title": "Устройства",
+      "subtitle": "Оборудование в каталоге"
+    },
+    "home-entities": {
+      "title": "Объекты",
+      "subtitle": "Управляемые сущности дома"
+    },
+    "home-areas": {
+      "title": "Комнаты",
+      "subtitle": "Зоны и привязки"
+    },
+    "auto-scenarios": {
+      "title": "Сценарии",
+      "subtitle": "Запуск по времени и состояниям"
+    },
+    "auto-scenes": {
+      "title": "Сцены",
+      "subtitle": "Готовые наборы состояний"
+    },
+    "auto-scripts": {
+      "title": "Последовательности",
+      "subtitle": "Цепочки действий вручную"
+    },
+    "activity": {
+      "title": "Журнал",
+      "subtitle": "История событий и действий"
+    },
+    "modules": {
+      "title": "Расширения",
+      "subtitle": "Подключаемые модули"
+    },
+    "settings-account": {
+      "title": "Аккаунт",
+      "subtitle": "Профиль текущей сессии"
+    },
+    "settings-appearance": {
+      "title": "Оформление",
+      "subtitle": "Тема и акцентный цвет"
+    },
+    "settings-services": {
+      "title": "Сервисы",
+      "subtitle": "Состояние компонентов"
+    },
+    "settings-users": {
+      "title": "Пользователи",
+      "subtitle": "Доступ к панели"
+    },
+    "settings-backup": {
+      "title": "Бэкап",
+      "subtitle": "Экспорт и восстановление"
+    },
+    "settings-tools": {
+      "title": "Сервис",
+      "subtitle": "Служебные операции"
+    }
+  },
+  "login": {
+    "tagline": "Войдите, чтобы управлять умным домом",
+    "emailLabel": "Email",
+    "passwordLabel": "Пароль",
+    "submit": "Войти",
+    "pending": "Выполняется вход…",
+    "invalidCredentialsError": "Не удалось выполнить вход. Проверьте данные и повторите попытку.",
+    "connectionError": "Нет соединения с сервером. Попробуйте ещё раз."
+  },
+  "overview": {
+    "toolbar": {
+      "title": "Рабочее пространство",
+      "description": "Соберите удобный экран для повседневного управления домом.",
+      "addWidget": "Добавить виджет"
+    },
+    "requestError": "Ошибка запроса {status}",
+    "stats": {
+      "devices": "Устройства",
+      "devicesInCatalog": "в каталоге",
+      "devicesAddInHome": "добавьте в «Дом»",
+      "entities": "Объекты",
+      "entitiesOn": "{count} включено",
+      "entitiesWaitingDiscovery": "ожидают обнаружения",
+      "rooms": "Комнаты",
+      "roomExample": "напр. {name}",
+      "roomsUnassigned": "без привязок",
+      "connection": "Связь",
+      "onlineValue": "Online",
+      "offlineValue": "Offline",
+      "checkingValue": "…",
+      "checkingHint": "проверка связи",
+      "channels": "{count} канал.",
+      "controllerAvailable": "контроллер доступен",
+      "agentNoResponse": "нет ответа агента"
+    },
+    "widgets": {
+      "emptyTitle": "Начните с первого виджета",
+      "emptyDescription": "Добавьте виджеты освещения, комнат, статуса системы или журнала событий.",
+      "addFirstWidget": "Добавить первый виджет",
+      "newTitle": "Новый виджет",
+      "editTitle": "Изменить виджет",
+      "nameLabel": "Название",
+      "namePlaceholder": "Гостиная",
+      "typeLabel": "Тип",
+      "roomLabel": "Комната",
+      "moveUpAria": "Поднять виджет",
+      "moveDownAria": "Опустить виджет",
+      "moveUp": "Выше",
+      "moveDown": "Ниже",
+      "menuAria": "Действия с виджетом",
+      "deleteConfirm": "Удалить виджет «{title}»?",
+      "loadError": "Не удалось загрузить виджеты",
+      "deleteError": "Не удалось удалить виджет",
+      "orderError": "Не удалось изменить порядок",
+      "saveError": "Не удалось сохранить виджет",
+      "kinds": {
+        "entities": "Объекты",
+        "lights": "Свет",
+        "area": "Комната",
+        "status": "Статус",
+        "activity": "Активность"
+      },
+      "kindArea": "Комната: {room}",
+      "noRoomSelected": "не выбрана",
+      "unnamed": "Без названия",
+      "noMatchingTitle": "Нет подходящих объектов",
+      "noMatchingAreaDescription": "В комнате «{room}» пока нет объектов.",
+      "noMatchingGenericDescription": "Измените фильтр или добавьте устройства в разделе «Дом».",
+      "noData": "нет данных",
+      "andMore": "И ещё {count}"
+    },
+    "statusWidget": {
+      "controller": "Контроллер",
+      "localAgent": "Локальный агент",
+      "noConnection": "Нет соединения",
+      "catalog": "Каталог",
+      "active": "Активны",
+      "channels": "Каналы",
+      "roomsCount": "Комнат: {count}",
+      "devicesAbbrev": "устр."
+    },
+    "activityWidget": {
+      "loadError": "Не удалось загрузить события",
+      "emptyTitle": "Событий пока нет",
+      "emptyDescription": "Здесь будет отображаться недавняя активность системы.",
+      "fallbackTitle": "Событие"
+    }
+  },
+  "inventory": {
+    "devices": {
+      "title": "Устройства",
+      "description": "Оборудование в каталоге",
+      "count": "{count} устройств",
+      "controllerOnline": "контроллер в сети",
+      "nodesOnline": "узлов онлайн: {count}",
+      "channels": "каналов: {count}",
+      "controllerUnavailable": "контроллер недоступен",
+      "discover": "Найти устройства",
+      "discoverError": "Не удалось выполнить поиск устройств",
+      "discoverSuccess": "Найдено объектов: {count}. Названия и привязки сохранены.",
+      "emptyTitle": "Устройства ещё не добавлены",
+      "emptyDescription": "Запустите поиск в сети — найденные устройства появятся здесь. Ваши названия и привязки сохранятся.",
+      "onCount": "{on}/{total} вкл",
+      "areaLabel": "зона",
+      "unassignedArea": "не привязана",
+      "settingsTitle": "Параметры устройства",
+      "nameLabel": "Название",
+      "areaSelectLabel": "Зона",
+      "noArea": "Без зоны",
+      "cascadeArea": "Применить комнату ко всем объектам устройства"
+    },
+    "entities": {
+      "title": "Объекты",
+      "description": "Управляемые сущности дома",
+      "searchPlaceholder": "Поиск…",
+      "allAreas": "Все зоны",
+      "noArea": "Без зоны",
+      "allDomains": "Все домены",
+      "unboundNotice": "Есть сущности без зоны.",
+      "emptyTitle": "Объекты ещё не найдены",
+      "emptyDescription": "После обнаружения устройств объекты управления появятся автоматически.",
+      "controlHeading": "Управление",
+      "settingsTitle": "Параметры объекта",
+      "nameLabel": "Название",
+      "deviceLabel": "Устройство",
+      "areaLabel": "Зона",
+      "noDevice": "Без устройства",
+      "areaSuffixNone": "без зоны"
+    },
+    "areas": {
+      "title": "Комнаты",
+      "description": "Зоны и привязки",
+      "count": "{count} зон",
+      "add": "Добавить зону",
+      "emptyTitle": "Комнаты ещё не созданы",
+      "emptyDescription": "Создайте комнату и назначьте устройства. Привязки сохраняются при повторном поиске.",
+      "devicesAbbrev": "устр.",
+      "entitiesAbbrev": "сущн.",
+      "onAbbrev": "вкл",
+      "nothingAssigned": "К этой комнате пока ничего не привязано",
+      "editTitle": "Зона",
+      "newTitle": "Новая зона",
+      "nameLabel": "Название",
+      "namePlaceholder": "Например, Гостиная",
+      "assignDevice": "Назначить устройство",
+      "assignEntity": "Назначить объект",
+      "skip": "Пропустить"
+    }
+  },
+  "rules": {
+    "requestError": "Ошибка запроса {status}",
+    "automations": {
+      "title": "Сценарии",
+      "description": "Запускайте действия по расписанию или при изменении состояния устройств.",
+      "emptyTitle": "Сценарии ещё не созданы",
+      "emptyDescription": "Добавьте сценарий, когда будете готовы автоматизировать дом.",
+      "create": "Создать сценарий",
+      "active": "Активна",
+      "inactive": "Выключена",
+      "enableAria": "Включить автоматизацию",
+      "deleteConfirm": "Удалить сценарий «{name}»?",
+      "loadError": "Не удалось загрузить",
+      "updateError": "Не удалось обновить",
+      "deleteError": "Не удалось удалить"
+    },
+    "scenes": {
+      "title": "Сцены",
+      "description": "Сохраняйте готовые состояния устройств и активируйте их одним нажатием.",
+      "emptyTitle": "Сцены ещё не созданы",
+      "emptyDescription": "Сохраните набор состояний устройств для быстрого запуска.",
+      "create": "Создать сцену",
+      "newTitle": "Новая сцена",
+      "entityCount": "{count} объектов",
+      "deleteConfirm": "Удалить сцену «{name}»?",
+      "loadError": "Не удалось загрузить",
+      "deleteError": "Не удалось удалить",
+      "activateError": "Не удалось запустить сцену",
+      "saveError": "Не удалось сохранить сцену",
+      "modeManual": "Выбрать устройство",
+      "modeCapture": "Сохранить текущее",
+      "sceneDevice": "Устройство сцены",
+      "noAvailableEntities": "Доступных объектов пока нет.",
+      "namePlaceholder": "Вечерний режим"
+    },
+    "scripts": {
+      "title": "Последовательности",
+      "description": "Цепочки действий, которые можно запускать вручную в любой момент.",
+      "emptyTitle": "Последовательности ещё не созданы",
+      "emptyDescription": "Добавьте последовательность действий для ручного запуска.",
+      "create": "Создать последовательность",
+      "newTitle": "Новая последовательность",
+      "loadError": "Не удалось загрузить",
+      "runError": "Не удалось запустить сценарий",
+      "saveError": "Не удалось сохранить",
+      "deleteError": "Не удалось удалить",
+      "deleteConfirm": "Удалить последовательность «{name}»?",
+      "namePlaceholder": "Проверить свет",
+      "entityLabel": "Объект",
+      "actionLabel": "Действие"
+    }
+  },
+  "automationEditor": {
+    "newTitle": "Новый сценарий",
+    "editTitle": "Редактирование сценария",
+    "nameLabel": "Название",
+    "namePlaceholder": "Например, Вечерний свет",
+    "triggerSection": "Триггер",
+    "triggerKinds": {
+      "time": "Время",
+      "state": "Состояние",
+      "numeric_state": "Число"
+    },
+    "timeLabel": "Время",
+    "weekdaysLabel": "Дни недели (пусто = каждый день)",
+    "weekdays": {
+      "mon": "Пн",
+      "tue": "Вт",
+      "wed": "Ср",
+      "thu": "Чт",
+      "fri": "Пт",
+      "sat": "Сб",
+      "sun": "Вс"
+    },
+    "entityLabel": "Объект",
+    "becomesLabel": "Становится",
+    "wasOptionalLabel": "Было (опционально)",
+    "attributeLabel": "Атрибут",
+    "attributeOptionalLabel": "Атрибут (опционально)",
+    "attributePlaceholder": "brightness",
+    "numericAttributePlaceholder": "brightness / пусто = state",
+    "aboveLabel": "Выше",
+    "belowLabel": "Ниже",
+    "abovePlaceholder": "например 200",
+    "belowPlaceholder": "например 50",
+    "conditionsSection": "Условия",
+    "addCondition": "Добавить условие",
+    "noConditions": "Без дополнительных условий сценарий выполнится сразу после запуска.",
+    "conditionLabel": "Условие {index}",
+    "conditionKinds": {
+      "state": "Состояние",
+      "numeric_state": "Число",
+      "time": "Интервал времени"
+    },
+    "equalsLabel": "Равно",
+    "afterLabel": "После",
+    "beforeLabel": "До",
+    "actionSection": "Действие",
+    "commandLabel": "Команда",
+    "brightnessLabel": "Яркость, %",
+    "colorLabel": "Цвет",
+    "effectLabel": "Эффект",
+    "speedLabel": "Скорость эффекта (0–255)",
+    "capabilitiesLine": "Возможности: {capabilities} · domain {domain}",
+    "emptyCapabilities": "—",
+    "unknownDomain": "?",
+    "saveError": "Не удалось сохранить",
+    "requestError": "Ошибка запроса {status}",
+    "triggerLabels": {
+      "timeAt": "Время {time}{days}",
+      "timeFallback": "Триггер по времени",
+      "state": "Состояние {entity} → {to}",
+      "numeric": "Число {entity} {range}",
+      "undefined": "Условие запуска не задано"
+    },
+    "actionLabels": {
+      "undefined": "Действие не задано",
+      "fallbackAction": "действие",
+      "fallbackTarget": "объект"
+    }
+  },
+  "settings": {
+    "account": {
+      "title": "Аккаунт",
+      "description": "Текущий пользователь этой установки.",
+      "profileTitle": "Профиль",
+      "profileDescription": "Данные только на вашем сервере.",
+      "idLabel": "ID"
+    },
+    "appearance": {
+      "title": "Внешний вид",
+      "description": "Тема и цвет панели в этом браузере."
+    },
+    "services": {
+      "title": "Сервисы",
+      "description": "Настройки развёртывания: режимы WWW и БД.",
+      "agentTitle": "Агент Iotvex",
+      "localAgent": "Локальный агент",
+      "ready": "Готов к работе",
+      "errorStatus": "ошибка",
+      "checkingStatus": "проверка…",
+      "localStatus": "локально",
+      "remoteStatus": "удалённо",
+      "lanStatus": "LAN",
+      "publishedStatus": "опубликован",
+      "homeSchedulerStatus": "домашний таймер",
+      "alwaysLocal": "Всегда на домашней машине",
+      "databaseTitle": "База данных",
+      "databaseDescription": "Локальный Supabase: каталог и auth",
+      "databaseDetail": "Конфиги автоматизаций здесь; данные на этом сервере",
+      "databaseRemoteDescription": "Ваш удалённый проект Supabase",
+      "databaseRemoteDetail": "Своя remote БД (RLS/ключи — ваша зона)",
+      "otbrTitle": "OTBR",
+      "otbrDescription": "Thread Border Router",
+      "otbrDetail": "USB-радио и контейнер на этом хосте",
+      "wwwTitle": "Веб-панель",
+      "wwwLanDescription": "Доступ по LAN / mDNS",
+      "wwwLanDetail": "Опциональное имя Avahi",
+      "wwwPublishedDescription": "Проброс порта + свой домен/TLS",
+      "wwwPublishedDetail": "Вы публикуете :8443; агент остаётся на localhost",
+      "automationsTitle": "Планировщик автоматизаций",
+      "automationsDescription": "Конфиг в БД; тики только на этом хосте",
+      "automationsDetail": "systemd → 127.0.0.1:3100 → локальный агент"
+    },
+    "users": {
+      "title": "Пользователи",
+      "description": "Локальные учётные записи панели.",
+      "newTitle": "Новый пользователь",
+      "newDescription": "Email и пароль (минимум 6 символов).",
+      "emailPlaceholder": "user@example.local",
+      "create": "Создать",
+      "loadError": "Не удалось загрузить пользователей",
+      "createError": "Не удалось создать пользователя",
+      "emptyTitle": "Пользователей нет",
+      "emptyDescription": "Создайте первую учётную запись для доступа к панели.",
+      "defaultRole": "user"
+    },
+    "backup": {
+      "title": "Бэкап",
+      "description": "Экспорт и импорт локального каталога.",
+      "exportTitle": "Экспорт",
+      "exportDescription": "Скачать JSON каталога.",
+      "downloadJson": "Скачать JSON",
+      "importTitle": "Импорт",
+      "importDescription": "Загрузить ранее сохранённый JSON.",
+      "publicUrlTitle": "Публичный URL",
+      "publicUrlDescription": "Адрес для внешних интеграций.",
+      "urlNotConfigured": "URL не настроен",
+      "loadPublicUrlError": "Не удалось получить публичный URL",
+      "exportStarted": "Экспорт каталога начат.",
+      "exportError": "Не удалось экспортировать каталог",
+      "imported": "Каталог импортирован.",
+      "importError": "Не удалось импортировать каталог"
+    },
+    "tools": {
+      "title": "Инструменты",
+      "description": "Сервисные действия панели.",
+      "commandError": "Команда не выполнена",
+      "discoverTitle": "Обнаружение",
+      "discoverDescription": "Поиск локальных устройств.",
+      "discoverAction": "Найти",
+      "discoverStarted": "Поиск устройств запущен.",
+      "catalogTitle": "Каталог",
+      "catalogDescription": "Обновить объекты и устройства.",
+      "catalogRefreshed": "Каталог обновлён.",
+      "publicUrlTitle": "Публичный URL",
+      "publicUrlDescription": "Показать текущий адрес.",
+      "publicUrlReceived": "Публичный URL получен.",
+      "publicUrlNotConfigured": "Публичный URL не настроен.",
+      "busy": "…"
+    },
+    "requestError": "Ошибка запроса {status}",
+    "language": {
+      "title": "Язык",
+      "description": "Язык интерфейса в этом браузере.",
+      "label": "Язык интерфейса"
+    },
+    "deployment": {
+      "title": "Развёртывание",
+      "description": "Доступ к панели и бэкенд БД. Плоскость устройств (agent/OTBR) всегда локальная.",
+      "loadError": "Не удалось загрузить runtime-конфиг",
+      "saveError": "Не удалось сохранить",
+      "saved": "Сохранено в config/runtime.json.",
+      "wwwTitle": "Веб-панель",
+      "wwwDescription": "Как открывается UI. В local-режимах всегда есть IP:port и mDNS.",
+      "wwwModeLabel": "Режим WWW",
+      "wwwModes": {
+        "local": "Локальный",
+        "local_published": "Локальный + опубликованный",
+        "cloud": "Облако"
+      },
+      "wwwModeHelp": {
+        "local": "Хостинг на этой машине. HTTP + HTTPS в LAN/mDNS.",
+        "local_published": "То же + публичный HTTPS (проброс, домен, Pinggy, Cloudflare, ngrok, Tailscale…).",
+        "cloud": "UI в облаке; дом держит agent/OTBR. С local БД — туннель Supabase+agent. С cloud БД — туннель agent."
+      },
+      "mdnsLabel": "Имя mDNS",
+      "customDomainLabel": "Свой домен",
+      "cloudWwwLabel": "URL облачного WWW",
+      "accessLabel": "Адреса доступа",
+      "accessHint": "Подставьте LAN IP хоста вместо <lan-ip>. Публичный HTTPS — через проброс или туннель.",
+      "providersLabel": "Провайдеры публикации / туннелей",
+      "saveWww": "Сохранить WWW",
+      "dbTitle": "База данных",
+      "dbDescription": "Каталог, auth, конфиги автоматизаций. Смена: probe → merge → swap без ребилда.",
+      "activeDb": "Активная",
+      "dbModeLabel": "Режим БД",
+      "dbModes": {
+        "local": "Локальная",
+        "cloud_public": "Облако public",
+        "cloud_private": "Облако private"
+      },
+      "dbModeHelp": {
+        "local": "Локальный Supabase. Доступен и cloud WWW через bridge-туннель.",
+        "cloud_public": "Общая Supabase Iotvex (multi-tenant).",
+        "cloud_private": "Ваш личный проект Supabase."
+      },
+      "targetUrl": "URL Supabase",
+      "targetAnon": "Anon key",
+      "targetService": "Service role key",
+      "optionalIfLocal": "Необязательно, если уже в secrets",
+      "mergeLabel": "Смерджить перед сменой",
+      "mergeHelp": "Upsert каталога из текущей БД в целевую, затем переключить подключение.",
+      "probe": "Проверить цель",
+      "probeOk": "Целевая БД доступна, схема ок.",
+      "probeFail": "Проверка не удалась",
+      "switch": "Merge и переключить",
+      "switching": "Переключение…",
+      "switched": "Переключено. Смерджено {imported} записей. Перезагрузка…",
+      "switchError": "Не удалось переключить",
+      "matrixTitle": "Матрица WWW × БД",
+      "matrixDescription": "Каждый режим WWW работает с каждой БД. Cloud UI + local DB автоматически туннелирует Supabase и agent.",
+      "matrixCurrent": "Сейчас: {www} × {db}",
+      "applyPublish": "Применить туннели",
+      "stopPublish": "Остановить туннели",
+      "refreshPublish": "Обновить статус",
+      "publishing": "Работаю…",
+      "publishQueued": "В очереди на домашнем хосте — туннели поднимутся сейчас.",
+      "publishStatus": "Активные туннели: {tunnels}",
+      "publishError": "Ошибка publish manager"
+    }
+  },
+  "activity": {
+    "metaCount": "{count} записей",
+    "metaEmpty": "Журнал заполнится по мере работы системы",
+    "refresh": "Обновить",
+    "clearJournal": "Очистить журнал",
+    "filterAll": "Все",
+    "emptyTitle": "Журнал пока пуст",
+    "emptyDescription": "События появятся после управления устройствами, запуска сценариев или поиска оборудования."
+  },
+  "modules": {
+    "metaCount": "{count} расширений",
+    "metaEmpty": "Подключайте дополнительные возможности панели",
+    "refresh": "Обновить",
+    "connect": "Подключить",
+    "emptyTitle": "Расширения ещё не подключены",
+    "emptyDescription": "Укажите адрес манифеста расширения — система загрузит его описание.",
+    "enabledShort": "вкл",
+    "disabledShort": "выкл",
+    "enable": "Включить",
+    "disable": "Выключить",
+    "dialogTitle": "Подключение расширения",
+    "nameLabel": "Имя",
+    "idOptionalLabel": "ID (опционально)",
+    "idPlaceholder": "my-panel",
+    "manifestUrlLabel": "Адрес манифеста",
+    "manifestUrlPlaceholder": "https://…/module.json",
+    "register": "Зарегистрировать"
+  },
+  "entity": {
+    "states": {
+      "offline": "offline",
+      "on": "on",
+      "off": "off"
+    },
+    "brightness": "Яркость",
+    "colorLabel": "Цвет",
+    "effect": "Эффект",
+    "speed": "Скорость",
+    "emptyEntities": "Нет сущностей.",
+    "fallbackEffect": "solid",
+    "colorPicker": {
+      "title": "Цвет",
+      "done": "Готово",
+      "hue": "Оттенок",
+      "saturation": "Насыщенность",
+      "value": "Яркость",
+      "hex": "Hex",
+      "quickAccess": "Быстрый доступ",
+      "saveCurrent": "Сохранить цвет",
+      "managePresets": "Управление пресетами",
+      "moveUp": "Выше",
+      "moveDown": "Ниже",
+      "remove": "Удалить",
+      "noPresets": "Пока нет сохранённых цветов.",
+      "tabs": {
+        "wheel": "Круг",
+        "sliders": "Слайдеры",
+        "hex": "Hex",
+        "presets": "Пресеты"
+      }
+    }
+  },
+  "theme": {
+    "ariaLabel": "Оформление",
+    "buttonLabel": "Оформление",
+    "modeLabel": "Режим",
+    "colorLabel": "Цвет",
+    "colorCurrent": "Цвет · сейчас {color}",
+    "themeTitle": "Тема оформления",
+    "accentColor": "Акцентный цвет",
+    "resolvedDark": "dark",
+    "resolvedLight": "light",
+    "modes": {
+      "light": "Светлая",
+      "dark": "Тёмная",
+      "system": "Системная"
+    },
+    "colors": {
+      "default": "Бирюзовый",
+      "blue": "Синий",
+      "green": "Зелёный",
+      "orange": "Оранжевый",
+      "rose": "Розовый",
+      "violet": "Фиолетовый",
+      "yellow": "Жёлтый",
+      "red": "Красный",
+      "zinc": "Серый"
+    }
+  },
+  "actions": {
+    "turn_on": "Включить",
+    "turn_off": "Выключить",
+    "toggle": "Переключить",
+    "set_brightness": "Установить яркость",
+    "set_color": "Установить цвет",
+    "set_effect": "Установить эффект",
+    "set_speed": "Установить скорость"
+  },
+  "topbar": {
+    "menu": "Меню",
+    "logout": "Выйти",
+    "navigation": "Навигация",
+    "onlineBadge": "online",
+    "documentTitle": "{title} · Iotvex"
+  },
+  "sidebar": {
+    "panelControlSubtitle": "Панель управления"
+  }
+}

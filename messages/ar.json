@@ -1,0 +1,696 @@
+{
+  "meta": {
+    "title": "Iotvex Home",
+    "description": "لوحة تحكم Iotvex",
+    "panelControl": "لوحة التحكم"
+  },
+  "common": {
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "create": "إنشاء",
+    "creating": "جارٍ الإنشاء...",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "loading": "جارٍ التحميل...",
+    "error": "خطأ",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "search": "بحث",
+    "actions": "الإجراءات",
+    "yes": "نعم",
+    "yesCascade": "نعم، طبّق على الكل",
+    "no": "لا",
+    "back": "رجوع",
+    "retry": "إعادة المحاولة",
+    "confirm": "تأكيد",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "enabled": "مفعّل",
+    "disabled": "معطّل",
+    "add": "إضافة",
+    "remove": "إزالة",
+    "run": "تشغيل",
+    "activate": "تفعيل",
+    "empty": "فارغ",
+    "unknown": "غير معروف",
+    "notSpecified": "غير محدد",
+    "copied": "تم النسخ",
+    "copy": "نسخ",
+    "export": "تصدير",
+    "import": "استيراد",
+    "refresh": "تحديث",
+    "show": "عرض",
+    "skip": "تخطي",
+    "clear": "مسح",
+    "all": "الكل",
+    "local": "محلي",
+    "notConfigured": "غير مهيأ"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Русский",
+    "ja": "日本語",
+    "zh": "中文",
+    "es": "Español",
+    "hi": "हिन्दी",
+    "ar": "العربية",
+    "fr": "Français",
+    "pt": "Português",
+    "id": "Bahasa Indonesia"
+  },
+  "nav": {
+    "sections": {
+      "home": "المنزل",
+      "automation": "الأتمتة",
+      "system": "النظام",
+      "settings": "الإعدادات"
+    },
+    "items": {
+      "dashboard": "نظرة عامة",
+      "home-devices": "الأجهزة",
+      "home-entities": "الكيانات",
+      "home-areas": "الغرف",
+      "auto-scenarios": "الأتمتات",
+      "auto-scenes": "المشاهد",
+      "auto-scripts": "البرامج النصية",
+      "activity": "النشاط",
+      "modules": "الإضافات",
+      "settings-account": "الحساب",
+      "settings-appearance": "المظهر",
+      "settings-services": "الخدمات",
+      "settings-users": "المستخدمون",
+      "settings-backup": "النسخ الاحتياطي",
+      "settings-tools": "الأدوات"
+    },
+    "mobile": {
+      "overview": "نظرة عامة",
+      "home": "المنزل",
+      "auto": "تلقائي",
+      "more": "المزيد"
+    }
+  },
+  "views": {
+    "dashboard": {
+      "title": "نظرة عامة",
+      "subtitle": "مساحة عمل منزلك"
+    },
+    "home-devices": {
+      "title": "الأجهزة",
+      "subtitle": "المعدات في الكتالوج"
+    },
+    "home-entities": {
+      "title": "الكيانات",
+      "subtitle": "كيانات منزلية قابلة للتحكم"
+    },
+    "home-areas": {
+      "title": "الغرف",
+      "subtitle": "المناطق والتعيينات"
+    },
+    "auto-scenarios": {
+      "title": "الأتمتات",
+      "subtitle": "تشغيل حسب الوقت والحالات"
+    },
+    "auto-scenes": {
+      "title": "المشاهد",
+      "subtitle": "مجموعات حالات جاهزة"
+    },
+    "auto-scripts": {
+      "title": "البرامج النصية",
+      "subtitle": "سلاسل إجراءات يدوية"
+    },
+    "activity": {
+      "title": "النشاط",
+      "subtitle": "سجل الأحداث والإجراءات"
+    },
+    "modules": {
+      "title": "الإضافات",
+      "subtitle": "وحدات قابلة للتوصيل"
+    },
+    "settings-account": {
+      "title": "الحساب",
+      "subtitle": "ملف الجلسة الحالية"
+    },
+    "settings-appearance": {
+      "title": "المظهر",
+      "subtitle": "السمة ولون التمييز"
+    },
+    "settings-services": {
+      "title": "الخدمات",
+      "subtitle": "حالة المكونات"
+    },
+    "settings-users": {
+      "title": "المستخدمون",
+      "subtitle": "الوصول إلى اللوحة"
+    },
+    "settings-backup": {
+      "title": "النسخ الاحتياطي",
+      "subtitle": "التصدير والاستعادة"
+    },
+    "settings-tools": {
+      "title": "الأدوات",
+      "subtitle": "عمليات الصيانة"
+    }
+  },
+  "login": {
+    "tagline": "سجّل الدخول لإدارة منزلك الذكي",
+    "emailLabel": "البريد الإلكتروني",
+    "passwordLabel": "كلمة المرور",
+    "submit": "تسجيل الدخول",
+    "pending": "جارٍ تسجيل الدخول...",
+    "invalidCredentialsError": "تعذّر تسجيل الدخول. تحقق من بياناتك وحاول مرة أخرى.",
+    "connectionError": "لا يوجد اتصال بالخادم. حاول مرة أخرى."
+  },
+  "overview": {
+    "toolbar": {
+      "title": "مساحة العمل",
+      "description": "أنشئ شاشة مريحة للتحكم اليومي في المنزل.",
+      "addWidget": "إضافة عنصر واجهة"
+    },
+    "requestError": "خطأ في الطلب {status}",
+    "stats": {
+      "devices": "الأجهزة",
+      "devicesInCatalog": "في الكتالوج",
+      "devicesAddInHome": "أضف في المنزل",
+      "entities": "الكيانات",
+      "entitiesOn": "{count} قيد التشغيل",
+      "entitiesWaitingDiscovery": "بانتظار الاكتشاف",
+      "rooms": "الغرف",
+      "roomExample": "مثلاً {name}",
+      "roomsUnassigned": "غير معيّنة",
+      "connection": "الاتصال",
+      "onlineValue": "متصل",
+      "offlineValue": "غير متصل",
+      "channels": "{count} قناة",
+      "controllerAvailable": "وحدة التحكم متاحة",
+      "agentNoResponse": "الوكيل لا يستجيب",
+      "checkingValue": "…",
+      "checkingHint": "جارٍ التحقق من الاتصال"
+    },
+    "widgets": {
+      "emptyTitle": "ابدأ بأول عنصر واجهة",
+      "emptyDescription": "أضف عناصر واجهة للإضاءة أو الغرف أو حالة النظام أو سجل الأحداث.",
+      "addFirstWidget": "إضافة أول عنصر واجهة",
+      "newTitle": "عنصر واجهة جديد",
+      "editTitle": "تعديل عنصر واجهة",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "غرفة المعيشة",
+      "typeLabel": "النوع",
+      "roomLabel": "الغرفة",
+      "moveUpAria": "نقل عنصر الواجهة إلى الأعلى",
+      "moveDownAria": "نقل عنصر الواجهة إلى الأسفل",
+      "deleteConfirm": "حذف عنصر الواجهة “{title}”؟",
+      "loadError": "تعذّر تحميل عناصر الواجهة",
+      "deleteError": "تعذّر حذف عنصر الواجهة",
+      "orderError": "تعذّر تغيير الترتيب",
+      "saveError": "تعذّر حفظ عنصر الواجهة",
+      "kinds": {
+        "entities": "الكيانات",
+        "lights": "الأضواء",
+        "area": "الغرفة",
+        "status": "الحالة",
+        "activity": "النشاط"
+      },
+      "kindArea": "الغرفة: {room}",
+      "noRoomSelected": "غير محددة",
+      "unnamed": "بدون عنوان",
+      "noMatchingTitle": "لا توجد كيانات مطابقة",
+      "noMatchingAreaDescription": "لا توجد كيانات في “{room}” بعد.",
+      "noMatchingGenericDescription": "غيّر الفلتر أو أضف أجهزة في المنزل.",
+      "noData": "لا توجد بيانات",
+      "andMore": "و{count} أخرى",
+      "moveUp": "تحريك لأعلى",
+      "moveDown": "تحريك لأسفل",
+      "menuAria": "إجراءات العنصر"
+    },
+    "statusWidget": {
+      "controller": "وحدة التحكم",
+      "localAgent": "الوكيل المحلي",
+      "noConnection": "لا يوجد اتصال",
+      "catalog": "الكتالوج",
+      "active": "نشط",
+      "channels": "القنوات",
+      "roomsCount": "الغرف: {count}",
+      "devicesAbbrev": "أجهزة"
+    },
+    "activityWidget": {
+      "loadError": "تعذّر تحميل الأحداث",
+      "emptyTitle": "لا توجد أحداث بعد",
+      "emptyDescription": "سيظهر نشاط النظام الأخير هنا.",
+      "fallbackTitle": "حدث"
+    }
+  },
+  "inventory": {
+    "devices": {
+      "title": "الأجهزة",
+      "description": "المعدات في الكتالوج",
+      "count": "{count} أجهزة",
+      "controllerOnline": "وحدة التحكم متصلة",
+      "channels": "القنوات: {count}",
+      "controllerUnavailable": "وحدة التحكم غير متاحة",
+      "discover": "العثور على أجهزة",
+      "discoverError": "تعذّر البحث عن الأجهزة",
+      "discoverSuccess": "تم العثور على كيانات: {count}. تم حفظ الأسماء والتعيينات.",
+      "emptyTitle": "لم تتم إضافة أجهزة بعد",
+      "emptyDescription": "ابدأ الاكتشاف على الشبكة — ستظهر الأجهزة التي يتم العثور عليها هنا. سيتم الاحتفاظ بالأسماء والتعيينات.",
+      "onCount": "{on}/{total} قيد التشغيل",
+      "areaLabel": "المنطقة",
+      "unassignedArea": "غير معيّنة",
+      "settingsTitle": "إعدادات الجهاز",
+      "nameLabel": "الاسم",
+      "areaSelectLabel": "المنطقة",
+      "noArea": "بلا منطقة",
+      "cascadeArea": "تطبيق الغرفة على جميع كيانات الجهاز",
+      "nodesOnline": "عقد متصلة: {count}"
+    },
+    "entities": {
+      "title": "الكيانات",
+      "description": "كيانات منزلية قابلة للتحكم",
+      "searchPlaceholder": "بحث…",
+      "allAreas": "كل المناطق",
+      "noArea": "بلا منطقة",
+      "allDomains": "كل النطاقات",
+      "unboundNotice": "توجد كيانات بلا منطقة.",
+      "emptyTitle": "لم يتم العثور على كيانات بعد",
+      "emptyDescription": "ستظهر كيانات التحكم تلقائياً بعد اكتشاف الأجهزة.",
+      "controlHeading": "التحكم",
+      "settingsTitle": "إعدادات الكيان",
+      "nameLabel": "الاسم",
+      "deviceLabel": "الجهاز",
+      "areaLabel": "المنطقة",
+      "noDevice": "بلا جهاز",
+      "areaSuffixNone": "بلا منطقة"
+    },
+    "areas": {
+      "title": "الغرف",
+      "description": "المناطق والتعيينات",
+      "count": "{count} مناطق",
+      "add": "إضافة منطقة",
+      "emptyTitle": "لم يتم إنشاء غرف بعد",
+      "emptyDescription": "أنشئ غرفة وعيّن الأجهزة. يتم الاحتفاظ بالتعيينات أثناء إعادة الاكتشاف.",
+      "devicesAbbrev": "أجهزة",
+      "entitiesAbbrev": "كيانات",
+      "onAbbrev": "تشغيل",
+      "nothingAssigned": "لم يتم تعيين أي شيء لهذه الغرفة بعد",
+      "editTitle": "المنطقة",
+      "newTitle": "منطقة جديدة",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "مثلاً، غرفة المعيشة",
+      "assignDevice": "تعيين جهاز",
+      "assignEntity": "تعيين كيان",
+      "skip": "تخطي"
+    }
+  },
+  "rules": {
+    "requestError": "خطأ في الطلب {status}",
+    "automations": {
+      "title": "الأتمتات",
+      "description": "شغّل الإجراءات وفق جدول زمني أو عند تغيّر حالات الأجهزة.",
+      "emptyTitle": "لم يتم إنشاء أتمتات بعد",
+      "emptyDescription": "أضف أتمتة عندما تكون مستعداً لأتمتة منزلك.",
+      "create": "إنشاء أتمتة",
+      "active": "نشطة",
+      "inactive": "متوقفة",
+      "enableAria": "تفعيل الأتمتة",
+      "deleteConfirm": "حذف الأتمتة “{name}”؟",
+      "loadError": "تعذّر التحميل",
+      "updateError": "تعذّر التحديث",
+      "deleteError": "تعذّر الحذف"
+    },
+    "scenes": {
+      "title": "المشاهد",
+      "description": "احفظ حالات الأجهزة الجاهزة وفعّلها بلمسة واحدة.",
+      "emptyTitle": "لم يتم إنشاء مشاهد بعد",
+      "emptyDescription": "احفظ مجموعة من حالات الأجهزة للتشغيل السريع.",
+      "create": "إنشاء مشهد",
+      "newTitle": "مشهد جديد",
+      "entityCount": "{count} كيانات",
+      "deleteConfirm": "حذف المشهد “{name}”؟",
+      "loadError": "تعذّر التحميل",
+      "deleteError": "تعذّر الحذف",
+      "activateError": "تعذّر بدء المشهد",
+      "saveError": "تعذّر حفظ المشهد",
+      "modeManual": "اختيار جهاز",
+      "modeCapture": "حفظ الحالي",
+      "sceneDevice": "جهاز المشهد",
+      "noAvailableEntities": "لا توجد كيانات متاحة بعد.",
+      "namePlaceholder": "وضع المساء"
+    },
+    "scripts": {
+      "title": "البرامج النصية",
+      "description": "سلاسل إجراءات يمكن تشغيلها يدوياً في أي وقت.",
+      "emptyTitle": "لم يتم إنشاء برامج نصية بعد",
+      "emptyDescription": "أضف تسلسلاً من الإجراءات للتشغيل اليدوي.",
+      "create": "إنشاء برنامج نصي",
+      "newTitle": "برنامج نصي جديد",
+      "loadError": "تعذّر التحميل",
+      "runError": "تعذّر تشغيل البرنامج النصي",
+      "saveError": "تعذّر الحفظ",
+      "deleteError": "تعذّر الحذف",
+      "deleteConfirm": "حذف البرنامج النصي “{name}”؟",
+      "namePlaceholder": "فحص الأضواء",
+      "entityLabel": "الكيان",
+      "actionLabel": "الإجراء"
+    }
+  },
+  "automationEditor": {
+    "newTitle": "أتمتة جديدة",
+    "editTitle": "تعديل الأتمتة",
+    "nameLabel": "الاسم",
+    "namePlaceholder": "مثلاً، إضاءة المساء",
+    "triggerSection": "المشغّل",
+    "triggerKinds": {
+      "time": "الوقت",
+      "state": "الحالة",
+      "numeric_state": "رقم"
+    },
+    "timeLabel": "الوقت",
+    "weekdaysLabel": "أيام الأسبوع (فارغ = كل يوم)",
+    "weekdays": {
+      "mon": "الاثنين",
+      "tue": "الثلاثاء",
+      "wed": "الأربعاء",
+      "thu": "الخميس",
+      "fri": "الجمعة",
+      "sat": "السبت",
+      "sun": "الأحد"
+    },
+    "entityLabel": "الكيان",
+    "becomesLabel": "يصبح",
+    "wasOptionalLabel": "كان (اختياري)",
+    "attributeLabel": "السمة",
+    "attributeOptionalLabel": "السمة (اختياري)",
+    "attributePlaceholder": "brightness",
+    "numericAttributePlaceholder": "brightness / فارغ = state",
+    "aboveLabel": "أعلى من",
+    "belowLabel": "أقل من",
+    "abovePlaceholder": "مثلاً 200",
+    "belowPlaceholder": "مثلاً 50",
+    "conditionsSection": "الشروط",
+    "addCondition": "إضافة شرط",
+    "noConditions": "بدون شروط إضافية، ستعمل الأتمتة فور تشغيلها.",
+    "conditionLabel": "الشرط {index}",
+    "conditionKinds": {
+      "state": "الحالة",
+      "numeric_state": "رقم",
+      "time": "فترة زمنية"
+    },
+    "equalsLabel": "يساوي",
+    "afterLabel": "بعد",
+    "beforeLabel": "قبل",
+    "actionSection": "الإجراء",
+    "commandLabel": "الأمر",
+    "brightnessLabel": "السطوع، %",
+    "colorLabel": "اللون",
+    "effectLabel": "التأثير",
+    "speedLabel": "سرعة التأثير (0–255)",
+    "capabilitiesLine": "الإمكانات: {capabilities} · domain {domain}",
+    "emptyCapabilities": "—",
+    "unknownDomain": "?",
+    "saveError": "تعذّر الحفظ",
+    "requestError": "خطأ في الطلب {status}",
+    "triggerLabels": {
+      "timeAt": "الوقت {time}{days}",
+      "timeFallback": "مشغّل الوقت",
+      "state": "الحالة {entity} → {to}",
+      "numeric": "رقم {entity} {range}",
+      "undefined": "لم يتم تعيين شرط البدء"
+    },
+    "actionLabels": {
+      "undefined": "لم يتم تعيين الإجراء",
+      "fallbackAction": "إجراء",
+      "fallbackTarget": "كيان"
+    }
+  },
+  "settings": {
+    "account": {
+      "title": "الحساب",
+      "description": "المستخدم الحالي لهذا التثبيت.",
+      "profileTitle": "الملف الشخصي",
+      "profileDescription": "البيانات موجودة على خادمك فقط.",
+      "idLabel": "ID"
+    },
+    "appearance": {
+      "title": "المظهر",
+      "description": "سمة اللوحة ولونها في هذا المتصفح."
+    },
+    "services": {
+      "title": "Services",
+      "description": "Deployment settings moved here — WWW/DB modes.",
+      "agentTitle": "Iotvex agent",
+      "localAgent": "Local agent",
+      "ready": "Ready",
+      "errorStatus": "error",
+      "checkingStatus": "checking…",
+      "localStatus": "local",
+      "remoteStatus": "remote",
+      "lanStatus": "LAN",
+      "publishedStatus": "published",
+      "homeSchedulerStatus": "home timer",
+      "alwaysLocal": "Always on the home machine",
+      "databaseTitle": "Database",
+      "databaseDescription": "Local Supabase catalog and auth",
+      "databaseDetail": "Automation configs stored here; data stays on this server",
+      "databaseRemoteDescription": "Your remote Supabase project",
+      "databaseRemoteDetail": "User-owned remote DB (RLS/keys are your responsibility)",
+      "otbrTitle": "OTBR",
+      "otbrDescription": "Thread Border Router",
+      "otbrDetail": "USB radio + container on this host",
+      "wwwTitle": "Web panel",
+      "wwwLanDescription": "Reachable on LAN / mDNS",
+      "wwwLanDetail": "Optional Avahi name",
+      "wwwPublishedDescription": "Port-forward + your domain/TLS",
+      "wwwPublishedDetail": "You publish :8443; agent stays private on localhost",
+      "automationsTitle": "Automations runner",
+      "automationsDescription": "Config in DB; ticks only on this host",
+      "automationsDetail": "systemd → 127.0.0.1:3100 → local agent"
+    },
+    "users": {
+      "title": "المستخدمون",
+      "description": "حسابات اللوحة المحلية.",
+      "newTitle": "مستخدم جديد",
+      "newDescription": "البريد الإلكتروني وكلمة المرور (6 أحرف على الأقل).",
+      "emailPlaceholder": "user@example.local",
+      "create": "إنشاء",
+      "loadError": "تعذّر تحميل المستخدمين",
+      "createError": "تعذّر إنشاء المستخدم",
+      "emptyTitle": "لا يوجد مستخدمون",
+      "emptyDescription": "أنشئ الحساب الأول للوصول إلى اللوحة.",
+      "defaultRole": "user"
+    },
+    "backup": {
+      "title": "النسخ الاحتياطي",
+      "description": "تصدير واستيراد الكتالوج المحلي.",
+      "exportTitle": "تصدير",
+      "exportDescription": "تنزيل JSON الكتالوج.",
+      "downloadJson": "تنزيل JSON",
+      "importTitle": "استيراد",
+      "importDescription": "تحميل JSON محفوظ سابقاً.",
+      "publicUrlTitle": "URL عام",
+      "publicUrlDescription": "العنوان للتكاملات الخارجية.",
+      "urlNotConfigured": "لم تتم تهيئة URL",
+      "loadPublicUrlError": "تعذّر الحصول على URL العام",
+      "exportStarted": "بدأ تصدير الكتالوج.",
+      "exportError": "تعذّر تصدير الكتالوج",
+      "imported": "تم استيراد الكتالوج.",
+      "importError": "تعذّر استيراد الكتالوج"
+    },
+    "tools": {
+      "title": "الأدوات",
+      "description": "إجراءات صيانة اللوحة.",
+      "commandError": "لم يتم تشغيل الأمر",
+      "discoverTitle": "الاكتشاف",
+      "discoverDescription": "البحث عن الأجهزة المحلية.",
+      "discoverAction": "بحث",
+      "discoverStarted": "بدأ البحث عن الأجهزة.",
+      "catalogTitle": "الكتالوج",
+      "catalogDescription": "تحديث الكيانات والأجهزة.",
+      "catalogRefreshed": "تم تحديث الكتالوج.",
+      "publicUrlTitle": "URL عام",
+      "publicUrlDescription": "عرض العنوان الحالي.",
+      "publicUrlReceived": "تم استلام URL العام.",
+      "publicUrlNotConfigured": "لم تتم تهيئة URL العام.",
+      "busy": "…"
+    },
+    "requestError": "خطأ في الطلب {status}",
+    "language": {
+      "title": "اللغة",
+      "description": "لغة الواجهة في هذا المتصفح.",
+      "label": "لغة الواجهة"
+    },
+    "deployment": {
+      "title": "Deployment",
+      "description": "WWW reachability and database backend. Device plane (agent/OTBR) stays local.",
+      "loadError": "Failed to load runtime config",
+      "saveError": "Failed to save",
+      "saved": "Saved. mDNS/publish providers updated in config/runtime.json.",
+      "wwwTitle": "Web panel",
+      "wwwDescription": "How you open the UI. Local modes always include IP:port and mDNS.",
+      "wwwModeLabel": "WWW mode",
+      "wwwModes": {
+        "local": "Local",
+        "local_published": "Local + published",
+        "cloud": "Cloud"
+      },
+      "wwwModeHelp": {
+        "local": "Self-hosted on this machine. HTTP + HTTPS on LAN/mDNS.",
+        "local_published": "Same as local, plus public HTTPS (port-forward, domain, Pinggy, Cloudflare, ngrok, Tailscale…).",
+        "cloud": "UI in the cloud; home keeps agent/OTBR. With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
+      },
+      "mdnsLabel": "mDNS name",
+      "customDomainLabel": "Custom domain",
+      "cloudWwwLabel": "Cloud WWW base URL",
+      "accessLabel": "Access URLs",
+      "accessHint": "Replace <lan-ip> with this host’s LAN address. Public HTTPS needs port-forward or an enabled tunnel provider.",
+      "providersLabel": "Publish / tunnel providers",
+      "saveWww": "Save WWW settings",
+      "dbTitle": "Database",
+      "dbDescription": "Catalog, auth, automation configs. Switch hot-reloads after probe + merge.",
+      "activeDb": "Active",
+      "dbModeLabel": "DB mode",
+      "dbModes": {
+        "local": "Local",
+        "cloud_public": "Cloud public",
+        "cloud_private": "Cloud private"
+      },
+      "dbModeHelp": {
+        "local": "Bundled Supabase. Also usable by cloud WWW via home bridge tunnel.",
+        "cloud_public": "Shared Iotvex-hosted Supabase (multi-tenant).",
+        "cloud_private": "Your own Supabase project."
+      },
+      "targetUrl": "Supabase URL",
+      "targetAnon": "Anon key",
+      "targetService": "Service role key",
+      "optionalIfLocal": "Optional if already in secrets",
+      "mergeLabel": "Merge before switch",
+      "mergeHelp": "Copy/upsert catalog from current DB into the target, then swap.",
+      "probe": "Probe target",
+      "probeOk": "Target DB reachable and schema OK.",
+      "probeFail": "Probe failed",
+      "switch": "Merge & switch",
+      "switching": "Switching…",
+      "switched": "Switched. Merged {imported} rows. Reloading…",
+      "switchError": "Switch failed",
+      "matrixTitle": "WWW × DB matrix",
+      "matrixDescription": "Every WWW mode works with every DB mode. Cloud UI + local DB automatically bridges Supabase + agent.",
+      "matrixCurrent": "Current: {www} × {db}",
+      "applyPublish": "Apply tunnels",
+      "stopPublish": "Stop tunnels",
+      "refreshPublish": "Refresh status",
+      "publishing": "Working…",
+      "publishQueued": "Queued on home host — tunnels reconcile shortly.",
+      "publishStatus": "Active tunnels: {tunnels}",
+      "publishError": "Publish manager error"
+    }
+  },
+  "activity": {
+    "metaCount": "{count} إدخالات",
+    "metaEmpty": "سيُملأ السجل أثناء عمل النظام",
+    "refresh": "تحديث",
+    "clearJournal": "مسح السجل",
+    "filterAll": "الكل",
+    "emptyTitle": "السجل فارغ",
+    "emptyDescription": "ستظهر الأحداث بعد التحكم في الأجهزة أو تشغيل الأتمتات أو اكتشاف المعدات."
+  },
+  "modules": {
+    "metaCount": "{count} إضافات",
+    "metaEmpty": "وصّل إمكانات إضافية للوحة",
+    "refresh": "تحديث",
+    "connect": "توصيل",
+    "emptyTitle": "لم يتم توصيل إضافات بعد",
+    "emptyDescription": "أدخل عنوان بيان الإضافة — سيحمّل النظام وصفها.",
+    "enabledShort": "تشغيل",
+    "disabledShort": "إيقاف",
+    "enable": "تفعيل",
+    "disable": "تعطيل",
+    "dialogTitle": "توصيل إضافة",
+    "nameLabel": "الاسم",
+    "idOptionalLabel": "ID (اختياري)",
+    "idPlaceholder": "my-panel",
+    "manifestUrlLabel": "عنوان البيان",
+    "manifestUrlPlaceholder": "https://…/module.json",
+    "register": "تسجيل"
+  },
+  "entity": {
+    "states": {
+      "offline": "offline",
+      "on": "on",
+      "off": "off"
+    },
+    "brightness": "السطوع",
+    "colorLabel": "اللون",
+    "effect": "التأثير",
+    "speed": "السرعة",
+    "emptyEntities": "لا توجد كيانات.",
+    "fallbackEffect": "solid",
+    "colorPicker": {
+      "title": "اللون",
+      "done": "تم",
+      "hue": "الدرجة",
+      "saturation": "التشبع",
+      "value": "السطوع",
+      "hex": "Hex",
+      "quickAccess": "وصول سريع",
+      "saveCurrent": "حفظ اللون",
+      "managePresets": "إدارة الإعدادات المسبقة",
+      "moveUp": "أعلى",
+      "moveDown": "أسفل",
+      "remove": "إزالة",
+      "noPresets": "لا توجد ألوان محفوظة بعد.",
+      "tabs": {
+        "wheel": "عجلة",
+        "sliders": "منزلقات",
+        "hex": "Hex",
+        "presets": "إعدادات"
+      }
+    }
+  },
+  "theme": {
+    "ariaLabel": "المظهر",
+    "buttonLabel": "المظهر",
+    "modeLabel": "الوضع",
+    "colorLabel": "اللون",
+    "colorCurrent": "اللون · الآن {color}",
+    "themeTitle": "السمة",
+    "accentColor": "لون التمييز",
+    "resolvedDark": "dark",
+    "resolvedLight": "light",
+    "modes": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
+    },
+    "colors": {
+      "default": "تركوازي",
+      "blue": "أزرق",
+      "green": "أخضر",
+      "orange": "برتقالي",
+      "rose": "وردي",
+      "violet": "بنفسجي",
+      "yellow": "أصفر",
+      "red": "أحمر",
+      "zinc": "رمادي"
+    }
+  },
+  "actions": {
+    "turn_on": "تشغيل",
+    "turn_off": "إيقاف",
+    "toggle": "تبديل",
+    "set_brightness": "تعيين السطوع",
+    "set_color": "تعيين اللون",
+    "set_effect": "تعيين التأثير",
+    "set_speed": "تعيين السرعة"
+  },
+  "topbar": {
+    "menu": "القائمة",
+    "logout": "تسجيل الخروج",
+    "navigation": "التنقل",
+    "onlineBadge": "online",
+    "documentTitle": "{title} · Iotvex"
+  },
+  "sidebar": {
+    "panelControlSubtitle": "لوحة التحكم"
+  }
+}

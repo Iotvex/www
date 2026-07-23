@@ -1,0 +1,696 @@
+{
+  "meta": {
+    "title": "Iotvex Home",
+    "description": "Panel kontrol Iotvex",
+    "panelControl": "Panel kontrol"
+  },
+  "common": {
+    "save": "Simpan",
+    "saving": "Menyimpan...",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "create": "Buat",
+    "creating": "Membuat...",
+    "edit": "Edit",
+    "close": "Tutup",
+    "loading": "Memuat...",
+    "error": "Kesalahan",
+    "online": "online",
+    "offline": "offline",
+    "search": "Cari",
+    "actions": "Tindakan",
+    "yes": "Ya",
+    "yesCascade": "Ya, terapkan ke semua",
+    "no": "Tidak",
+    "back": "Kembali",
+    "retry": "Coba lagi",
+    "confirm": "Konfirmasi",
+    "name": "Nama",
+    "email": "Email",
+    "password": "Kata sandi",
+    "enabled": "aktif",
+    "disabled": "nonaktif",
+    "add": "Tambah",
+    "remove": "Hapus",
+    "run": "Jalankan",
+    "activate": "Aktifkan",
+    "empty": "Kosong",
+    "unknown": "tidak diketahui",
+    "notSpecified": "tidak ditentukan",
+    "copied": "Disalin",
+    "copy": "Salin",
+    "export": "Ekspor",
+    "import": "Impor",
+    "refresh": "Segarkan",
+    "show": "Tampilkan",
+    "skip": "Lewati",
+    "clear": "Bersihkan",
+    "all": "Semua",
+    "local": "lokal",
+    "notConfigured": "belum dikonfigurasi"
+  },
+  "languages": {
+    "en": "English",
+    "ru": "Русский",
+    "ja": "日本語",
+    "zh": "中文",
+    "es": "Español",
+    "hi": "हिन्दी",
+    "ar": "العربية",
+    "fr": "Français",
+    "pt": "Português",
+    "id": "Bahasa Indonesia"
+  },
+  "nav": {
+    "sections": {
+      "home": "Rumah",
+      "automation": "Otomasi",
+      "system": "Sistem",
+      "settings": "Pengaturan"
+    },
+    "items": {
+      "dashboard": "Ikhtisar",
+      "home-devices": "Perangkat",
+      "home-entities": "Entitas",
+      "home-areas": "Ruangan",
+      "auto-scenarios": "Otomasi",
+      "auto-scenes": "Adegan",
+      "auto-scripts": "Skrip",
+      "activity": "Aktivitas",
+      "modules": "Ekstensi",
+      "settings-account": "Akun",
+      "settings-appearance": "Tampilan",
+      "settings-services": "Layanan",
+      "settings-users": "Pengguna",
+      "settings-backup": "Cadangan",
+      "settings-tools": "Alat"
+    },
+    "mobile": {
+      "overview": "Ikhtisar",
+      "home": "Rumah",
+      "auto": "Auto",
+      "more": "Lainnya"
+    }
+  },
+  "views": {
+    "dashboard": {
+      "title": "Ikhtisar",
+      "subtitle": "Ruang kerja rumah Anda"
+    },
+    "home-devices": {
+      "title": "Perangkat",
+      "subtitle": "Peralatan dalam katalog"
+    },
+    "home-entities": {
+      "title": "Entitas",
+      "subtitle": "Entitas rumah yang dapat dikontrol"
+    },
+    "home-areas": {
+      "title": "Ruangan",
+      "subtitle": "Zona dan penetapan"
+    },
+    "auto-scenarios": {
+      "title": "Otomasi",
+      "subtitle": "Berjalan berdasarkan waktu dan status"
+    },
+    "auto-scenes": {
+      "title": "Adegan",
+      "subtitle": "Set status siap pakai"
+    },
+    "auto-scripts": {
+      "title": "Skrip",
+      "subtitle": "Rangkaian tindakan manual"
+    },
+    "activity": {
+      "title": "Aktivitas",
+      "subtitle": "Riwayat peristiwa dan tindakan"
+    },
+    "modules": {
+      "title": "Ekstensi",
+      "subtitle": "Modul yang dapat dihubungkan"
+    },
+    "settings-account": {
+      "title": "Akun",
+      "subtitle": "Profil sesi saat ini"
+    },
+    "settings-appearance": {
+      "title": "Tampilan",
+      "subtitle": "Tema dan warna aksen"
+    },
+    "settings-services": {
+      "title": "Layanan",
+      "subtitle": "Status komponen"
+    },
+    "settings-users": {
+      "title": "Pengguna",
+      "subtitle": "Akses panel"
+    },
+    "settings-backup": {
+      "title": "Cadangan",
+      "subtitle": "Ekspor dan pulihkan"
+    },
+    "settings-tools": {
+      "title": "Alat",
+      "subtitle": "Operasi pemeliharaan"
+    }
+  },
+  "login": {
+    "tagline": "Masuk untuk mengelola rumah pintar Anda",
+    "emailLabel": "Email",
+    "passwordLabel": "Kata sandi",
+    "submit": "Masuk",
+    "pending": "Sedang masuk...",
+    "invalidCredentialsError": "Tidak dapat masuk. Periksa detail Anda dan coba lagi.",
+    "connectionError": "Tidak ada koneksi ke server. Coba lagi."
+  },
+  "overview": {
+    "toolbar": {
+      "title": "Ruang kerja",
+      "description": "Susun layar yang nyaman untuk kontrol rumah sehari-hari.",
+      "addWidget": "Tambah widget"
+    },
+    "requestError": "Kesalahan permintaan {status}",
+    "stats": {
+      "devices": "Perangkat",
+      "devicesInCatalog": "dalam katalog",
+      "devicesAddInHome": "tambahkan di Rumah",
+      "entities": "Entitas",
+      "entitiesOn": "{count} menyala",
+      "entitiesWaitingDiscovery": "menunggu penemuan",
+      "rooms": "Ruangan",
+      "roomExample": "mis. {name}",
+      "roomsUnassigned": "belum ditetapkan",
+      "connection": "Koneksi",
+      "onlineValue": "Online",
+      "offlineValue": "Offline",
+      "channels": "{count} saluran",
+      "controllerAvailable": "pengontrol tersedia",
+      "agentNoResponse": "agen tidak merespons",
+      "checkingValue": "…",
+      "checkingHint": "memeriksa koneksi"
+    },
+    "widgets": {
+      "emptyTitle": "Mulai dengan widget pertama Anda",
+      "emptyDescription": "Tambahkan widget pencahayaan, ruangan, status sistem, atau log peristiwa.",
+      "addFirstWidget": "Tambah widget pertama",
+      "newTitle": "Widget baru",
+      "editTitle": "Edit widget",
+      "nameLabel": "Nama",
+      "namePlaceholder": "Ruang keluarga",
+      "typeLabel": "Jenis",
+      "roomLabel": "Ruangan",
+      "moveUpAria": "Pindahkan widget ke atas",
+      "moveDownAria": "Pindahkan widget ke bawah",
+      "deleteConfirm": "Hapus widget “{title}”?",
+      "loadError": "Tidak dapat memuat widget",
+      "deleteError": "Tidak dapat menghapus widget",
+      "orderError": "Tidak dapat mengubah urutan",
+      "saveError": "Tidak dapat menyimpan widget",
+      "kinds": {
+        "entities": "Entitas",
+        "lights": "Lampu",
+        "area": "Ruangan",
+        "status": "Status",
+        "activity": "Aktivitas"
+      },
+      "kindArea": "Ruangan: {room}",
+      "noRoomSelected": "belum dipilih",
+      "unnamed": "Tanpa judul",
+      "noMatchingTitle": "Tidak ada entitas yang cocok",
+      "noMatchingAreaDescription": "Belum ada entitas di “{room}”.",
+      "noMatchingGenericDescription": "Ubah filter atau tambahkan perangkat di Rumah.",
+      "noData": "tidak ada data",
+      "andMore": "Dan {count} lagi",
+      "moveUp": "Pindah ke atas",
+      "moveDown": "Pindah ke bawah",
+      "menuAria": "Tindakan widget"
+    },
+    "statusWidget": {
+      "controller": "Pengontrol",
+      "localAgent": "Agen lokal",
+      "noConnection": "Tidak ada koneksi",
+      "catalog": "Katalog",
+      "active": "Aktif",
+      "channels": "Saluran",
+      "roomsCount": "Ruangan: {count}",
+      "devicesAbbrev": "perkt."
+    },
+    "activityWidget": {
+      "loadError": "Tidak dapat memuat peristiwa",
+      "emptyTitle": "Belum ada peristiwa",
+      "emptyDescription": "Aktivitas sistem terbaru akan muncul di sini.",
+      "fallbackTitle": "Peristiwa"
+    }
+  },
+  "inventory": {
+    "devices": {
+      "title": "Perangkat",
+      "description": "Peralatan dalam katalog",
+      "count": "{count} perangkat",
+      "controllerOnline": "pengontrol online",
+      "channels": "saluran: {count}",
+      "controllerUnavailable": "pengontrol tidak tersedia",
+      "discover": "Temukan perangkat",
+      "discoverError": "Tidak dapat mencari perangkat",
+      "discoverSuccess": "Entitas ditemukan: {count}. Nama dan penetapan telah disimpan.",
+      "emptyTitle": "Belum ada perangkat yang ditambahkan",
+      "emptyDescription": "Mulai penemuan di jaringan — perangkat yang ditemukan akan muncul di sini. Nama dan penetapan Anda akan dipertahankan.",
+      "onCount": "{on}/{total} menyala",
+      "areaLabel": "area",
+      "unassignedArea": "belum ditetapkan",
+      "settingsTitle": "Pengaturan perangkat",
+      "nameLabel": "Nama",
+      "areaSelectLabel": "Area",
+      "noArea": "Tidak ada area",
+      "cascadeArea": "Terapkan ruangan ke semua entitas perangkat",
+      "nodesOnline": "node online: {count}"
+    },
+    "entities": {
+      "title": "Entitas",
+      "description": "Entitas rumah yang dapat dikontrol",
+      "searchPlaceholder": "Cari…",
+      "allAreas": "Semua area",
+      "noArea": "Tidak ada area",
+      "allDomains": "Semua domain",
+      "unboundNotice": "Ada entitas tanpa area.",
+      "emptyTitle": "Belum ada entitas ditemukan",
+      "emptyDescription": "Entitas kontrol akan muncul otomatis setelah penemuan perangkat.",
+      "controlHeading": "Kontrol",
+      "settingsTitle": "Pengaturan entitas",
+      "nameLabel": "Nama",
+      "deviceLabel": "Perangkat",
+      "areaLabel": "Area",
+      "noDevice": "Tidak ada perangkat",
+      "areaSuffixNone": "tanpa area"
+    },
+    "areas": {
+      "title": "Ruangan",
+      "description": "Zona dan penetapan",
+      "count": "{count} area",
+      "add": "Tambah area",
+      "emptyTitle": "Belum ada ruangan dibuat",
+      "emptyDescription": "Buat ruangan dan tetapkan perangkat. Penetapan dipertahankan saat penemuan ulang.",
+      "devicesAbbrev": "perkt.",
+      "entitiesAbbrev": "ent.",
+      "onAbbrev": "nyala",
+      "nothingAssigned": "Belum ada yang ditetapkan ke ruangan ini",
+      "editTitle": "Area",
+      "newTitle": "Area baru",
+      "nameLabel": "Nama",
+      "namePlaceholder": "Misalnya, Ruang keluarga",
+      "assignDevice": "Tetapkan perangkat",
+      "assignEntity": "Tetapkan entitas",
+      "skip": "Lewati"
+    }
+  },
+  "rules": {
+    "requestError": "Kesalahan permintaan {status}",
+    "automations": {
+      "title": "Otomasi",
+      "description": "Jalankan tindakan sesuai jadwal atau saat status perangkat berubah.",
+      "emptyTitle": "Belum ada otomasi dibuat",
+      "emptyDescription": "Tambahkan otomasi saat Anda siap mengotomatiskan rumah Anda.",
+      "create": "Buat otomasi",
+      "active": "Aktif",
+      "inactive": "Mati",
+      "enableAria": "Aktifkan otomasi",
+      "deleteConfirm": "Hapus otomasi “{name}”?",
+      "loadError": "Tidak dapat memuat",
+      "updateError": "Tidak dapat memperbarui",
+      "deleteError": "Tidak dapat menghapus"
+    },
+    "scenes": {
+      "title": "Adegan",
+      "description": "Simpan status perangkat siap pakai dan aktifkan dengan satu ketukan.",
+      "emptyTitle": "Belum ada adegan dibuat",
+      "emptyDescription": "Simpan satu set status perangkat untuk peluncuran cepat.",
+      "create": "Buat adegan",
+      "newTitle": "Adegan baru",
+      "entityCount": "{count} entitas",
+      "deleteConfirm": "Hapus adegan “{name}”?",
+      "loadError": "Tidak dapat memuat",
+      "deleteError": "Tidak dapat menghapus",
+      "activateError": "Tidak dapat memulai adegan",
+      "saveError": "Tidak dapat menyimpan adegan",
+      "modeManual": "Pilih perangkat",
+      "modeCapture": "Simpan saat ini",
+      "sceneDevice": "Perangkat adegan",
+      "noAvailableEntities": "Belum ada entitas yang tersedia.",
+      "namePlaceholder": "Mode malam"
+    },
+    "scripts": {
+      "title": "Skrip",
+      "description": "Rangkaian tindakan yang dapat dijalankan manual kapan saja.",
+      "emptyTitle": "Belum ada skrip dibuat",
+      "emptyDescription": "Tambahkan urutan tindakan untuk dijalankan manual.",
+      "create": "Buat skrip",
+      "newTitle": "Skrip baru",
+      "loadError": "Tidak dapat memuat",
+      "runError": "Tidak dapat menjalankan skrip",
+      "saveError": "Tidak dapat menyimpan",
+      "deleteError": "Tidak dapat menghapus",
+      "deleteConfirm": "Hapus skrip “{name}”?",
+      "namePlaceholder": "Periksa lampu",
+      "entityLabel": "Entitas",
+      "actionLabel": "Tindakan"
+    }
+  },
+  "automationEditor": {
+    "newTitle": "Otomasi baru",
+    "editTitle": "Edit otomasi",
+    "nameLabel": "Nama",
+    "namePlaceholder": "Misalnya, Lampu malam",
+    "triggerSection": "Pemicu",
+    "triggerKinds": {
+      "time": "Waktu",
+      "state": "Status",
+      "numeric_state": "Angka"
+    },
+    "timeLabel": "Waktu",
+    "weekdaysLabel": "Hari kerja (kosong = setiap hari)",
+    "weekdays": {
+      "mon": "Sen",
+      "tue": "Sel",
+      "wed": "Rab",
+      "thu": "Kam",
+      "fri": "Jum",
+      "sat": "Sab",
+      "sun": "Min"
+    },
+    "entityLabel": "Entitas",
+    "becomesLabel": "Menjadi",
+    "wasOptionalLabel": "Sebelumnya (opsional)",
+    "attributeLabel": "Atribut",
+    "attributeOptionalLabel": "Atribut (opsional)",
+    "attributePlaceholder": "brightness",
+    "numericAttributePlaceholder": "brightness / kosong = state",
+    "aboveLabel": "Di atas",
+    "belowLabel": "Di bawah",
+    "abovePlaceholder": "misalnya 200",
+    "belowPlaceholder": "misalnya 50",
+    "conditionsSection": "Kondisi",
+    "addCondition": "Tambah kondisi",
+    "noConditions": "Tanpa kondisi tambahan, otomasi akan berjalan segera setelah dipicu.",
+    "conditionLabel": "Kondisi {index}",
+    "conditionKinds": {
+      "state": "Status",
+      "numeric_state": "Angka",
+      "time": "Interval waktu"
+    },
+    "equalsLabel": "Sama dengan",
+    "afterLabel": "Setelah",
+    "beforeLabel": "Sebelum",
+    "actionSection": "Tindakan",
+    "commandLabel": "Perintah",
+    "brightnessLabel": "Kecerahan, %",
+    "colorLabel": "Warna",
+    "effectLabel": "Efek",
+    "speedLabel": "Kecepatan efek (0–255)",
+    "capabilitiesLine": "Kemampuan: {capabilities} · domain {domain}",
+    "emptyCapabilities": "—",
+    "unknownDomain": "?",
+    "saveError": "Tidak dapat menyimpan",
+    "requestError": "Kesalahan permintaan {status}",
+    "triggerLabels": {
+      "timeAt": "Waktu {time}{days}",
+      "timeFallback": "Pemicu waktu",
+      "state": "Status {entity} → {to}",
+      "numeric": "Angka {entity} {range}",
+      "undefined": "Kondisi awal belum diatur"
+    },
+    "actionLabels": {
+      "undefined": "Tindakan belum diatur",
+      "fallbackAction": "tindakan",
+      "fallbackTarget": "entitas"
+    }
+  },
+  "settings": {
+    "account": {
+      "title": "Akun",
+      "description": "Pengguna saat ini untuk instalasi ini.",
+      "profileTitle": "Profil",
+      "profileDescription": "Data hanya ada di server Anda.",
+      "idLabel": "ID"
+    },
+    "appearance": {
+      "title": "Tampilan",
+      "description": "Tema dan warna panel di browser ini."
+    },
+    "services": {
+      "title": "Services",
+      "description": "Deployment settings moved here — WWW/DB modes.",
+      "agentTitle": "Iotvex agent",
+      "localAgent": "Local agent",
+      "ready": "Ready",
+      "errorStatus": "error",
+      "checkingStatus": "checking…",
+      "localStatus": "local",
+      "remoteStatus": "remote",
+      "lanStatus": "LAN",
+      "publishedStatus": "published",
+      "homeSchedulerStatus": "home timer",
+      "alwaysLocal": "Always on the home machine",
+      "databaseTitle": "Database",
+      "databaseDescription": "Local Supabase catalog and auth",
+      "databaseDetail": "Automation configs stored here; data stays on this server",
+      "databaseRemoteDescription": "Your remote Supabase project",
+      "databaseRemoteDetail": "User-owned remote DB (RLS/keys are your responsibility)",
+      "otbrTitle": "OTBR",
+      "otbrDescription": "Thread Border Router",
+      "otbrDetail": "USB radio + container on this host",
+      "wwwTitle": "Web panel",
+      "wwwLanDescription": "Reachable on LAN / mDNS",
+      "wwwLanDetail": "Optional Avahi name",
+      "wwwPublishedDescription": "Port-forward + your domain/TLS",
+      "wwwPublishedDetail": "You publish :8443; agent stays private on localhost",
+      "automationsTitle": "Automations runner",
+      "automationsDescription": "Config in DB; ticks only on this host",
+      "automationsDetail": "systemd → 127.0.0.1:3100 → local agent"
+    },
+    "users": {
+      "title": "Pengguna",
+      "description": "Akun panel lokal.",
+      "newTitle": "Pengguna baru",
+      "newDescription": "Email dan kata sandi (minimal 6 karakter).",
+      "emailPlaceholder": "user@example.local",
+      "create": "Buat",
+      "loadError": "Tidak dapat memuat pengguna",
+      "createError": "Tidak dapat membuat pengguna",
+      "emptyTitle": "Tidak ada pengguna",
+      "emptyDescription": "Buat akun pertama untuk mengakses panel.",
+      "defaultRole": "user"
+    },
+    "backup": {
+      "title": "Cadangan",
+      "description": "Ekspor dan impor katalog lokal.",
+      "exportTitle": "Ekspor",
+      "exportDescription": "Unduh JSON katalog.",
+      "downloadJson": "Unduh JSON",
+      "importTitle": "Impor",
+      "importDescription": "Unggah JSON yang sebelumnya disimpan.",
+      "publicUrlTitle": "URL publik",
+      "publicUrlDescription": "Alamat untuk integrasi eksternal.",
+      "urlNotConfigured": "URL belum dikonfigurasi",
+      "loadPublicUrlError": "Tidak dapat mengambil URL publik",
+      "exportStarted": "Ekspor katalog dimulai.",
+      "exportError": "Tidak dapat mengekspor katalog",
+      "imported": "Katalog diimpor.",
+      "importError": "Tidak dapat mengimpor katalog"
+    },
+    "tools": {
+      "title": "Alat",
+      "description": "Tindakan pemeliharaan panel.",
+      "commandError": "Perintah tidak berjalan",
+      "discoverTitle": "Penemuan",
+      "discoverDescription": "Cari perangkat lokal.",
+      "discoverAction": "Temukan",
+      "discoverStarted": "Pencarian perangkat dimulai.",
+      "catalogTitle": "Katalog",
+      "catalogDescription": "Segarkan entitas dan perangkat.",
+      "catalogRefreshed": "Katalog disegarkan.",
+      "publicUrlTitle": "URL publik",
+      "publicUrlDescription": "Tampilkan alamat saat ini.",
+      "publicUrlReceived": "URL publik diterima.",
+      "publicUrlNotConfigured": "URL publik belum dikonfigurasi.",
+      "busy": "…"
+    },
+    "requestError": "Kesalahan permintaan {status}",
+    "language": {
+      "title": "Bahasa",
+      "description": "Bahasa antarmuka untuk browser ini.",
+      "label": "Bahasa antarmuka"
+    },
+    "deployment": {
+      "title": "Deployment",
+      "description": "WWW reachability and database backend. Device plane (agent/OTBR) stays local.",
+      "loadError": "Failed to load runtime config",
+      "saveError": "Failed to save",
+      "saved": "Saved. mDNS/publish providers updated in config/runtime.json.",
+      "wwwTitle": "Web panel",
+      "wwwDescription": "How you open the UI. Local modes always include IP:port and mDNS.",
+      "wwwModeLabel": "WWW mode",
+      "wwwModes": {
+        "local": "Local",
+        "local_published": "Local + published",
+        "cloud": "Cloud"
+      },
+      "wwwModeHelp": {
+        "local": "Self-hosted on this machine. HTTP + HTTPS on LAN/mDNS.",
+        "local_published": "Same as local, plus public HTTPS (port-forward, domain, Pinggy, Cloudflare, ngrok, Tailscale…).",
+        "cloud": "UI in the cloud; home keeps agent/OTBR. With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
+      },
+      "mdnsLabel": "mDNS name",
+      "customDomainLabel": "Custom domain",
+      "cloudWwwLabel": "Cloud WWW base URL",
+      "accessLabel": "Access URLs",
+      "accessHint": "Replace <lan-ip> with this host’s LAN address. Public HTTPS needs port-forward or an enabled tunnel provider.",
+      "providersLabel": "Publish / tunnel providers",
+      "saveWww": "Save WWW settings",
+      "dbTitle": "Database",
+      "dbDescription": "Catalog, auth, automation configs. Switch hot-reloads after probe + merge.",
+      "activeDb": "Active",
+      "dbModeLabel": "DB mode",
+      "dbModes": {
+        "local": "Local",
+        "cloud_public": "Cloud public",
+        "cloud_private": "Cloud private"
+      },
+      "dbModeHelp": {
+        "local": "Bundled Supabase. Also usable by cloud WWW via home bridge tunnel.",
+        "cloud_public": "Shared Iotvex-hosted Supabase (multi-tenant).",
+        "cloud_private": "Your own Supabase project."
+      },
+      "targetUrl": "Supabase URL",
+      "targetAnon": "Anon key",
+      "targetService": "Service role key",
+      "optionalIfLocal": "Optional if already in secrets",
+      "mergeLabel": "Merge before switch",
+      "mergeHelp": "Copy/upsert catalog from current DB into the target, then swap.",
+      "probe": "Probe target",
+      "probeOk": "Target DB reachable and schema OK.",
+      "probeFail": "Probe failed",
+      "switch": "Merge & switch",
+      "switching": "Switching…",
+      "switched": "Switched. Merged {imported} rows. Reloading…",
+      "switchError": "Switch failed",
+      "matrixTitle": "WWW × DB matrix",
+      "matrixDescription": "Every WWW mode works with every DB mode. Cloud UI + local DB automatically bridges Supabase + agent.",
+      "matrixCurrent": "Current: {www} × {db}",
+      "applyPublish": "Apply tunnels",
+      "stopPublish": "Stop tunnels",
+      "refreshPublish": "Refresh status",
+      "publishing": "Working…",
+      "publishQueued": "Queued on home host — tunnels reconcile shortly.",
+      "publishStatus": "Active tunnels: {tunnels}",
+      "publishError": "Publish manager error"
+    }
+  },
+  "activity": {
+    "metaCount": "{count} entri",
+    "metaEmpty": "Log akan terisi saat sistem berjalan",
+    "refresh": "Segarkan",
+    "clearJournal": "Bersihkan log",
+    "filterAll": "Semua",
+    "emptyTitle": "Log kosong",
+    "emptyDescription": "Peristiwa akan muncul setelah mengontrol perangkat, menjalankan otomasi, atau menemukan peralatan."
+  },
+  "modules": {
+    "metaCount": "{count} ekstensi",
+    "metaEmpty": "Hubungkan kemampuan panel tambahan",
+    "refresh": "Segarkan",
+    "connect": "Hubungkan",
+    "emptyTitle": "Belum ada ekstensi yang terhubung",
+    "emptyDescription": "Masukkan alamat manifes ekstensi — sistem akan memuat deskripsinya.",
+    "enabledShort": "on",
+    "disabledShort": "off",
+    "enable": "Aktifkan",
+    "disable": "Nonaktifkan",
+    "dialogTitle": "Hubungkan ekstensi",
+    "nameLabel": "Nama",
+    "idOptionalLabel": "ID (opsional)",
+    "idPlaceholder": "my-panel",
+    "manifestUrlLabel": "Alamat manifes",
+    "manifestUrlPlaceholder": "https://…/module.json",
+    "register": "Daftarkan"
+  },
+  "entity": {
+    "states": {
+      "offline": "offline",
+      "on": "on",
+      "off": "off"
+    },
+    "brightness": "Kecerahan",
+    "colorLabel": "Warna",
+    "effect": "Efek",
+    "speed": "Kecepatan",
+    "emptyEntities": "Tidak ada entitas.",
+    "fallbackEffect": "solid",
+    "colorPicker": {
+      "title": "Warna",
+      "done": "Selesai",
+      "hue": "Hue",
+      "saturation": "Saturasi",
+      "value": "Kecerahan",
+      "hex": "Hex",
+      "quickAccess": "Akses cepat",
+      "saveCurrent": "Simpan warna",
+      "managePresets": "Kelola preset",
+      "moveUp": "Naik",
+      "moveDown": "Turun",
+      "remove": "Hapus",
+      "noPresets": "Belum ada warna tersimpan.",
+      "tabs": {
+        "wheel": "Roda",
+        "sliders": "Slider",
+        "hex": "Hex",
+        "presets": "Preset"
+      }
+    }
+  },
+  "theme": {
+    "ariaLabel": "Tampilan",
+    "buttonLabel": "Tampilan",
+    "modeLabel": "Mode",
+    "colorLabel": "Warna",
+    "colorCurrent": "Warna · sekarang {color}",
+    "themeTitle": "Tema",
+    "accentColor": "Warna aksen",
+    "resolvedDark": "dark",
+    "resolvedLight": "light",
+    "modes": {
+      "light": "Terang",
+      "dark": "Gelap",
+      "system": "Sistem"
+    },
+    "colors": {
+      "default": "Turkuois",
+      "blue": "Biru",
+      "green": "Hijau",
+      "orange": "Oranye",
+      "rose": "Mawar",
+      "violet": "Violet",
+      "yellow": "Kuning",
+      "red": "Merah",
+      "zinc": "Abu-abu"
+    }
+  },
+  "actions": {
+    "turn_on": "Nyalakan",
+    "turn_off": "Matikan",
+    "toggle": "Alihkan",
+    "set_brightness": "Atur kecerahan",
+    "set_color": "Atur warna",
+    "set_effect": "Atur efek",
+    "set_speed": "Atur kecepatan"
+  },
+  "topbar": {
+    "menu": "Menu",
+    "logout": "Keluar",
+    "navigation": "Navigasi",
+    "onlineBadge": "online",
+    "documentTitle": "{title} · Iotvex"
+  },
+  "sidebar": {
+    "panelControlSubtitle": "Panel kontrol"
+  }
+}
