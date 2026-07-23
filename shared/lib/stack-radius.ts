@@ -1,14 +1,54 @@
+import type { CSSProperties } from "react"
 import { cn } from "@/shared/lib/utils"
 
 export type StackRadius = "md" | "lg" | "xl" | "2xl"
 
+const RADIUS_PX: Record<StackRadius, number> = {
+  md: 6,
+  lg: 8,
+  xl: 12,
+  "2xl": 16,
+}
+
 /**
- * Nested section stack inside a parent card:
- * - first: rounded top only
- * - middle: all sharp
- * - last: rounded bottom only
- * - single: fully rounded
+ * Exact stack corners from the sketch:
+ * first → top only, last → bottom only, middle → sharp, single → all.
+ * Inline styles beat any competing Tailwind rounded-* class.
  */
+export function stackRadiusStyle(
+  index: number,
+  total: number,
+  radius: StackRadius = "xl",
+): CSSProperties {
+  const px = RADIUS_PX[radius]
+  if (total <= 1) {
+    return { borderRadius: px }
+  }
+  if (index === 0) {
+    return {
+      borderTopLeftRadius: px,
+      borderTopRightRadius: px,
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    }
+  }
+  if (index === total - 1) {
+    return {
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: 0,
+      borderBottomLeftRadius: px,
+      borderBottomRightRadius: px,
+    }
+  }
+  return {
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  }
+}
+
+/** Tailwind fallback (kept for places that only need classes). */
 export function stackRadiusClass(
   index: number,
   total: number,
@@ -27,7 +67,6 @@ export function stackRadiusClass(
   return "rounded-none"
 }
 
-/** Collapse adjacent borders so stacked sections share one edge. */
 export function stackItemOffsetClass(index: number): string {
   return index > 0 ? "-mt-px" : ""
 }

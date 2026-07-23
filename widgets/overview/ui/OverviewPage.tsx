@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/shared/lib/utils";
+import { stackItemOffsetClass, stackRadiusStyle } from "@/shared/lib/stack-radius";
 
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -976,20 +977,24 @@ function WidgetBody({
   if (!groupByDevice) {
     const rows = source.slice(0, 8)
     return (
-      <div className="overflow-hidden rounded-xl border border-white/[0.1] bg-white/[0.03]">
+      <div className="flex min-w-0 flex-col">
         {rows.map((entity, index) => (
-          <div key={entityId(entity)} className="min-w-0">
-            {index > 0 ? <div className="h-px w-full bg-white/[0.08]" aria-hidden /> : null}
-            <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2 sm:px-3">
-              <p className="truncate font-medium text-sm">{entityName(entity)}</p>
-              <Badge variant={entity.state === "on" ? "default" : "secondary"}>
-                {String(entity.state ?? t("widgets.noData"))}
-              </Badge>
-            </div>
+          <div
+            key={entityId(entity)}
+            className={cn(
+              "flex min-w-0 items-center justify-between gap-2 border border-white/[0.1] bg-white/[0.04] px-2.5 py-2",
+              stackItemOffsetClass(index),
+            )}
+            style={stackRadiusStyle(index, rows.length, "xl")}
+          >
+            <p className="truncate font-medium text-sm">{entityName(entity)}</p>
+            <Badge variant={entity.state === "on" ? "default" : "secondary"}>
+              {String(entity.state ?? t("widgets.noData"))}
+            </Badge>
           </div>
         ))}
         {source.length > 8 ? (
-          <p className="border-t border-white/[0.08] px-2.5 py-2 text-xs text-muted-foreground sm:px-3">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             {t("widgets.andMore", { count: source.length - 8 })}
           </p>
         ) : null}
@@ -1037,12 +1042,16 @@ function WidgetBody({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/[0.1] bg-white/[0.03]">
+    <div className="flex min-w-0 flex-col">
       {visibleGroups.map((group, groupIndex) => (
-        <section key={group.key} className="min-w-0">
-          {groupIndex > 0 ? (
-            <div className="h-px w-full bg-white/[0.12]" aria-hidden />
-          ) : null}
+        <section
+          key={group.key}
+          className={cn(
+            "min-w-0 overflow-hidden border border-white/[0.1] bg-white/[0.04]",
+            stackItemOffsetClass(groupIndex),
+          )}
+          style={stackRadiusStyle(groupIndex, visibleGroups.length, "xl")}
+        >
           <div className="px-2.5 py-1.5 sm:px-3">
             <p className="truncate text-xs font-semibold tracking-tight text-foreground/90">
               {group.title}
@@ -1050,7 +1059,7 @@ function WidgetBody({
           </div>
           {group.entities.map((entity) => (
             <div key={entity.entity_id} className="min-w-0">
-              <div className="h-px w-full bg-white/[0.08]" aria-hidden />
+              <div className="h-px w-full bg-white/[0.1]" aria-hidden />
               <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2 sm:px-3">
                 <p className="truncate text-sm font-medium">{entity.name}</p>
                 <Badge variant={entity.state === "on" ? "default" : "secondary"}>
@@ -1065,7 +1074,7 @@ function WidgetBody({
         </section>
       ))}
       {source.length > flatLimit ? (
-        <p className="border-t border-white/[0.08] px-2.5 py-2 text-xs text-muted-foreground sm:px-3">
+        <p className="mt-1.5 text-xs text-muted-foreground">
           {t("widgets.andMore", { count: source.length - flatLimit })}
         </p>
       ) : null}
@@ -1111,26 +1120,30 @@ function ActivityList() {
     return <EmptyState title={t("activityWidget.emptyTitle")} description={t("activityWidget.emptyDescription")} />;
   }
 
-  return (
-    <div className="overflow-hidden rounded-xl border border-white/[0.1] bg-white/[0.03]">
+    return (
+    <div className="flex min-w-0 flex-col">
       {items.map((event, index) => (
-        <div key={event.id ?? `${event.created_at}-${index}`} className="min-w-0">
-          {index > 0 ? <div className="h-px w-full bg-white/[0.08]" aria-hidden /> : null}
-          <div className="px-2.5 py-2 sm:px-3">
-            <div className="flex min-w-0 items-start justify-between gap-2">
-              <p className="min-w-0 flex-1 break-words font-medium text-sm leading-snug">
-                {event.title ?? event.type ?? t("activityWidget.fallbackTitle")}
-              </p>
-              {event.created_at ? (
-                <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-                  {new Date(event.created_at).toLocaleString(locale)}
-                </span>
-              ) : null}
-            </div>
-            <p className="iotvex-hide-scroll mt-0.5 min-w-0 overflow-x-auto whitespace-nowrap text-xs text-muted-foreground">
-              {event.detail || event.kind || ""}
+        <div
+          key={event.id ?? `${event.created_at}-${index}`}
+          className={cn(
+            "min-w-0 border border-white/[0.1] bg-white/[0.04] px-2.5 py-2",
+            stackItemOffsetClass(index),
+          )}
+          style={stackRadiusStyle(index, items.length, "xl")}
+        >
+          <div className="flex min-w-0 items-start justify-between gap-2">
+            <p className="min-w-0 flex-1 break-words font-medium text-sm leading-snug">
+              {event.title ?? event.type ?? t("activityWidget.fallbackTitle")}
             </p>
+            {event.created_at ? (
+              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                {new Date(event.created_at).toLocaleString(locale)}
+              </span>
+            ) : null}
           </div>
+          <p className="iotvex-hide-scroll mt-0.5 min-w-0 overflow-x-auto whitespace-nowrap text-xs text-muted-foreground">
+            {event.detail || event.kind || ""}
+          </p>
         </div>
       ))}
     </div>

@@ -34,7 +34,7 @@ import {
   pctToByte,
 } from "@/shared/lib/home/action-options"
 import { cn } from "@/shared/lib/utils"
-import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
+import { stackItemOffsetClass, stackRadiusClass, stackRadiusStyle } from "@/shared/lib/stack-radius"
 import {
   Atom,
   Binary,
@@ -595,12 +595,11 @@ function DeviceEntityCard({
 
   return (
     <div
-      style={style}
+      style={{ ...style, ...stackRadiusStyle(stackIndex, stackTotal, "xl") }}
       className={cn(
-        "iotvex-card-in relative min-w-0 overflow-hidden bg-black/50 transition-[background-color,box-shadow] duration-300",
+        "iotvex-card-in relative min-w-0 overflow-hidden border border-white/[0.1] bg-black/50 transition-[background-color,box-shadow] duration-300",
         "hover:z-[1] hover:bg-black/60",
-        // Radius owned by parent stack shell; segments stay sharp at joins.
-        stackIndex === 0 && stackTotal === 1 && "rounded-xl",
+        stackItemOffsetClass(stackIndex),
       )}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -665,47 +664,36 @@ export function EntityGrid({
   if (!groupByDevice) {
     return (
       <div className={cn("flex flex-col md:grid md:grid-cols-2 md:gap-2.5", className)}>
-        {entities.map((e, i) => {
-          const stacked = stackRadiusClass(i, entities.length, "xl")
-          return (
-            <EntityCard
-              key={e.entity_id}
-              entity={e}
-              onEdit={onEdit}
-              style={{ animationDelay: `${i * 35}ms` }}
-              className={cn(
-                "hover:z-[1] max-md:hover:translate-y-0",
-                stackItemOffsetClass(i),
-                stacked,
-                // Restore independent cards from md up (override stack radius).
-                "md:mt-0 md:rounded-xl",
-              )}
-            />
-          )
-        })}
+        {entities.map((e, i) => (
+          <EntityCard
+            key={e.entity_id}
+            entity={e}
+            onEdit={onEdit}
+            style={{ animationDelay: `${i * 35}ms` }}
+            className={cn(
+              "hover:z-[1] max-md:hover:translate-y-0",
+              stackItemOffsetClass(i),
+              stackRadiusClass(i, entities.length, "xl"),
+              "md:mt-0 md:rounded-xl",
+            )}
+          />
+        ))}
       </div>
     )
   }
 
   return (
-    <div
-      className={cn(
-        "flex flex-col overflow-hidden rounded-xl border border-white/[0.1] bg-black/40 shadow-sm backdrop-blur-2xl",
-        className,
-      )}
-    >
+    <div className={cn("flex flex-col", className)}>
       {groups.map((group, gi) => (
-        <div key={group.key} className="min-w-0">
-          {gi > 0 ? <div className="h-px w-full bg-white/[0.1]" aria-hidden /> : null}
-          <DeviceEntityCard
-            group={group}
-            onEdit={onEdit}
-            style={{ animationDelay: `${gi * 55}ms` }}
-            menu={headerMenu?.(group)}
-            stackIndex={gi}
-            stackTotal={groups.length}
-          />
-        </div>
+        <DeviceEntityCard
+          key={group.key}
+          group={group}
+          onEdit={onEdit}
+          style={{ animationDelay: `${gi * 55}ms` }}
+          menu={headerMenu?.(group)}
+          stackIndex={gi}
+          stackTotal={groups.length}
+        />
       ))}
     </div>
   )
