@@ -2,43 +2,32 @@ import { cn } from "@/shared/lib/utils"
 
 export type StackRadius = "md" | "lg" | "xl" | "2xl"
 
-const TOP: Record<StackRadius, string> = {
-  md: "rounded-t-md",
-  lg: "rounded-t-lg",
-  xl: "rounded-t-xl",
-  "2xl": "rounded-t-2xl",
-}
-
-const BOTTOM: Record<StackRadius, string> = {
-  md: "rounded-b-md",
-  lg: "rounded-b-lg",
-  xl: "rounded-b-xl",
-  "2xl": "rounded-b-2xl",
-}
-
-const ALL: Record<StackRadius, string> = {
-  md: "rounded-md",
-  lg: "rounded-lg",
-  xl: "rounded-xl",
-  "2xl": "rounded-2xl",
-}
-
 /**
- * Connected-list radius: first item rounds top, last rounds bottom,
- * middle items stay sharp. Single item keeps full radius.
+ * Nested section stack inside a parent card:
+ * - first: rounded top only
+ * - middle: all sharp
+ * - last: rounded bottom only
+ * - single: fully rounded
  */
 export function stackRadiusClass(
   index: number,
   total: number,
   radius: StackRadius = "xl",
 ): string {
-  if (total <= 1) return ALL[radius]
-  if (index === 0) return cn(TOP[radius], "rounded-b-none")
-  if (index === total - 1) return cn(BOTTOM[radius], "rounded-t-none")
+  const t = {
+    md: { t: "rounded-t-md", b: "rounded-b-md", a: "rounded-md" },
+    lg: { t: "rounded-t-lg", b: "rounded-b-lg", a: "rounded-lg" },
+    xl: { t: "rounded-t-xl", b: "rounded-b-xl", a: "rounded-xl" },
+    "2xl": { t: "rounded-t-2xl", b: "rounded-b-2xl", a: "rounded-2xl" },
+  }[radius]
+
+  if (total <= 1) return t.a
+  if (index === 0) return cn(t.t, "rounded-b-none")
+  if (index === total - 1) return cn(t.b, "rounded-t-none")
   return "rounded-none"
 }
 
-/** Collapse adjacent borders so stacked items share one edge. */
+/** Collapse adjacent borders so stacked sections share one edge. */
 export function stackItemOffsetClass(index: number): string {
   return index > 0 ? "-mt-px" : ""
 }
