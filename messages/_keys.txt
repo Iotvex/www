@@ -55,6 +55,7 @@ automationEditor.nameLabel
 automationEditor.namePlaceholder
 automationEditor.newTitle
 automationEditor.noConditions
+automationEditor.noControllableTargets
 automationEditor.numericAttributePlaceholder
 automationEditor.requestError
 automationEditor.saveError
