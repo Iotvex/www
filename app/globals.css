@@ -781,6 +781,7 @@ body::-webkit-scrollbar,
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-.iotvex-strip-matrix span {
-  will-change: background-color, box-shadow;
+.iotvex-strip-matrix {
+  display: block;
+  image-rendering: auto;
 }
