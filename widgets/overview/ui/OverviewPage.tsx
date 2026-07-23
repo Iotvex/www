@@ -23,7 +23,6 @@ import {
   ArrowRight,
   ArrowUp,
   Cpu,
-  GripVertical,
   House,
   Lightbulb,
   MoreHorizontal,
@@ -486,7 +485,7 @@ function StatsRow({
   ];
 
   return (
-    <div className="iotvex-stat-panel min-w-0 overflow-hidden rounded-xl border border-white/[0.06] bg-black/50 backdrop-blur-xl">
+    <div className="iotvex-stat-panel iotvex-surface min-w-0 overflow-hidden rounded-xl border backdrop-blur-xl">
       <div className="grid grid-cols-2 lg:grid-cols-4">
         {items.map((item, index) => (
           <StatButton
@@ -608,17 +607,12 @@ function SortableWidgetCard({
             : "flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3"
         }
       >
-        <div className="flex min-w-0 items-start gap-1.5">
-          <button
-            type="button"
-            className="mt-0.5 shrink-0 cursor-grab rounded-md p-1 text-muted-foreground hover:bg-white/[0.05] hover:text-foreground active:cursor-grabbing"
-            aria-label={t("widgets.dragAria")}
-            {...attributes}
-            {...listeners}
-          >
-            <GripVertical className="h-4 w-4" />
-          </button>
-          <div className="min-w-0">
+        <div
+          className="flex min-w-0 items-start gap-1.5"
+          {...attributes}
+          {...listeners}
+        >
+          <div className="min-w-0 cursor-grab active:cursor-grabbing">
             {widget.kind === "status" ? null : (
               <>
                 <CardTitle className="truncate text-sm sm:text-base">{widget.title}</CardTitle>
@@ -1044,7 +1038,7 @@ function ActivityList() {
         <div
           key={event.id ?? `${event.created_at}-${index}`}
           className={cn(
-            "min-w-0 border border-white/[0.1] bg-white/[0.04] px-2.5 py-2",
+            "iotvex-surface min-w-0 border px-2.5 py-2",
             stackItemOffsetClass(index),
           )}
           style={{ ...stackItemOffsetStyle(index), ...stackRadiusStyle(index, items.length, "xl") }}

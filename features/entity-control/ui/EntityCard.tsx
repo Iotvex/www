@@ -41,8 +41,7 @@ import {
   Cpu,
   Droplets,
   Gauge,
-  LampCeiling,
-  Lightbulb,
+  GripHorizontal,
   MoreHorizontal,
   Pencil,
   Power,
@@ -58,7 +57,7 @@ import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from
 function DomainIcon({ entity, className }: { entity: EntityState; className?: string }) {
   const cls = String(entity.attributes.device_class || "")
   const iconCls = cn("h-4 w-4", className)
-  if (entity.domain === "light") return <LampCeiling className={iconCls} />
+  if (entity.domain === "light") return <GripHorizontal className={iconCls} />
   if (entity.domain === "switch") return <ToggleLeft className={iconCls} />
   if (hasCapability(entity, "temperature") || cls === "temperature")
     return <Thermometer className={iconCls} />
@@ -70,6 +69,65 @@ function DomainIcon({ entity, className }: { entity: EntityState; className?: st
   if (hasCapability(entity, "binary")) return <Binary className={iconCls} />
   if (entity.domain === "sensor") return <Atom className={iconCls} />
   return <Power className={iconCls} />
+}
+
+
+function effectNameOf(entity: EntityState): string {
+  const list = entity.attributes.effect_list
+  const effect = Number(entity.attributes.effect ?? 0)
+  if (Array.isArray(list) && typeof list[effect] === "string") return String(list[effect])
+  const fallback = ["solid","rainbow","chase","pulse","sparkle","theater","fire","comet","wave","scanner","twinkle","gradient","color_loop","snow"]
+  return fallback[effect] ?? "solid"
+}
+
+function stripSpeedSec(entity: EntityState): number {
+  const speed = Number(entity.attributes.speed ?? 128)
+  // higher wire speed → faster animation (0.45s .. 3.2s)
+  const pct = Math.max(1, Math.min(255, speed)) / 255
+  return Math.max(0.45, 3.2 - pct * 2.6)
+}
+
+function StripGlowIcon({
+  entity,
+  className,
+  size = "md",
+}: {
+  entity: EntityState
+  className?: string
+  size?: "sm" | "md"
+}) {
+  const on = entity.state === "on" || entity.state === "home" || entity.state === "open"
+  const rgb = (entity.attributes.rgb_color as number[]) || [255, 200, 80]
+  const r = rgb[0] ?? 255
+  const g = rgb[1] ?? 200
+  const b = rgb[2] ?? 80
+  const effect = effectNameOf(entity)
+  const box = size === "sm" ? "h-7 w-7 rounded-lg" : "h-8 w-8 rounded-lg"
+  const icon = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4"
+  return (
+    <div
+      className={cn(
+        "iotvex-strip-icon flex shrink-0 items-center justify-center border backdrop-blur-md",
+        box,
+        on
+          ? "border-white/10 bg-white/[0.03]"
+          : "border-white/[0.06] bg-white/[0.03] text-muted-foreground",
+        className,
+      )}
+      data-on={on ? "true" : "false"}
+      data-effect={on && effect !== "solid" && effect !== "gradient" ? effect : undefined}
+      style={
+        on
+          ? {
+              color: `rgb(${r}, ${g}, ${b})`,
+              ["--iotvex-strip-speed" as string]: `${stripSpeedSec(entity)}s`,
+            }
+          : undefined
+      }
+    >
+      <GripHorizontal className={icon} strokeWidth={1.75} />
+    </div>
+  )
 }
 
 function isSensorReading(entity: EntityState) {
@@ -285,7 +343,7 @@ export function EntityControls({
       <div className={cn("flex items-center gap-2.5", compact ? "py-2" : "py-1")}>
         <div
           className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.05] text-foreground/75",
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-foreground/75",
             !entity.available && "opacity-50",
           )}
         >
@@ -331,14 +389,18 @@ export function EntityControls({
     <div className={cn("space-y-2", compact ? "py-2.5" : "")}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
-          <div
-            className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.04] text-muted-foreground backdrop-blur-md",
-              entity.available && on && "border-primary/20 bg-primary/10 text-primary",
-            )}
-          >
-            <DomainIcon entity={entity} className="h-3.5 w-3.5" />
-          </div>
+          {isLightStrip ? (
+            <StripGlowIcon entity={entity} />
+          ) : (
+            <div
+              className={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.03] text-muted-foreground backdrop-blur-md",
+                entity.available && on && "border-primary/20 bg-primary/10 text-primary",
+              )}
+            >
+              <DomainIcon entity={entity} className="h-3.5 w-3.5" />
+            </div>
+          )}
           <div className="min-w-0">
             <p className="truncate text-sm font-medium tracking-tight">{entity.name}</p>
             {!entity.available ? (
@@ -506,7 +568,7 @@ export function EntityCard({
       style={style}
       className={cn(
         "iotvex-card-in group relative min-w-0 overflow-hidden transition-[transform,box-shadow,background-color,border-color] duration-300",
-        "hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-black/65 hover:shadow-[0_12px_40px_-18px_rgba(0,0,0,0.65)]",
+        "hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.045] hover:shadow-[0_12px_40px_-18px_rgba(0,0,0,0.65)]",
         className,
       )}
     >
@@ -587,28 +649,39 @@ function DeviceEntityCard({
   stackTotal?: number
 }) {
   const t = useTranslations("entity")
-  const Icon = group.entities.some((e) => e.domain === "light")
-    ? Lightbulb
-    : group.entities.some((e) => e.domain === "sensor")
-      ? Cpu
-      : Power
+  const leadLight = group.entities.find(
+    (e) =>
+      e.domain === "light" ||
+      e.capabilities.includes("brightness") ||
+      e.capabilities.includes("color") ||
+      e.capabilities.includes("effect"),
+  )
+  const isSensorGroup = !leadLight && group.entities.some((e) => e.domain === "sensor")
 
   return (
     <div
       style={{ ...style, ...stackItemOffsetStyle(stackIndex), ...stackRadiusStyle(stackIndex, stackTotal, "xl") }}
       className={cn(
-        "iotvex-card-in relative min-w-0 overflow-hidden border border-white/[0.1] bg-black/50 transition-[background-color,box-shadow] duration-300",
-        "hover:z-[1] hover:bg-black/60",
+        "iotvex-card-in iotvex-surface relative min-w-0 overflow-hidden border transition-[background-color,box-shadow] duration-300",
+        "hover:z-[1] hover:bg-white/[0.04]",
         stackItemOffsetClass(stackIndex),
       )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
       <div className="flex flex-row items-center justify-between gap-2 px-3 py-2.5 sm:px-3.5">
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.05] text-foreground/85 backdrop-blur-md">
-            <Icon className="h-4 w-4" strokeWidth={1.75} />
-          </div>
+          {leadLight ? (
+            <StripGlowIcon entity={leadLight} />
+          ) : (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-foreground/80 backdrop-blur-md">
+              {isSensorGroup ? (
+                <Cpu className="h-4 w-4" strokeWidth={1.75} />
+              ) : (
+                <Power className="h-4 w-4" strokeWidth={1.75} />
+              )}
+            </div>
+          )}
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold tracking-tight">{group.title}</p>
             <p className="truncate text-[11px] text-muted-foreground">

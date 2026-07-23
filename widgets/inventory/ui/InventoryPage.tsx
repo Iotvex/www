@@ -412,7 +412,7 @@ function EntitiesTab() {
       />
 
       {areas.length > 0 && entities.some((e) => !e.area) ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-border/50 bg-card/40 px-3 py-3 text-xs text-muted-foreground backdrop-blur-md sm:flex-row sm:flex-wrap sm:items-center dark:bg-card/30">
+        <div className="flex flex-col gap-2 rounded-xl border border-border/50 bg-white/[0.03] px-3 py-3 text-xs text-muted-foreground backdrop-blur-md sm:flex-row sm:flex-wrap sm:items-center dark:bg-white/[0.03]">
           <span className="shrink-0">{t("entities.unboundNotice")}</span>
           <div className="-mx-0.5 flex gap-1.5 overflow-x-auto overscroll-x-contain px-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {areas.map((a) => (
