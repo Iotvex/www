@@ -339,7 +339,9 @@
       "deleteConfirm": "Supprimer l’automatisation “{name}” ?",
       "loadError": "Impossible de charger",
       "updateError": "Impossible de mettre à jour",
-      "deleteError": "Impossible de supprimer"
+      "deleteError": "Impossible de supprimer",
+      "runError": "Could not run automation",
+      "running": "Running…"
     },
     "scenes": {
       "title": "Scènes",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "L’action n’est pas définie",
       "fallbackAction": "action",
-      "fallbackTarget": "entité"
-    }
+      "fallbackTarget": "entité",
+      "multi": "{kind} → {count} targets"
+    },
+    "targetsLabel": "Targets",
+    "selectAllTargets": "Select all",
+    "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
+    "targetsRequired": "Select at least one target"
   },
   "settings": {
     "account": {

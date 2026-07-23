@@ -339,7 +339,9 @@
       "deleteConfirm": "删除自动化“{name}”？",
       "loadError": "无法加载",
       "updateError": "无法更新",
-      "deleteError": "无法删除"
+      "deleteError": "无法删除",
+      "runError": "Could not run automation",
+      "running": "Running…"
     },
     "scenes": {
       "title": "场景",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "未设置操作",
       "fallbackAction": "操作",
-      "fallbackTarget": "实体"
-    }
+      "fallbackTarget": "实体",
+      "multi": "{kind} → {count} targets"
+    },
+    "targetsLabel": "Targets",
+    "selectAllTargets": "Select all",
+    "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
+    "targetsRequired": "Select at least one target"
   },
   "settings": {
     "account": {

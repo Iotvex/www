@@ -339,7 +339,9 @@
       "deleteConfirm": "ऑटोमेशन “{name}” हटाएँ?",
       "loadError": "लोड नहीं हो सका",
       "updateError": "अपडेट नहीं हो सका",
-      "deleteError": "हटाया नहीं जा सका"
+      "deleteError": "हटाया नहीं जा सका",
+      "runError": "Could not run automation",
+      "running": "Running…"
     },
     "scenes": {
       "title": "सीन",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "कार्रवाई सेट नहीं है",
       "fallbackAction": "कार्रवाई",
-      "fallbackTarget": "एंटिटी"
-    }
+      "fallbackTarget": "एंटिटी",
+      "multi": "{kind} → {count} targets"
+    },
+    "targetsLabel": "Targets",
+    "selectAllTargets": "Select all",
+    "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
+    "targetsRequired": "Select at least one target"
   },
   "settings": {
     "account": {

@@ -141,7 +141,7 @@ values (
   true,
   '{"trigger":"time","at":"17:00:00"}'::jsonb,
   '[]'::jsonb,
-  '[{"action":"light.turn_on","target":{"entity_id":"light.living_room_strip_0"},"data":{"rgb_color":[255,116,116],"brightness_pct":50,"effect":"solid"}}]'::jsonb,
+  '[{"action":"light.turn_on","target":{"entity_id":["light.living_room_strip_0","light.living_room_strip_1"]},"data":{"rgb_color":[255,116,116],"brightness_pct":50,"effect":0}}]'::jsonb,
   'single',
   'automation.svet_v_17_00'
 )

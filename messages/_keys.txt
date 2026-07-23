@@ -25,6 +25,7 @@ automationEditor.aboveLabel
 automationEditor.abovePlaceholder
 automationEditor.actionLabels.fallbackAction
 automationEditor.actionLabels.fallbackTarget
+automationEditor.actionLabels.multi
 automationEditor.actionLabels.undefined
 automationEditor.actionSection
 automationEditor.addCondition
@@ -57,7 +58,11 @@ automationEditor.noConditions
 automationEditor.numericAttributePlaceholder
 automationEditor.requestError
 automationEditor.saveError
+automationEditor.selectAllTargets
 automationEditor.speedLabel
+automationEditor.targetsHint
+automationEditor.targetsLabel
+automationEditor.targetsRequired
 automationEditor.timeLabel
 automationEditor.triggerKinds.numeric_state
 automationEditor.triggerKinds.state
@@ -362,6 +367,8 @@ rules.automations.emptyTitle
 rules.automations.enableAria
 rules.automations.inactive
 rules.automations.loadError
+rules.automations.runError
+rules.automations.running
 rules.automations.title
 rules.automations.updateError
 rules.requestError

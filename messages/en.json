@@ -339,7 +339,9 @@
       "deleteConfirm": "Delete automation “{name}”?",
       "loadError": "Could not load",
       "updateError": "Could not update",
-      "deleteError": "Could not delete"
+      "deleteError": "Could not delete",
+      "runError": "Could not run automation",
+      "running": "Running…"
     },
     "scenes": {
       "title": "Scenes",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "Action is not set",
       "fallbackAction": "action",
-      "fallbackTarget": "entity"
-    }
+      "fallbackTarget": "entity",
+      "multi": "{kind} → {count} targets"
+    },
+    "targetsLabel": "Targets",
+    "selectAllTargets": "Select all",
+    "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
+    "targetsRequired": "Select at least one target"
   },
   "settings": {
     "account": {

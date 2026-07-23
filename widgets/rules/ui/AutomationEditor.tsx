@@ -1,7 +1,8 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
 import { useTranslations } from "next-intl"
+import { Sun, Timer } from "lucide-react"
 
 import { Button } from "@/shared/ui/button"
 import {
@@ -14,7 +15,21 @@ import {
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 import { FieldSelect, SegmentedTabs } from "@/shared/ui/page-toolbar"
-import { verbsForCapabilities } from "@/shared/lib/home/action-options"
+import { Slider } from "@/shared/ui/slider"
+import { ColorPicker, type Rgb } from "@/shared/ui/color-picker"
+import { cn } from "@/shared/lib/utils"
+import {
+  byteToPct,
+  effectSupportsColor,
+  effectSupportsSpeed,
+  pctToByte,
+  verbsForCapabilities,
+} from "@/shared/lib/home/action-options"
+import {
+  stackItemOffsetClass,
+  stackItemOffsetStyle,
+  stackRadiusStyle,
+} from "@/shared/lib/stack-radius"
 
 export type RuleEntity = {
   id?: string
@@ -53,15 +68,21 @@ type ConditionKind = "state" | "numeric_state" | "time"
 
 const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const
 
-const COLOR_PRESETS = [
-  [255, 255, 255],
-  [255, 180, 120],
-  [255, 110, 84],
-  [255, 64, 64],
-  [255, 40, 160],
-  [80, 120, 255],
-  [40, 200, 180],
-  [120, 255, 80],
+const EFFECT_FALLBACK = [
+  "solid",
+  "rainbow",
+  "chase",
+  "pulse",
+  "sparkle",
+  "theater",
+  "fire",
+  "comet",
+  "wave",
+  "scanner",
+  "twinkle",
+  "gradient",
+  "color_loop",
+  "snow",
 ]
 
 function entityId(entity: RuleEntity): string {
@@ -85,6 +106,25 @@ function capsOf(entity: RuleEntity | undefined): string[] {
   if (domain === "light") return ["on_off", "brightness", "color", "effect", "speed"]
   if (domain === "switch") return ["on_off"]
   return ["on_off"]
+}
+
+function collectTargetIds(actions: AutomationAction[] | undefined): string[] {
+  const ids: string[] = []
+  for (const action of actions || []) {
+    const raw = action.target?.entity_id ?? action.entity_id
+    if (Array.isArray(raw)) ids.push(...raw.map(String))
+    else if (raw) ids.push(String(raw))
+  }
+  return [...new Set(ids.map((id) => id.trim()).filter(Boolean))]
+}
+
+function resolveEffectNumber(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.trunc(value)
+  const raw = String(value ?? "0").trim()
+  const asNum = Number(raw)
+  if (Number.isFinite(asNum)) return Math.trunc(asNum)
+  const idx = EFFECT_FALLBACK.indexOf(raw.toLowerCase())
+  return idx >= 0 ? idx : 0
 }
 
 async function api<T>(
@@ -146,6 +186,36 @@ function newCondition(entity_id = ""): ConditionDraft {
   }
 }
 
+function EditorSection({
+  index,
+  total,
+  title,
+  children,
+  trailing,
+}: {
+  index: number
+  total: number
+  title: string
+  children: ReactNode
+  trailing?: ReactNode
+}) {
+  return (
+    <section
+      className={cn(
+        "iotvex-surface grid gap-3 border border-border/60 bg-background/20 p-3",
+        stackItemOffsetClass(index),
+      )}
+      style={{ ...stackItemOffsetStyle(index), ...stackRadiusStyle(index, total, "xl") }}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-sm font-medium">{title}</div>
+        {trailing}
+      </div>
+      {children}
+    </section>
+  )
+}
+
 export function AutomationEditor({
   entities,
   item,
@@ -164,6 +234,15 @@ export function AutomationEditor({
   const common = useTranslations("common")
   const requestError = useCallback((status: number) => t("requestError", { status }), [t])
   const firstEntityId = entityId(entities[0] ?? {})
+  const lightIds = useMemo(
+    () =>
+      entities
+        .filter((e) => (e.domain || entityId(e).split(".")[0]) === "light")
+        .map(entityId)
+        .filter(Boolean),
+    [entities],
+  )
+
   const [name, setName] = useState("")
   const [triggerKind, setTriggerKind] = useState<TriggerKind>("time")
   const [time, setTime] = useState("08:00")
@@ -175,28 +254,43 @@ export function AutomationEditor({
   const [triggerBelow, setTriggerBelow] = useState("")
   const [triggerAttribute, setTriggerAttribute] = useState("")
   const [conditions, setConditions] = useState<ConditionDraft[]>([])
-  const [selectedEntity, setSelectedEntity] = useState(firstEntityId)
+  const [selectedEntities, setSelectedEntities] = useState<string[]>(
+    lightIds.length ? lightIds : firstEntityId ? [firstEntityId] : [],
+  )
   const [verb, setVerb] = useState("turn_on")
-  const [brightness, setBrightness] = useState(80)
-  const [rgb, setRgb] = useState<[number, number, number]>([255, 255, 255])
+  const [brightnessPct, setBrightnessPct] = useState(80)
+  const [rgb, setRgb] = useState<Rgb>([255, 255, 255])
   const [effect, setEffect] = useState(0)
-  const [speed, setSpeed] = useState(128)
+  const [speedPct, setSpeedPct] = useState(50)
   const [effects, setEffects] = useState<EffectOpt[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const selected = useMemo(
-    () => entities.find((e) => entityId(e) === selectedEntity),
-    [entities, selectedEntity],
-  )
-  const caps = capsOf(selected)
+  const primaryEntity = useMemo(() => {
+    const id = selectedEntities[0]
+    return entities.find((e) => entityId(e) === id)
+  }, [entities, selectedEntities])
+  const caps = capsOf(primaryEntity)
+  const showColor =
+    (verb === "turn_on" || verb === "set_color") &&
+    caps.includes("color") &&
+    effectSupportsColor(effect)
+  const showSpeed =
+    (verb === "turn_on" || verb === "set_effect" || verb === "set_speed") &&
+    caps.includes("speed") &&
+    effectSupportsSpeed(effect)
+  const showBrightness =
+    (verb === "turn_on" || verb === "set_brightness") && caps.includes("brightness")
+  const showEffect =
+    (verb === "turn_on" || verb === "set_effect") && caps.includes("effect")
+
   const verbOptions = useMemo(
     () =>
-      verbsForCapabilities(caps, selected?.domain).map((option) => ({
+      verbsForCapabilities(caps, primaryEntity?.domain).map((option) => ({
         ...option,
         label: tActions(option.labelKey),
       })),
-    [caps, selected?.domain, tActions],
+    [caps, primaryEntity?.domain, tActions],
   )
 
   useEffect(() => {
@@ -240,20 +334,33 @@ export function AutomationEditor({
       }),
     )
 
-    const target = (currentAction?.target || {}) as { entity_id?: string }
-    const eid = String(target.entity_id || currentAction?.entity_id || firstEntityId)
-    setSelectedEntity(eid)
-    const rawAction = String(currentAction?.action || currentAction?.service || currentAction?.type || "turn_on")
+    const targets = collectTargetIds(item?.actions)
+    if (targets.length) setSelectedEntities(targets)
+    else if (lightIds.length) setSelectedEntities(lightIds)
+    else if (firstEntityId) setSelectedEntities([firstEntityId])
+    else setSelectedEntities([])
+
+    const rawAction = String(
+      currentAction?.action || currentAction?.service || currentAction?.type || "turn_on",
+    )
     const normalized = rawAction.includes(".") ? rawAction.split(".").pop()! : rawAction
     setVerb(normalized)
     const data = (currentAction?.data || {}) as Record<string, unknown>
-    setBrightness(Number(data.brightness_pct ?? currentAction?.brightness ?? 80))
+    const briPct =
+      data.brightness_pct != null
+        ? Number(data.brightness_pct)
+        : data.brightness != null
+          ? byteToPct(Number(data.brightness))
+          : currentAction?.brightness != null
+            ? Number(currentAction.brightness)
+            : 80
+    setBrightnessPct(Math.max(1, Math.min(100, Math.round(briPct))))
     const color = (data.rgb_color as number[]) || [255, 255, 255]
     setRgb([Number(color[0] ?? 255), Number(color[1] ?? 255), Number(color[2] ?? 255)])
-    setEffect(Number(data.effect ?? data.effect_id ?? 0))
-    setSpeed(Number(data.speed ?? 128))
+    setEffect(resolveEffectNumber(data.effect ?? data.effect_id ?? 0))
+    setSpeedPct(byteToPct(Number(data.speed ?? 128)))
     setError(null)
-  }, [firstEntityId, item, open])
+  }, [firstEntityId, item, lightIds, open])
 
   useEffect(() => {
     if (!verbOptions.some((o) => o.value === verb)) {
@@ -265,31 +372,46 @@ export function AutomationEditor({
     setWeekdays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]))
   }
 
+  const toggleTarget = (id: string) => {
+    setSelectedEntities((prev) => {
+      if (prev.includes(id)) {
+        if (prev.length <= 1) return prev
+        return prev.filter((x) => x !== id)
+      }
+      return [...prev, id]
+    })
+  }
+
+  const selectAllTargets = () => {
+    const all = entities.map(entityId).filter(Boolean)
+    if (all.length) setSelectedEntities(all)
+  }
+
   const buildTrigger = (): Record<string, unknown> => {
     if (triggerKind === "time") {
       const at = time.length === 5 ? `${time}:00` : time
-      const t: Record<string, unknown> = { trigger: "time", at }
-      if (weekdays.length) t.weekday = weekdays
-      return t
+      const row: Record<string, unknown> = { trigger: "time", at }
+      if (weekdays.length) row.weekday = weekdays
+      return row
     }
     if (triggerKind === "state") {
-      const t: Record<string, unknown> = {
+      const row: Record<string, unknown> = {
         trigger: "state",
         entity_id: triggerEntity,
         to: triggerTo,
       }
-      if (triggerFrom) t.from = triggerFrom
-      if (triggerAttribute) t.attribute = triggerAttribute
-      return t
+      if (triggerFrom) row.from = triggerFrom
+      if (triggerAttribute) row.attribute = triggerAttribute
+      return row
     }
-    const t: Record<string, unknown> = {
+    const row: Record<string, unknown> = {
       trigger: "numeric_state",
       entity_id: triggerEntity,
     }
-    if (triggerAbove !== "") t.above = Number(triggerAbove)
-    if (triggerBelow !== "") t.below = Number(triggerBelow)
-    if (triggerAttribute) t.attribute = triggerAttribute
-    return t
+    if (triggerAbove !== "") row.above = Number(triggerAbove)
+    if (triggerBelow !== "") row.below = Number(triggerBelow)
+    if (triggerAttribute) row.attribute = triggerAttribute
+    return row
   }
 
   const buildConditions = () =>
@@ -321,21 +443,18 @@ export function AutomationEditor({
 
   const buildActionData = (): Record<string, unknown> => {
     const data: Record<string, unknown> = {}
-    if (verb === "turn_on" || verb === "set_brightness") {
-      if (caps.includes("brightness")) data.brightness_pct = brightness
+    if (showBrightness || verb === "set_brightness") {
+      data.brightness_pct = brightnessPct
     }
-    if ((verb === "turn_on" || verb === "set_color") && caps.includes("color")) {
+    if (showColor || verb === "set_color") {
       data.rgb_color = rgb
     }
-    if ((verb === "turn_on" || verb === "set_effect") && caps.includes("effect")) {
+    if (showEffect || verb === "set_effect") {
       data.effect = effect
     }
-    if ((verb === "turn_on" || verb === "set_speed" || verb === "set_effect") && caps.includes("speed")) {
-      data.speed = speed
+    if (showSpeed || verb === "set_speed") {
+      data.speed = pctToByte(speedPct)
     }
-    if (verb === "set_color") data.rgb_color = rgb
-    if (verb === "set_effect") data.effect = effect
-    if (verb === "set_speed") data.speed = speed
     return data
   }
 
@@ -343,7 +462,8 @@ export function AutomationEditor({
     setSaving(true)
     setError(null)
     try {
-      const domain = selected?.domain || selectedEntity.split(".")[0] || "home"
+      if (!selectedEntities.length) throw new Error(t("targetsRequired"))
+      const domain = primaryEntity?.domain || selectedEntities[0]?.split(".")[0] || "home"
       const payload = {
         name: name.trim(),
         trigger: buildTrigger(),
@@ -351,7 +471,10 @@ export function AutomationEditor({
         actions: [
           {
             action: `${domain}.${verb}`,
-            target: { entity_id: selectedEntity },
+            target: {
+              entity_id:
+                selectedEntities.length === 1 ? selectedEntities[0] : selectedEntities,
+            },
             data: buildActionData(),
           },
         ],
@@ -382,13 +505,11 @@ export function AutomationEditor({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            {item ? t("editTitle") : t("newTitle")}
-          </DialogTitle>
+          <DialogTitle>{item ? t("editTitle") : t("newTitle")}</DialogTitle>
         </DialogHeader>
 
-        <div className="grid max-h-[min(70dvh,640px)] gap-4 overflow-y-auto overscroll-contain py-1 [scrollbar-gutter:stable]">
-          <div className="grid gap-2">
+        <div className="grid max-h-[min(70dvh,640px)] gap-0 overflow-y-auto overscroll-contain py-1 [scrollbar-gutter:stable]">
+          <div className="mb-4 grid gap-2">
             <Label htmlFor="automation-name">{t("nameLabel")}</Label>
             <Input
               id="automation-name"
@@ -398,8 +519,7 @@ export function AutomationEditor({
             />
           </div>
 
-          <section className="grid gap-3 rounded-xl border border-border/60 bg-background/20 p-3">
-            <div className="text-sm font-medium">{t("triggerSection")}</div>
+          <EditorSection index={0} total={3} title={t("triggerSection")}>
             <SegmentedTabs
               value={triggerKind}
               onValueChange={(v) => setTriggerKind(v as TriggerKind)}
@@ -510,11 +630,13 @@ export function AutomationEditor({
                 </div>
               </div>
             ) : null}
-          </section>
+          </EditorSection>
 
-          <section className="grid gap-3 rounded-xl border border-border/60 bg-background/20 p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="text-sm font-medium">{t("conditionsSection")}</div>
+          <EditorSection
+            index={1}
+            total={3}
+            title={t("conditionsSection")}
+            trailing={
               <Button
                 type="button"
                 size="sm"
@@ -523,7 +645,8 @@ export function AutomationEditor({
               >
                 {t("addCondition")}
               </Button>
-            </div>
+            }
+          >
             {conditions.length === 0 ? (
               <p className="text-xs text-muted-foreground">{t("noConditions")}</p>
             ) : null}
@@ -679,16 +802,43 @@ export function AutomationEditor({
                 ) : null}
               </div>
             ))}
-          </section>
+          </EditorSection>
 
-          <section className="grid gap-3 rounded-xl border border-border/60 bg-background/20 p-3">
-            <div className="text-sm font-medium">{t("actionSection")}</div>
-            <FieldSelect
-              label={t("entityLabel")}
-              value={selectedEntity}
-              onValueChange={setSelectedEntity}
-              options={entityOptions}
-            />
+          <EditorSection index={2} total={3} title={t("actionSection")}>
+            <div className="grid gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label>{t("targetsLabel")}</Label>
+                <Button type="button" size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={selectAllTargets}>
+                  {t("selectAllTargets")}
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {entities.map((entity) => {
+                  const id = entityId(entity)
+                  if (!id) return null
+                  const active = selectedEntities.includes(id)
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => toggleTarget(id)}
+                      className={cn(
+                        "inline-flex min-h-9 items-center rounded-lg border px-2.5 text-xs font-medium transition",
+                        active
+                          ? "border-primary/40 bg-primary/12 text-primary"
+                          : "border-border/70 text-muted-foreground hover:bg-accent/40",
+                      )}
+                    >
+                      {entityName(entity)}
+                    </button>
+                  )
+                })}
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                {t("targetsHint", { count: selectedEntities.length })}
+              </p>
+            </div>
+
             <FieldSelect
               label={t("commandLabel")}
               value={verb}
@@ -696,82 +846,81 @@ export function AutomationEditor({
               options={verbOptions.map((o) => ({ value: o.value, label: o.label }))}
             />
 
-            {(verb === "turn_on" || verb === "set_brightness") && caps.includes("brightness") ? (
-              <div className="grid gap-2">
-                <Label htmlFor="automation-brightness">{t("brightnessLabel")}</Label>
-                <Input
-                  id="automation-brightness"
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={brightness}
-                  onChange={(event) => setBrightness(Number(event.target.value))}
-                />
+            {showBrightness || showSpeed ? (
+              <div
+                className={cn(
+                  "grid gap-2.5",
+                  showBrightness && showSpeed ? "grid-cols-2" : "grid-cols-1",
+                )}
+              >
+                {showBrightness ? (
+                  <div className="min-w-0 space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Sun className="h-3.5 w-3.5" />
+                      <span>{t("brightnessLabel")}</span>
+                      <span className="ml-auto tabular-nums text-foreground/80">{brightnessPct}%</span>
+                    </div>
+                    <Slider
+                      aria-label={t("brightnessLabel")}
+                      min={1}
+                      max={100}
+                      step={1}
+                      value={[brightnessPct]}
+                      onValueChange={(v) => setBrightnessPct(v[0])}
+                    />
+                  </div>
+                ) : null}
+                {showSpeed ? (
+                  <div className="min-w-0 space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Timer className="h-3.5 w-3.5" />
+                      <span>{t("speedLabel")}</span>
+                      <span className="ml-auto tabular-nums text-foreground/80">{speedPct}%</span>
+                    </div>
+                    <Slider
+                      aria-label={t("speedLabel")}
+                      min={1}
+                      max={100}
+                      step={1}
+                      value={[speedPct]}
+                      onValueChange={(v) => setSpeedPct(v[0])}
+                    />
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
-            {(verb === "turn_on" || verb === "set_color") && caps.includes("color") ? (
-              <div className="grid gap-2">
-                <Label>{t("colorLabel")}</Label>
-                <div className="grid grid-cols-8 gap-1.5">
-                  {COLOR_PRESETS.map((p) => {
-                    const active = rgb[0] === p[0] && rgb[1] === p[1] && rgb[2] === p[2]
-                    return (
-                      <button
-                        key={p.join("-")}
-                        type="button"
-                        className={
-                          active
-                            ? "h-7 rounded-full border border-primary ring-1 ring-primary/40"
-                            : "h-7 rounded-full border border-border/80"
-                        }
-                        style={{ background: `rgb(${p.join(",")})` }}
-                        onClick={() => setRgb([p[0], p[1], p[2]])}
-                      />
-                    )
-                  })}
-                </div>
+            {showColor || showEffect ? (
+              <div
+                className={cn(
+                  "grid gap-2.5",
+                  showColor && showEffect ? "grid-cols-2" : "grid-cols-1",
+                )}
+              >
+                {showColor ? (
+                  <div className="min-w-0 space-y-1.5">
+                    <div className="text-xs text-muted-foreground">{t("colorLabel")}</div>
+                    <ColorPicker value={rgb} onChange={setRgb} onCommit={setRgb} />
+                  </div>
+                ) : null}
+                {showEffect ? (
+                  <div className="min-w-0 space-y-1.5">
+                    <FieldSelect
+                      label={t("effectLabel")}
+                      value={String(effect)}
+                      onValueChange={(v) => setEffect(Number(v))}
+                      options={(effects.length
+                        ? effects
+                        : EFFECT_FALLBACK.map((name, id) => ({ id, name }))
+                      ).map((e) => ({ value: String(e.id), label: e.name }))}
+                    />
+                  </div>
+                ) : null}
               </div>
             ) : null}
+          </EditorSection>
 
-            {(verb === "turn_on" || verb === "set_effect") && caps.includes("effect") ? (
-              <FieldSelect
-                label={t("effectLabel")}
-                value={String(effect)}
-                onValueChange={(v) => setEffect(Number(v))}
-                options={(effects.length
-                  ? effects
-                  : [{ id: 0, name: "solid" }]
-                ).map((e) => ({ value: String(e.id), label: e.name }))}
-              />
-            ) : null}
-
-            {(verb === "turn_on" || verb === "set_effect" || verb === "set_speed") &&
-            caps.includes("speed") ? (
-              <div className="grid gap-2">
-                <Label htmlFor="automation-speed">{t("speedLabel")}</Label>
-                <Input
-                  id="automation-speed"
-                  type="number"
-                  min={0}
-                  max={255}
-                  value={speed}
-                  onChange={(event) => setSpeed(Number(event.target.value))}
-                />
-              </div>
-            ) : null}
-
-            {selected ? (
-              <p className="text-[11px] text-muted-foreground">
-                {t("capabilitiesLine", {
-                  capabilities: caps.join(", ") || t("emptyCapabilities"),
-                  domain: selected.domain || t("unknownDomain"),
-                })}
-              </p>
-            ) : null}
-          </section>
-
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
         </div>
 
         <DialogFooter>
@@ -780,7 +929,7 @@ export function AutomationEditor({
           </Button>
           <Button
             onClick={() => void save()}
-            disabled={saving || !name.trim() || !selectedEntity}
+            disabled={saving || !name.trim() || selectedEntities.length === 0}
           >
             {saving ? common("saving") : common("save")}
           </Button>
@@ -821,7 +970,8 @@ export function triggerLabel(item: AutomationItem, t?: TranslationFn): string {
 }
 
 export function actionLabel(item: { actions?: AutomationAction[] }, t?: TranslationFn): string {
-  const action = item.actions?.[0]
+  const actions = item.actions || []
+  const action = actions[0]
   if (!action) return labelText(t, "actionLabels.undefined", "Action is not set")
   const kind = String(
     action.action ||
@@ -829,7 +979,15 @@ export function actionLabel(item: { actions?: AutomationAction[] }, t?: Translat
       action.type ||
       labelText(t, "actionLabels.fallbackAction", "action"),
   )
-  const target = (action.target || {}) as { entity_id?: string }
-  const eid = target.entity_id || action.entity_id || labelText(t, "actionLabels.fallbackTarget", "entity")
-  return `${kind} -> ${eid}`
+  const targets = collectTargetIds(actions)
+  if (targets.length > 1) {
+    return labelText(t, "actionLabels.multi", `${kind} → ${targets.length} targets`, {
+      kind,
+      count: targets.length,
+    })
+  }
+  const eid =
+    targets[0] ||
+    labelText(t, "actionLabels.fallbackTarget", "entity")
+  return `${kind} → ${eid}`
 }

@@ -339,7 +339,9 @@
       "deleteConfirm": "Hapus otomasi “{name}”?",
       "loadError": "Tidak dapat memuat",
       "updateError": "Tidak dapat memperbarui",
-      "deleteError": "Tidak dapat menghapus"
+      "deleteError": "Tidak dapat menghapus",
+      "runError": "Could not run automation",
+      "running": "Running…"
     },
     "scenes": {
       "title": "Adegan",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "Tindakan belum diatur",
       "fallbackAction": "tindakan",
-      "fallbackTarget": "entitas"
-    }
+      "fallbackTarget": "entitas",
+      "multi": "{kind} → {count} targets"
+    },
+    "targetsLabel": "Targets",
+    "selectAllTargets": "Select all",
+    "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
+    "targetsRequired": "Select at least one target"
   },
   "settings": {
     "account": {

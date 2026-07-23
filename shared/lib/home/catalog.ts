@@ -64,6 +64,13 @@ export async function listAutomations() {
   return (data || []) as DbAutomation[]
 }
 
+export async function getAutomation(id: string) {
+  const sb = createAdminClient()
+  const { data, error } = await sb.from("automations").select("*").eq("id", id).single()
+  if (error) throw new Error(error.message)
+  return data as DbAutomation
+}
+
 export async function setAutomationEnabled(id: string, enabled: boolean) {
   const sb = createAdminClient()
   const { data, error } = await sb.from("automations").update({ enabled }).eq("id", id).select("*").single()
@@ -208,7 +215,16 @@ export function summarizeAction(actions: unknown[]): string {
   const service = String(a.action || a.service || "action")
   const target = (a.target || {}) as Record<string, unknown>
   const eid = target.entity_id || target.device_id
-  return eid ? `${service} -> ${Array.isArray(eid) ? eid[0] : eid}` : service
+  if (Array.isArray(eid)) {
+    if (!eid.length) return service
+    if (eid.length === 1) return `${service} -> ${eid[0]}`
+    return `${service} -> ${eid.length} targets`
+  }
+  // Legacy: one automation stored as N identical action steps
+  if (!eid && (actions?.length || 0) > 1) {
+    return `${service} -> ${actions!.length} targets`
+  }
+  return eid ? `${service} -> ${eid}` : service
 }
 
 const EFFECT_LIST = [

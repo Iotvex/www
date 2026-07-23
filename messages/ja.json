@@ -339,7 +339,9 @@
       "deleteConfirm": "オートメーション「{name}」を削除しますか？",
       "loadError": "読み込めませんでした",
       "updateError": "更新できませんでした",
-      "deleteError": "削除できませんでした"
+      "deleteError": "削除できませんでした",
+      "runError": "Could not run automation",
+      "running": "Running…"
     },
     "scenes": {
       "title": "シーン",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "アクションが設定されていません",
       "fallbackAction": "アクション",
-      "fallbackTarget": "エンティティ"
-    }
+      "fallbackTarget": "エンティティ",
+      "multi": "{kind} → {count} targets"
+    },
+    "targetsLabel": "Targets",
+    "selectAllTargets": "Select all",
+    "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
+    "targetsRequired": "Select at least one target"
   },
   "settings": {
     "account": {
