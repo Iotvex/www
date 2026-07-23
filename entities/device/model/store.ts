@@ -230,7 +230,7 @@ function deviceFromNode(node: IotvexNode, existing?: Device, fallbackAreaId?: st
     id: deviceUuidForNode(node.node_id),
     name: existing?.name || defaultDeviceName(node.node_id, node.kind),
     manufacturer: existing?.manufacturer ?? "Iotvex",
-    model: existing?.model || defaultDeviceModel(node.node_id, node.kind),
+    model: defaultDeviceModel(node.node_id, node.kind),
     // Never invent seed area ids — live catalogs may use gostinaya / custom ids.
     area_id: existing?.area_id ?? fallbackAreaId ?? null,
     platform: existing?.platform || "iotvex",

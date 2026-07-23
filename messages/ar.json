@@ -72,7 +72,7 @@
       "dashboard": "نظرة عامة",
       "home-devices": "الأجهزة",
       "home-entities": "الكيانات",
-      "home-areas": "الغرف",
+      "home-areas": "المناطق",
       "auto-scenarios": "الأتمتات",
       "auto-scenes": "المشاهد",
       "auto-scripts": "البرامج النصية",
@@ -106,8 +106,8 @@
       "subtitle": "كيانات منزلية قابلة للتحكم"
     },
     "home-areas": {
-      "title": "الغرف",
-      "subtitle": "المناطق والتعيينات"
+      "title": "المناطق",
+      "subtitle": "التعيينات"
     },
     "auto-scenarios": {
       "title": "الأتمتات",
@@ -177,7 +177,7 @@
       "entities": "الكيانات",
       "entitiesOn": "{count} قيد التشغيل",
       "entitiesWaitingDiscovery": "بانتظار الاكتشاف",
-      "rooms": "الغرف",
+      "rooms": "المناطق",
       "roomExample": "مثلاً {name}",
       "roomsUnassigned": "غير معيّنة",
       "connection": "الاتصال",
@@ -187,7 +187,8 @@
       "controllerAvailable": "وحدة التحكم متاحة",
       "agentNoResponse": "الوكيل لا يستجيب",
       "checkingValue": "…",
-      "checkingHint": "جارٍ التحقق من الاتصال"
+      "checkingHint": "جارٍ التحقق من الاتصال",
+      "agentStatus": "حالة الوكيل"
     },
     "widgets": {
       "emptyTitle": "ابدأ بأول عنصر واجهة",
@@ -198,7 +199,7 @@
       "nameLabel": "الاسم",
       "namePlaceholder": "غرفة المعيشة",
       "typeLabel": "النوع",
-      "roomLabel": "الغرفة",
+      "roomLabel": "منطقة",
       "moveUpAria": "نقل عنصر الواجهة إلى الأعلى",
       "moveDownAria": "نقل عنصر الواجهة إلى الأسفل",
       "deleteConfirm": "حذف عنصر الواجهة “{title}”؟",
@@ -209,11 +210,11 @@
       "kinds": {
         "entities": "الكيانات",
         "lights": "الأضواء",
-        "area": "الغرفة",
+        "area": "منطقة",
         "status": "الحالة",
         "activity": "النشاط"
       },
-      "kindArea": "الغرفة: {room}",
+      "kindArea": "منطقة: {room}",
       "noRoomSelected": "غير محددة",
       "unnamed": "بدون عنوان",
       "noMatchingTitle": "لا توجد كيانات مطابقة",
@@ -223,7 +224,10 @@
       "andMore": "و{count} أخرى",
       "moveUp": "تحريك لأعلى",
       "moveDown": "تحريك لأسفل",
-      "menuAria": "إجراءات العنصر"
+      "menuAria": "إجراءات العنصر",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "dragAria": "Drag widget"
     },
     "statusWidget": {
       "controller": "وحدة التحكم",
@@ -232,7 +236,7 @@
       "catalog": "الكتالوج",
       "active": "نشط",
       "channels": "القنوات",
-      "roomsCount": "الغرف: {count}",
+      "roomsCount": "المناطق: {count}",
       "devicesAbbrev": "أجهزة"
     },
     "activityWidget": {
@@ -254,7 +258,7 @@
       "discoverError": "تعذّر البحث عن الأجهزة",
       "discoverSuccess": "تم العثور على كيانات: {count}. تم حفظ الأسماء والتعيينات.",
       "emptyTitle": "لم تتم إضافة أجهزة بعد",
-      "emptyDescription": "ابدأ الاكتشاف على الشبكة — ستظهر الأجهزة التي يتم العثور عليها هنا. سيتم الاحتفاظ بالأسماء والتعيينات.",
+      "emptyDescription": "ابدأ الاكتشاف على الشبكة — ستظهر الأجهزة التي يتم العثور عليها هنا.",
       "onCount": "{on}/{total} قيد التشغيل",
       "areaLabel": "المنطقة",
       "unassignedArea": "غير معيّنة",
@@ -262,7 +266,7 @@
       "nameLabel": "الاسم",
       "areaSelectLabel": "المنطقة",
       "noArea": "بلا منطقة",
-      "cascadeArea": "تطبيق الغرفة على جميع كيانات الجهاز",
+      "cascadeArea": "Apply zone to all device entities",
       "nodesOnline": "عقد متصلة: {count}"
     },
     "entities": {
@@ -281,26 +285,36 @@
       "deviceLabel": "الجهاز",
       "areaLabel": "المنطقة",
       "noDevice": "بلا جهاز",
-      "areaSuffixNone": "بلا منطقة"
+      "areaSuffixNone": "بلا منطقة",
+      "sortAria": "فرز",
+      "sortNameAsc": "الاسم أ→ي",
+      "sortNameDesc": "الاسم ي→أ",
+      "sortDomain": "حسب المجال",
+      "sortActive": "النشطة أولاً",
+      "sortId": "حسب المعرف",
+      "filterAria": "Filters"
     },
     "areas": {
-      "title": "الغرف",
+      "title": "المناطق",
       "description": "المناطق والتعيينات",
-      "count": "{count} مناطق",
+      "count": "{count} المناطق",
       "add": "إضافة منطقة",
-      "emptyTitle": "لم يتم إنشاء غرف بعد",
-      "emptyDescription": "أنشئ غرفة وعيّن الأجهزة. يتم الاحتفاظ بالتعيينات أثناء إعادة الاكتشاف.",
+      "emptyTitle": "No zones created yet",
+      "emptyDescription": "Create a zone and assign devices.",
       "devicesAbbrev": "أجهزة",
       "entitiesAbbrev": "كيانات",
       "onAbbrev": "تشغيل",
-      "nothingAssigned": "لم يتم تعيين أي شيء لهذه الغرفة بعد",
-      "editTitle": "المنطقة",
+      "nothingAssigned": "Nothing is assigned to this zone yet",
+      "editTitle": "منطقة",
       "newTitle": "منطقة جديدة",
       "nameLabel": "الاسم",
       "namePlaceholder": "مثلاً، غرفة المعيشة",
       "assignDevice": "تعيين جهاز",
       "assignEntity": "تعيين كيان",
-      "skip": "تخطي"
+      "skip": "تخطي",
+      "assignHint": "Select a device to attach all its entities. Uncheck ones you want to leave out.",
+      "orphanEntities": "Other entities",
+      "selectedCount": "{devices} devices · {entities} entities"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "مسح السجل",
     "filterAll": "الكل",
     "emptyTitle": "السجل فارغ",
-    "emptyDescription": "ستظهر الأحداث بعد التحكم في الأجهزة أو تشغيل الأتمتات أو اكتشاف المعدات."
+    "emptyDescription": "ستظهر الأحداث بعد التحكم في الأجهزة أو تشغيل الأتمتات أو اكتشاف المعدات.",
+    "searchPlaceholder": "Search…",
+    "filterAria": "Filters",
+    "filterKindLabel": "Event type",
+    "sortLabel": "Sort",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTitleAsc": "Title A → Z",
+    "sortTitleDesc": "Title Z → A",
+    "sortKindAsc": "Event type A → Z"
   },
   "modules": {
     "metaCount": "{count} إضافات",
@@ -688,7 +711,8 @@
     "logout": "تسجيل الخروج",
     "navigation": "التنقل",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "اللغة"
   },
   "sidebar": {
     "panelControlSubtitle": "لوحة التحكم"

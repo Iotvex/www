@@ -25,12 +25,24 @@ function applyColor(id: ColorThemeId) {
   document.documentElement.setAttribute("data-color", id)
 }
 
+function readInitialColor(): ColorThemeId {
+  if (typeof document !== "undefined") {
+    const attr = document.documentElement.getAttribute("data-color")
+    if (attr && isColorThemeId(attr)) return attr
+  }
+  if (typeof window !== "undefined") {
+    const stored = readLocalPreferences().color_theme
+    if (stored && isColorThemeId(stored)) return stored
+  }
+  return "default"
+}
+
 const ColorThemeProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [color, setColorState] = useState<ColorThemeId>("default")
+  const [color, setColorState] = useState<ColorThemeId>(readInitialColor)
 
   useEffect(() => {
     const stored = readLocalPreferences().color_theme
-    const initial = stored && isColorThemeId(stored) ? stored : "default"
+    const initial = stored && isColorThemeId(stored) ? stored : readInitialColor()
     setColorState(initial)
     applyColor(initial)
   }, [])

@@ -72,7 +72,7 @@
       "dashboard": "Ikhtisar",
       "home-devices": "Perangkat",
       "home-entities": "Entitas",
-      "home-areas": "Ruangan",
+      "home-areas": "Zona",
       "auto-scenarios": "Otomasi",
       "auto-scenes": "Adegan",
       "auto-scripts": "Skrip",
@@ -106,8 +106,8 @@
       "subtitle": "Entitas rumah yang dapat dikontrol"
     },
     "home-areas": {
-      "title": "Ruangan",
-      "subtitle": "Zona dan penetapan"
+      "title": "Zona",
+      "subtitle": "Penugasan"
     },
     "auto-scenarios": {
       "title": "Otomasi",
@@ -177,7 +177,7 @@
       "entities": "Entitas",
       "entitiesOn": "{count} menyala",
       "entitiesWaitingDiscovery": "menunggu penemuan",
-      "rooms": "Ruangan",
+      "rooms": "Zona",
       "roomExample": "mis. {name}",
       "roomsUnassigned": "belum ditetapkan",
       "connection": "Koneksi",
@@ -187,7 +187,8 @@
       "controllerAvailable": "pengontrol tersedia",
       "agentNoResponse": "agen tidak merespons",
       "checkingValue": "…",
-      "checkingHint": "memeriksa koneksi"
+      "checkingHint": "memeriksa koneksi",
+      "agentStatus": "Status agen"
     },
     "widgets": {
       "emptyTitle": "Mulai dengan widget pertama Anda",
@@ -198,7 +199,7 @@
       "nameLabel": "Nama",
       "namePlaceholder": "Ruang keluarga",
       "typeLabel": "Jenis",
-      "roomLabel": "Ruangan",
+      "roomLabel": "Zona",
       "moveUpAria": "Pindahkan widget ke atas",
       "moveDownAria": "Pindahkan widget ke bawah",
       "deleteConfirm": "Hapus widget “{title}”?",
@@ -209,11 +210,11 @@
       "kinds": {
         "entities": "Entitas",
         "lights": "Lampu",
-        "area": "Ruangan",
+        "area": "Zona",
         "status": "Status",
         "activity": "Aktivitas"
       },
-      "kindArea": "Ruangan: {room}",
+      "kindArea": "Zona: {room}",
       "noRoomSelected": "belum dipilih",
       "unnamed": "Tanpa judul",
       "noMatchingTitle": "Tidak ada entitas yang cocok",
@@ -223,7 +224,10 @@
       "andMore": "Dan {count} lagi",
       "moveUp": "Pindah ke atas",
       "moveDown": "Pindah ke bawah",
-      "menuAria": "Tindakan widget"
+      "menuAria": "Tindakan widget",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "dragAria": "Drag widget"
     },
     "statusWidget": {
       "controller": "Pengontrol",
@@ -232,7 +236,7 @@
       "catalog": "Katalog",
       "active": "Aktif",
       "channels": "Saluran",
-      "roomsCount": "Ruangan: {count}",
+      "roomsCount": "Zona: {count}",
       "devicesAbbrev": "perkt."
     },
     "activityWidget": {
@@ -254,7 +258,7 @@
       "discoverError": "Tidak dapat mencari perangkat",
       "discoverSuccess": "Entitas ditemukan: {count}. Nama dan penetapan telah disimpan.",
       "emptyTitle": "Belum ada perangkat yang ditambahkan",
-      "emptyDescription": "Mulai penemuan di jaringan — perangkat yang ditemukan akan muncul di sini. Nama dan penetapan Anda akan dipertahankan.",
+      "emptyDescription": "Mulai penemuan di jaringan — perangkat yang ditemukan akan muncul di sini.",
       "onCount": "{on}/{total} menyala",
       "areaLabel": "area",
       "unassignedArea": "belum ditetapkan",
@@ -262,7 +266,7 @@
       "nameLabel": "Nama",
       "areaSelectLabel": "Area",
       "noArea": "Tidak ada area",
-      "cascadeArea": "Terapkan ruangan ke semua entitas perangkat",
+      "cascadeArea": "Apply zone to all device entities",
       "nodesOnline": "node online: {count}"
     },
     "entities": {
@@ -281,26 +285,36 @@
       "deviceLabel": "Perangkat",
       "areaLabel": "Area",
       "noDevice": "Tidak ada perangkat",
-      "areaSuffixNone": "tanpa area"
+      "areaSuffixNone": "tanpa area",
+      "sortAria": "Urutkan",
+      "sortNameAsc": "Nama A→Z",
+      "sortNameDesc": "Nama Z→A",
+      "sortDomain": "Berdasarkan domain",
+      "sortActive": "Aktif dulu",
+      "sortId": "Berdasarkan ID",
+      "filterAria": "Filters"
     },
     "areas": {
-      "title": "Ruangan",
+      "title": "Zona",
       "description": "Zona dan penetapan",
-      "count": "{count} area",
-      "add": "Tambah area",
-      "emptyTitle": "Belum ada ruangan dibuat",
-      "emptyDescription": "Buat ruangan dan tetapkan perangkat. Penetapan dipertahankan saat penemuan ulang.",
+      "count": "{count} zona",
+      "add": "Tambah zona",
+      "emptyTitle": "No zones created yet",
+      "emptyDescription": "Create a zone and assign devices.",
       "devicesAbbrev": "perkt.",
       "entitiesAbbrev": "ent.",
       "onAbbrev": "nyala",
-      "nothingAssigned": "Belum ada yang ditetapkan ke ruangan ini",
-      "editTitle": "Area",
-      "newTitle": "Area baru",
+      "nothingAssigned": "Nothing is assigned to this zone yet",
+      "editTitle": "Zona",
+      "newTitle": "Zona baru",
       "nameLabel": "Nama",
       "namePlaceholder": "Misalnya, Ruang keluarga",
       "assignDevice": "Tetapkan perangkat",
       "assignEntity": "Tetapkan entitas",
-      "skip": "Lewati"
+      "skip": "Lewati",
+      "assignHint": "Select a device to attach all its entities. Uncheck ones you want to leave out.",
+      "orphanEntities": "Other entities",
+      "selectedCount": "{devices} devices · {entities} entities"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "Bersihkan log",
     "filterAll": "Semua",
     "emptyTitle": "Log kosong",
-    "emptyDescription": "Peristiwa akan muncul setelah mengontrol perangkat, menjalankan otomasi, atau menemukan peralatan."
+    "emptyDescription": "Peristiwa akan muncul setelah mengontrol perangkat, menjalankan otomasi, atau menemukan peralatan.",
+    "searchPlaceholder": "Search…",
+    "filterAria": "Filters",
+    "filterKindLabel": "Event type",
+    "sortLabel": "Sort",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTitleAsc": "Title A → Z",
+    "sortTitleDesc": "Title Z → A",
+    "sortKindAsc": "Event type A → Z"
   },
   "modules": {
     "metaCount": "{count} ekstensi",
@@ -688,7 +711,8 @@
     "logout": "Keluar",
     "navigation": "Navigasi",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "Bahasa"
   },
   "sidebar": {
     "panelControlSubtitle": "Panel kontrol"

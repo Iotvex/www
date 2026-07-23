@@ -58,7 +58,7 @@ export function EmptyState({
   icon?: ReactNode
 }) {
   return (
-    <div className="iotvex-glass-muted flex flex-col items-center justify-center rounded-2xl border-dashed px-6 py-14 text-center animate-[iotvex-card-in_420ms_cubic-bezier(0.22,1,0.36,1)_both]">
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/[0.08] bg-black/40 px-6 py-14 text-center backdrop-blur-xl animate-[iotvex-card-in_420ms_cubic-bezier(0.22,1,0.36,1)_both]">
       {icon ? <div className="mb-3 text-muted-foreground/60">{icon}</div> : null}
       <p className="text-sm font-medium text-foreground">{title}</p>
       {description ? (
@@ -88,7 +88,7 @@ export function SegmentedTabs({
   }
   return (
     <div className="-mx-1 overflow-x-auto overscroll-x-contain px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div className="iotvex-glass-muted inline-flex min-w-full w-max gap-1 rounded-xl p-1 sm:min-w-0">
+      <div className="inline-flex min-w-full w-max gap-1 rounded-xl border border-white/[0.06] bg-black/40 p-1 backdrop-blur-md sm:min-w-0">
         {items.map((item) => {
           const id = item.id ?? item.value ?? item.label
           const active = id === value
@@ -98,7 +98,7 @@ export function SegmentedTabs({
               type="button"
               onClick={() => set(id)}
               className={cn(
-                "rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
+                "h-9 rounded-lg px-3.5 text-sm font-medium transition-colors",
                 active
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
@@ -145,7 +145,7 @@ export function FieldSelect({
       disabled={disabled}
       onChange={(e) => set(e.target.value)}
       className={cn(
-        "flex h-10 w-full min-w-0 appearance-none rounded-xl border border-input bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-1 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 sm:h-9",
+        "flex h-10 w-full min-w-0 appearance-none rounded-xl border border-input bg-background px-3 text-base outline-none transition-colors sm:text-sm focus-visible:ring-1 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
     >
@@ -241,7 +241,7 @@ export function CreateCard({ label, onClick }: { label: string; onClick: () => v
     <button
       type="button"
       onClick={onClick}
-      className="iotvex-glass-muted flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border/80 px-4 py-4 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+      className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 bg-transparent px-4 py-4 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
     >
       {label}
     </button>

@@ -2,8 +2,37 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useUnit } from "effector-react";
-import { ArrowDown, ArrowUp, Cpu, House, Lightbulb, MoreHorizontal, Pencil, Radio, Trash2 } from "lucide-react";
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Cpu,
+  GripVertical,
+  House,
+  Lightbulb,
+  MoreHorizontal,
+  Pencil,
+  Radio,
+  Trash2,
+} from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { cn } from "@/shared/lib/utils";
 
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -32,10 +61,11 @@ import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import {
   EmptyState,
+  CreateCard,
   FieldSelect,
-  PageToolbar,
   StatusDot,
 } from "@/shared/ui/page-toolbar";
+import { PageListSkeleton, StatsSkeleton } from "@/shared/ui/skeleton";
 import { isEntityActive } from "@/entities/device/model/capabilities";
 import {
   $areas,
@@ -242,44 +272,76 @@ export function OverviewPage() {
     }
   };
 
-  const moveWidget = async (widget: DashboardWidget, direction: -1 | 1) => {
+  const orderedWidgets = useMemo(() => sortWidgets(widgets), [widgets]);
+  const usedKinds = useMemo(
+    () => new Set(orderedWidgets.map((widget) => widget.kind)),
+    [orderedWidgets],
+  );
+  const availableKinds = useMemo(
+    () => WIDGET_KIND_VALUES.filter((kind) => !usedKinds.has(kind)),
+    [usedKinds],
+  );
+  const canAddWidget = availableKinds.length > 0;
+
+  const persistOrder = useCallback(
+    async (ordered: DashboardWidget[]) => {
+      const withOrder = ordered.map((widget, index) => ({ ...widget, sort_order: index }));
+      setWidgets(withOrder);
+      try {
+        await Promise.all(
+          withOrder.map((widget) =>
+            api(
+              `/api/dashboard/widgets/${widget.id}`,
+              {
+                method: "PATCH",
+                body: JSON.stringify({ sort_order: widget.sort_order }),
+              },
+              requestError,
+            ),
+          ),
+        );
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : t("widgets.orderError"));
+        await loadWidgets();
+      }
+    },
+    [loadWidgets, requestError, t],
+  );
+
+  const moveWidget = async (widget: DashboardWidget, direction: number) => {
     const ordered = sortWidgets(widgets);
     const index = ordered.findIndex((candidate) => candidate.id === widget.id);
-    const target = ordered[index + direction];
-
-    if (!target) {
+    const targetIndex = index + direction;
+    if (index < 0 || targetIndex < 0 || targetIndex >= ordered.length) {
       return;
     }
+    await persistOrder(arrayMove(ordered, index, targetIndex));
+  };
 
-    const nextOrder = target.sort_order ?? index + direction;
-    const targetOrder = widget.sort_order ?? index;
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+  );
 
-    try {
-      await Promise.all([
-        api(
-          `/api/dashboard/widgets/${widget.id}`,
-          {
-            method: "PATCH",
-            body: JSON.stringify({ sort_order: nextOrder }),
-          },
-          requestError,
-        ),
-        api(
-          `/api/dashboard/widgets/${target.id}`,
-          {
-            method: "PATCH",
-            body: JSON.stringify({ sort_order: targetOrder }),
-          },
-          requestError,
-        ),
-      ]);
-      await loadWidgets();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("widgets.orderError"));
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) {
+      return;
     }
+    const ordered = sortWidgets(widgets);
+    const oldIndex = ordered.findIndex((widget) => widget.id === active.id);
+    const newIndex = ordered.findIndex((widget) => widget.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) {
+      return;
+    }
+    void persistOrder(arrayMove(ordered, oldIndex, newIndex));
   };
 
   const openCreate = () => {
+    if (!canAddWidget) {
+      return;
+    }
     setEditing(null);
     setDialogOpen(true);
   };
@@ -291,119 +353,78 @@ export function OverviewPage() {
 
   return (
     <div className="iotvex-page min-w-0 space-y-4 sm:space-y-6">
-      <PageToolbar
-        title={t("toolbar.title")}
-        description={
-          <span className="hidden sm:inline">{t("toolbar.description")}</span>
-        }
-        actions={
-          <Button size="sm" onClick={openCreate}>
-            {t("toolbar.addWidget")}
-          </Button>
-        }
-      />
+      {loading ? (
+        <>
+          <StatsSkeleton />
+          <PageListSkeleton rows={4} dual />
+        </>
+      ) : (
+        <>
+          {widgets.some((w) => w.kind === "status") ? null : (
+            <StatsRow
+              devices={devices.length}
+              entities={entities.length}
+              areas={areas.length}
+              agentOnline={agentOnline}
+              agentConnection={agentConnection}
+              onHome={() => navigate("home-devices")}
+              onSettings={() => navigate("settings-account")}
+            />
+          )}
 
-      {widgets.some((w) => w.kind === "status") ? null : (
-        <StatsRow
-          devices={devices.length}
-          entities={entities.length}
-          entitiesOn={entities.filter(isEntityActive).length}
-          areas={areas.length}
-          areaHint={areas[0]?.name}
-          agentOnline={agentOnline}
-          agentConnection={agentConnection}
-          stripCount={Number(node?.strip_count ?? node?.strips?.length ?? 0)}
-          onHome={() => navigate("home-devices")}
-          onSettings={() => navigate("settings-account")}
-        />
-      )}
+          {error ? (
+            <Card className="iotvex-card-in border-destructive/30">
+              <CardContent className="pt-6 text-sm text-destructive">{error}</CardContent>
+            </Card>
+          ) : null}
 
-      {error ? (
-        <Card className="iotvex-card-in border-destructive/30">
-          <CardContent className="pt-6 text-sm text-destructive">{error}</CardContent>
-        </Card>
-      ) : null}
-
-      {!loading && widgets.length === 0 ? (
-        <EmptyState
-          title={t("widgets.emptyTitle")}
-          description={t("widgets.emptyDescription")}
-          action={
-            <Button size="sm" onClick={openCreate}>
-              {t("widgets.addFirstWidget")}
-            </Button>
-          }
-        />
-      ) : null}
-
-      <div className="grid min-w-0 gap-2 sm:gap-2.5 lg:grid-cols-2">
-        {sortWidgets(widgets).map((widget, index, ordered) => (
-          <Card key={widget.id} className="iotvex-card-in min-w-0 overflow-hidden">
-            <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
-              <div className="min-w-0">
-                <CardTitle className="truncate text-sm sm:text-base">{widget.title}</CardTitle>
-                <CardDescription className="truncate text-xs">
-                  {kindLabel(widget.kind, widget.config, areas, t)}
-                </CardDescription>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    className="shrink-0"
-                    aria-label={t("widgets.menuAria")}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
+          {widgets.length === 0 ? (
+            <EmptyState
+              title={t("widgets.emptyTitle")}
+              description={t("widgets.emptyDescription")}
+              action={
+                canAddWidget ? (
+                  <Button size="sm" onClick={openCreate}>
+                    {t("widgets.addFirstWidget")}
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    disabled={index === 0}
-                    onSelect={() => void moveWidget(widget, -1)}
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                    {t("widgets.moveUp")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={index === ordered.length - 1}
-                    onSelect={() => void moveWidget(widget, 1)}
-                  >
-                    <ArrowDown className="h-4 w-4" />
-                    {t("widgets.moveDown")}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={() => openEdit(widget)}>
-                    <Pencil className="h-4 w-4" />
-                    {common("edit")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onSelect={() => void removeWidget(widget)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {common("delete")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardHeader>
-            <CardContent className="min-w-0 overflow-hidden p-2.5 pt-0 sm:p-3 sm:pt-0">
-              <WidgetBody
-                widget={widget}
-                entities={entities}
-                areas={areas}
-                devices={devices}
-                node={node}
-                agentOnline={agentOnline}
-                agentConnection={agentConnection}
-              />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                ) : null
+              }
+            />
+          ) : null}
+
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <SortableContext items={orderedWidgets.map((widget) => widget.id)} strategy={rectSortingStrategy}>
+              <div className="grid min-w-0 gap-2 sm:gap-2.5 lg:grid-cols-2">
+                {orderedWidgets.map((widget, index) => (
+                  <SortableWidgetCard
+                    key={widget.id}
+                    widget={widget}
+                    index={index}
+                    total={orderedWidgets.length}
+                    areas={areas}
+                    entities={entities}
+                    devices={devices}
+                    node={node}
+                    agentOnline={agentOnline}
+                    agentConnection={agentConnection}
+                    onMove={(direction) => void moveWidget(widget, direction)}
+                    onEdit={() => openEdit(widget)}
+                    onRemove={() => void removeWidget(widget)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+
+          {widgets.length > 0 && canAddWidget ? (
+            <CreateCard label={t("toolbar.addWidget")} onClick={openCreate} />
+          ) : null}
+        </>
+      )}
 
       <WidgetDialog
         widget={editing}
+        widgets={orderedWidgets}
         areas={areas}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -416,23 +437,17 @@ export function OverviewPage() {
 function StatsRow({
   devices,
   entities,
-  entitiesOn,
   areas,
-  areaHint,
   agentOnline,
   agentConnection,
-  stripCount,
   onHome,
   onSettings,
 }: {
   devices: number;
   entities: number;
-  entitiesOn: number;
   areas: number;
-  areaHint?: string;
   agentOnline: boolean;
   agentConnection: AgentConnection;
-  stripCount: number;
   onHome: () => void;
   onSettings: () => void;
 }) {
@@ -443,21 +458,19 @@ function StatsRow({
       : agentOnline
         ? t("stats.onlineValue")
         : t("stats.offlineValue");
-  const connectionHint =
-    agentConnection === "pending"
-      ? t("stats.checkingHint")
-      : agentOnline
-        ? stripCount
-          ? t("stats.channels", { count: stripCount })
-          : t("stats.controllerAvailable")
-        : t("stats.agentNoResponse");
   const connectionTone =
     agentConnection === "pending" ? "neutral" : agentOnline ? "good" : "bad";
   const items = [
     {
+      label: t("stats.agentStatus"),
+      value: connectionValue,
+      icon: <Radio className="h-3.5 w-3.5" />,
+      onClick: onSettings,
+      tone: connectionTone as "good" | "bad" | "neutral",
+    },
+    {
       label: t("stats.devices"),
       value: String(devices),
-      hint: devices ? t("stats.devicesInCatalog") : t("stats.devicesAddInHome"),
       icon: <Cpu className="h-3.5 w-3.5" />,
       onClick: onHome,
       tone: "neutral" as const,
@@ -465,7 +478,6 @@ function StatsRow({
     {
       label: t("stats.entities"),
       value: String(entities),
-      hint: entities ? t("stats.entitiesOn", { count: entitiesOn }) : t("stats.entitiesWaitingDiscovery"),
       icon: <Lightbulb className="h-3.5 w-3.5" />,
       onClick: onHome,
       tone: "neutral" as const,
@@ -473,23 +485,14 @@ function StatsRow({
     {
       label: t("stats.rooms"),
       value: String(areas),
-      hint: areaHint ? t("stats.roomExample", { name: areaHint }) : t("stats.roomsUnassigned"),
       icon: <House className="h-3.5 w-3.5" />,
       onClick: onHome,
       tone: "neutral" as const,
     },
-    {
-      label: t("stats.connection"),
-      value: connectionValue,
-      hint: connectionHint,
-      icon: <Radio className="h-3.5 w-3.5" />,
-      onClick: onSettings,
-      tone: connectionTone as "good" | "bad" | "neutral",
-    },
   ];
 
   return (
-    <div className="iotvex-glass iotvex-stat-panel min-w-0 overflow-hidden rounded-2xl">
+    <div className="iotvex-stat-panel min-w-0 overflow-hidden rounded-xl border border-white/[0.06] bg-black/50 backdrop-blur-xl">
       <div className="grid grid-cols-2 lg:grid-cols-4">
         {items.map((item, index) => (
           <StatButton
@@ -508,7 +511,6 @@ function StatsRow({
 function StatButton({
   label,
   value,
-  hint,
   icon,
   tone = "neutral",
   onClick,
@@ -518,7 +520,6 @@ function StatButton({
 }: {
   label: string;
   value: string;
-  hint: string;
   icon: ReactNode;
   tone?: "neutral" | "good" | "bad";
   onClick: () => void;
@@ -535,9 +536,9 @@ function StatButton({
       }}
       style={{ animationDelay: `${delayMs}ms` }}
       className={[
-        "iotvex-stat-cell group relative flex min-h-[4.25rem] min-w-0 flex-col justify-between gap-1.5 px-2.5 py-2 text-left outline-none transition-colors sm:min-h-[4.75rem] sm:gap-2 sm:px-3 sm:py-2.5",
+        "iotvex-stat-cell group relative flex min-h-[4.25rem] min-w-0 flex-col justify-between gap-1.5 px-2.5 py-2.5 text-left outline-none transition-colors sm:min-h-[4.75rem] sm:gap-2 sm:px-3 sm:py-3",
         "hover:bg-white/[0.04] focus-visible:bg-white/[0.06]",
-        "border-border/40",
+        "border-white/[0.05]",
         lastInRow ? "" : "border-r",
         "border-b lg:border-b-0",
         lastInDesktop ? "lg:border-r-0" : "lg:border-r",
@@ -545,31 +546,167 @@ function StatButton({
     >
       <span className="flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-          <span className="text-muted-foreground/80">{icon}</span>
+          <span className="text-muted-foreground/70">{icon}</span>
           {label}
         </span>
         {tone !== "neutral" ? <StatusDot tone={tone} /> : null}
       </span>
-      <span>
-        <span className="iotvex-stat-value block text-xl font-semibold tracking-tight tabular-nums">
-          {value}
-        </span>
-        <span className="mt-0.5 block truncate text-[10px] leading-tight text-muted-foreground">
-          {hint}
-        </span>
+      <span className="iotvex-stat-value block text-xl font-semibold tracking-tight tabular-nums">
+        {value}
       </span>
     </button>
   );
 }
 
+function SortableWidgetCard({
+  widget,
+  index,
+  total,
+  areas,
+  entities,
+  devices,
+  node,
+  agentOnline,
+  agentConnection,
+  onMove,
+  onEdit,
+  onRemove,
+}: {
+  widget: DashboardWidget;
+  index: number;
+  total: number;
+  areas: Area[];
+  entities: Entity[];
+  devices: Device[];
+  node: NodeStatus | null;
+  agentOnline: boolean;
+  agentConnection: AgentConnection;
+  onMove: (direction: number) => void;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
+  const t = useTranslations("overview");
+  const common = useTranslations("common");
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: widget.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 20 : undefined,
+  };
+
+  return (
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "iotvex-card-in relative min-w-0 overflow-hidden touch-manipulation",
+        isDragging && "opacity-90 shadow-lg ring-1 ring-primary/30",
+      )}
+    >
+      <CardHeader
+        className={
+          widget.kind === "status"
+            ? "absolute right-1.5 top-1.5 z-10 flex flex-row items-start justify-end gap-0.5 space-y-0 p-0"
+            : "flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3"
+        }
+      >
+        <div className="flex min-w-0 items-start gap-1.5">
+          <button
+            type="button"
+            className="mt-0.5 shrink-0 cursor-grab rounded-md p-1 text-muted-foreground hover:bg-white/[0.05] hover:text-foreground active:cursor-grabbing"
+            aria-label={t("widgets.dragAria")}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+          <div className="min-w-0">
+            {widget.kind === "status" ? null : (
+              <>
+                <CardTitle className="truncate text-sm sm:text-base">{widget.title}</CardTitle>
+                {widget.kind === "area" ? (
+                  <CardDescription className="truncate text-xs">
+                    {kindLabel(widget.kind, widget.config, areas, t)}
+                  </CardDescription>
+                ) : null}
+              </>
+            )}
+          </div>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              className="shrink-0"
+              aria-label={t("widgets.menuAria")}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem disabled={index === 0} onSelect={() => onMove(-1)}>
+              <ArrowLeft className="h-4 w-4" />
+              {t("widgets.moveLeft")}
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled={index >= total - 1} onSelect={() => onMove(1)}>
+              <ArrowRight className="h-4 w-4" />
+              {t("widgets.moveRight")}
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled={index < 2} onSelect={() => onMove(-2)}>
+              <ArrowUp className="h-4 w-4" />
+              {t("widgets.moveUp")}
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled={index + 2 >= total} onSelect={() => onMove(2)}>
+              <ArrowDown className="h-4 w-4" />
+              {t("widgets.moveDown")}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={onEdit}>
+              <Pencil className="h-4 w-4" />
+              {common("edit")}
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={onRemove}>
+              <Trash2 className="h-4 w-4" />
+              {common("delete")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </CardHeader>
+      <CardContent
+        className={
+          widget.kind === "status"
+            ? "min-w-0 overflow-hidden p-0"
+            : "min-w-0 overflow-hidden p-2.5 pt-0 sm:p-3 sm:pt-0"
+        }
+      >
+        <WidgetBody
+          widget={widget}
+          entities={entities}
+          areas={areas}
+          devices={devices}
+          node={node}
+          agentOnline={agentOnline}
+          agentConnection={agentConnection}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
 function WidgetDialog({
   widget,
+  widgets,
   areas,
   open,
   onOpenChange,
   onSaved,
 }: {
   widget: DashboardWidget | null;
+  widgets: DashboardWidget[];
   areas: Area[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -582,28 +719,69 @@ function WidgetDialog({
   const [areaId, setAreaId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [titleTouched, setTitleTouched] = useState(false);
   const requestError = useCallback((status: number) => t("requestError", { status }), [t]);
-  const widgetKindOptions = useMemo(() => getWidgetKindOptions(t), [t]);
+
+  const usedKinds = useMemo(() => {
+    const set = new Set(widgets.map((item) => item.kind));
+    if (widget) {
+      set.delete(widget.kind);
+    }
+    return set;
+  }, [widget, widgets]);
+
+  const kindOptions = useMemo(
+    () =>
+      WIDGET_KIND_VALUES.filter((value) => !usedKinds.has(value)).map((value) => ({
+        value,
+        label: t(`widgets.kinds.${value}`),
+      })),
+    [t, usedKinds],
+  );
+
+  const defaultTitleFor = useCallback(
+    (value: WidgetKind) => t(`widgets.kinds.${value}`),
+    [t],
+  );
 
   useEffect(() => {
     if (!open) {
       return;
     }
 
-    setTitle(widget?.title ?? "");
-    setKind(widget?.kind ?? "entities");
-    setAreaId(widget?.config?.area_id ?? idOf(areas[0] ?? {}));
+    if (widget) {
+      setTitle(widget.title);
+      setKind(widget.kind);
+      setAreaId(widget.config?.area_id ?? idOf(areas[0] ?? {}));
+      setTitleTouched(true);
+    } else {
+      const initialKind = kindOptions[0]?.value ?? "entities";
+      setKind(initialKind);
+      setTitle(defaultTitleFor(initialKind));
+      setAreaId(idOf(areas[0] ?? {}));
+      setTitleTouched(false);
+    }
     setError(null);
-  }, [areas, open, widget]);
+  }, [areas, defaultTitleFor, kindOptions, open, widget]);
+
+  const onKindChange = (value: string) => {
+    const nextKind = value as WidgetKind;
+    setKind(nextKind);
+    if (!titleTouched || !title.trim() || title.trim() === defaultTitleFor(kind)) {
+      setTitle(defaultTitleFor(nextKind));
+      setTitleTouched(false);
+    }
+  };
 
   const save = async () => {
     setSaving(true);
     setError(null);
     try {
       const payload = {
-        title: title.trim(),
+        title: title.trim() || defaultTitleFor(kind),
         kind,
         config: kind === "area" ? { area_id: areaId } : {},
+        sort_order: widget?.sort_order ?? widgets.length,
       };
 
       await api(
@@ -625,7 +803,7 @@ function WidgetDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="shadow-none">
         <DialogHeader>
           <DialogTitle>{widget ? t("widgets.editTitle") : t("widgets.newTitle")}</DialogTitle>
         </DialogHeader>
@@ -636,16 +814,20 @@ function WidgetDialog({
             <Input
               id="widget-title"
               value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder={t("widgets.namePlaceholder")}
+              onChange={(event) => {
+                setTitle(event.target.value);
+                setTitleTouched(true);
+              }}
+              placeholder={defaultTitleFor(kind)}
             />
           </div>
 
           <FieldSelect
             label={t("widgets.typeLabel")}
             value={kind}
-            onValueChange={(value: string) => setKind(value as WidgetKind)}
-            options={widgetKindOptions}
+            onValueChange={onKindChange}
+            options={kindOptions.length ? kindOptions : [{ value: kind, label: t(`widgets.kinds.${kind}`) }]}
+            disabled={!widget && kindOptions.length === 0}
           />
 
           {kind === "area" ? (
@@ -668,8 +850,13 @@ function WidgetDialog({
             {common("cancel")}
           </Button>
           <Button
+            className="shadow-none"
             onClick={() => void save()}
-            disabled={saving || !title.trim() || (kind === "area" && !areaId)}
+            disabled={
+              saving ||
+              (!widget && kindOptions.length === 0) ||
+              (kind === "area" && !areaId)
+            }
           >
             {saving ? common("saving") : common("save")}
           </Button>
@@ -701,44 +888,31 @@ function WidgetBody({
   if (widget.kind === "status") {
     const pending = agentConnection === "pending";
     const online = agentOnline;
-    const onCount = entities.filter(isEntityActive).length;
-    const strips = Number(node?.strip_count ?? node?.strips?.length ?? 0);
+    const agentValue = pending
+      ? t("stats.checkingValue")
+      : online
+        ? t("stats.onlineValue")
+        : t("stats.offlineValue");
+    const agentTone = pending ? "neutral" : online ? "good" : "bad";
     return (
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-border/50 bg-background/20 px-2.5 py-2">
-          <div className="min-w-0">
-            <p className="text-[11px] text-muted-foreground">{t("statusWidget.controller")}</p>
-            <p className="truncate text-sm font-medium">
-              {pending
-                ? t("stats.checkingHint")
-                : online
-                  ? node?.host || t("statusWidget.localAgent")
-                  : t("statusWidget.noConnection")}
-            </p>
-          </div>
-          <Badge variant={pending ? "secondary" : online ? "success" : "danger"} className="shrink-0">
-            <span className="mr-1.5 inline-flex">
-              <StatusDot tone={pending ? "neutral" : online ? "good" : "bad"} />
-            </span>
-            {pending
-              ? t("stats.checkingValue")
-              : online
-                ? t("stats.onlineValue")
-                : t("stats.offlineValue")}
-          </Badge>
-        </div>
-        <div className="grid grid-cols-3 gap-1.5">
-          <MiniStat
-            label={t("statusWidget.catalog")}
-            value={`${devices.length} ${t("statusWidget.devicesAbbrev")}`}
-          />
-          <MiniStat label={t("statusWidget.active")} value={`${onCount}/${entities.length}`} />
-          <MiniStat label={t("statusWidget.channels")} value={strips || "—"} />
-        </div>
-        <p className="text-[11px] text-muted-foreground">
-          {t("statusWidget.roomsCount", { count: areas.length })}
-          {areas[0]?.name ? ` · ${areas.map((a) => a.name).slice(0, 2).join(", ")}` : ""}
-        </p>
+      <div className="grid grid-cols-2 overflow-hidden rounded-xl">
+        <MiniStat
+          label={t("stats.agentStatus")}
+          value={agentValue}
+          tone={agentTone}
+          className="border-b border-r border-white/[0.05]"
+        />
+        <MiniStat
+          label={t("stats.devices")}
+          value={devices.length}
+          className="border-b border-white/[0.05]"
+        />
+        <MiniStat
+          label={t("stats.entities")}
+          value={entities.length}
+          className="border-r border-white/[0.05]"
+        />
+        <MiniStat label={t("stats.rooms")} value={areas.length} />
       </div>
     );
   }
@@ -774,11 +948,11 @@ function WidgetBody({
   }
 
   return (
-    <div className="grid gap-1.5">
+    <div className="grid min-w-0 gap-1.5 overflow-hidden">
       {source.slice(0, 8).map((entity) => (
         <div
           key={entityId(entity)}
-          className="flex items-center justify-between gap-2 rounded-lg border border-border/50 bg-background/20 px-2.5 py-2"
+          className="flex min-w-0 items-center justify-between gap-2 overflow-hidden rounded-lg border border-white/[0.05] bg-white/[0.03] px-2.5 py-2"
         >
           <div className="min-w-0">
             <p className="truncate font-medium text-sm">{entityName(entity)}</p>
@@ -835,21 +1009,23 @@ function ActivityList() {
   }
 
   return (
-    <div className="grid gap-1.5">
+    <div className="grid min-w-0 gap-1.5 overflow-hidden">
       {items.map((event, index) => (
         <div
           key={event.id ?? `${event.created_at}-${index}`}
-          className="rounded-lg border border-border/50 bg-background/20 px-2.5 py-2"
+          className="min-w-0 overflow-hidden rounded-lg border border-white/[0.05] bg-white/[0.03] px-2.5 py-2"
         >
-          <div className="flex items-center justify-between gap-2">
-            <p className="truncate font-medium text-sm">{event.title ?? event.type ?? t("activityWidget.fallbackTitle")}</p>
+          <div className="flex min-w-0 items-start justify-between gap-2">
+            <p className="min-w-0 flex-1 break-words font-medium text-sm leading-snug">
+              {event.title ?? event.type ?? t("activityWidget.fallbackTitle")}
+            </p>
             {event.created_at ? (
-              <span className="shrink-0 text-xs text-muted-foreground">
+              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                 {new Date(event.created_at).toLocaleString(locale)}
               </span>
             ) : null}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="iotvex-hide-scroll mt-0.5 min-w-0 overflow-x-auto whitespace-nowrap text-xs text-muted-foreground">
             {[event.detail, event.entity_id].filter(Boolean).join(" · ") || event.kind || ""}
           </p>
         </div>
@@ -862,18 +1038,20 @@ function MiniStat({
   label,
   value,
   tone,
+  className = "",
 }: {
   label: string;
   value: number | string;
-  tone?: "good" | "bad";
+  tone?: "neutral" | "good" | "bad";
+  className?: string;
 }) {
   return (
-    <div className="rounded-lg border border-border/50 bg-background/20 px-2 py-1.5">
-      <p className="text-[11px] text-muted-foreground">{label}</p>
-      <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold tabular-nums">
-        {tone ? <StatusDot tone={tone} /> : null}
-        {value}
+    <div className={`flex min-h-[4.25rem] flex-col justify-between gap-1.5 px-2.5 py-2.5 ${className}`}>
+      <p className="flex items-center justify-between gap-2 text-[11px] font-medium text-muted-foreground">
+        <span>{label}</span>
+        {tone && tone !== "neutral" ? <StatusDot tone={tone} /> : null}
       </p>
+      <p className="text-xl font-semibold tracking-tight tabular-nums">{value}</p>
     </div>
   );
 }

@@ -72,7 +72,7 @@
       "dashboard": "Обзор",
       "home-devices": "Устройства",
       "home-entities": "Объекты",
-      "home-areas": "Комнаты",
+      "home-areas": "Зоны",
       "auto-scenarios": "Сценарии",
       "auto-scenes": "Сцены",
       "auto-scripts": "Последовательности",
@@ -106,8 +106,8 @@
       "subtitle": "Управляемые сущности дома"
     },
     "home-areas": {
-      "title": "Комнаты",
-      "subtitle": "Зоны и привязки"
+      "title": "Зоны",
+      "subtitle": "Привязки"
     },
     "auto-scenarios": {
       "title": "Сценарии",
@@ -177,7 +177,7 @@
       "entities": "Объекты",
       "entitiesOn": "{count} включено",
       "entitiesWaitingDiscovery": "ожидают обнаружения",
-      "rooms": "Комнаты",
+      "rooms": "Зоны",
       "roomExample": "напр. {name}",
       "roomsUnassigned": "без привязок",
       "connection": "Связь",
@@ -187,18 +187,19 @@
       "checkingHint": "проверка связи",
       "channels": "{count} канал.",
       "controllerAvailable": "контроллер доступен",
-      "agentNoResponse": "нет ответа агента"
+      "agentNoResponse": "нет ответа агента",
+      "agentStatus": "Статус агента"
     },
     "widgets": {
       "emptyTitle": "Начните с первого виджета",
-      "emptyDescription": "Добавьте виджеты освещения, комнат, статуса системы или журнала событий.",
+      "emptyDescription": "Добавьте виджеты освещения, зон, статуса системы или журнала событий.",
       "addFirstWidget": "Добавить первый виджет",
       "newTitle": "Новый виджет",
       "editTitle": "Изменить виджет",
       "nameLabel": "Название",
       "namePlaceholder": "Гостиная",
       "typeLabel": "Тип",
-      "roomLabel": "Комната",
+      "roomLabel": "Зона",
       "moveUpAria": "Поднять виджет",
       "moveDownAria": "Опустить виджет",
       "moveUp": "Выше",
@@ -212,18 +213,21 @@
       "kinds": {
         "entities": "Объекты",
         "lights": "Свет",
-        "area": "Комната",
+        "area": "Зона",
         "status": "Статус",
         "activity": "Активность"
       },
-      "kindArea": "Комната: {room}",
+      "kindArea": "Зона: {room}",
       "noRoomSelected": "не выбрана",
       "unnamed": "Без названия",
       "noMatchingTitle": "Нет подходящих объектов",
-      "noMatchingAreaDescription": "В комнате «{room}» пока нет объектов.",
+      "noMatchingAreaDescription": "В зоне «{room}» пока нет объектов.",
       "noMatchingGenericDescription": "Измените фильтр или добавьте устройства в разделе «Дом».",
       "noData": "нет данных",
-      "andMore": "И ещё {count}"
+      "andMore": "И ещё {count}",
+      "moveLeft": "Левее",
+      "moveRight": "Правее",
+      "dragAria": "Перетащить виджет"
     },
     "statusWidget": {
       "controller": "Контроллер",
@@ -232,7 +236,7 @@
       "catalog": "Каталог",
       "active": "Активны",
       "channels": "Каналы",
-      "roomsCount": "Комнат: {count}",
+      "roomsCount": "Зон: {count}",
       "devicesAbbrev": "устр."
     },
     "activityWidget": {
@@ -253,9 +257,9 @@
       "controllerUnavailable": "контроллер недоступен",
       "discover": "Найти устройства",
       "discoverError": "Не удалось выполнить поиск устройств",
-      "discoverSuccess": "Найдено объектов: {count}. Названия и привязки сохранены.",
+      "discoverSuccess": "Найдено объектов: {count}.",
       "emptyTitle": "Устройства ещё не добавлены",
-      "emptyDescription": "Запустите поиск в сети — найденные устройства появятся здесь. Ваши названия и привязки сохранятся.",
+      "emptyDescription": "Запустите поиск в сети — найденные устройства появятся здесь.",
       "onCount": "{on}/{total} вкл",
       "areaLabel": "зона",
       "unassignedArea": "не привязана",
@@ -263,7 +267,7 @@
       "nameLabel": "Название",
       "areaSelectLabel": "Зона",
       "noArea": "Без зоны",
-      "cascadeArea": "Применить комнату ко всем объектам устройства"
+      "cascadeArea": "Применить зону ко всем объектам устройства"
     },
     "entities": {
       "title": "Объекты",
@@ -281,26 +285,36 @@
       "deviceLabel": "Устройство",
       "areaLabel": "Зона",
       "noDevice": "Без устройства",
-      "areaSuffixNone": "без зоны"
+      "areaSuffixNone": "без зоны",
+      "sortAria": "Сортировка",
+      "sortNameAsc": "Имя А→Я",
+      "sortNameDesc": "Имя Я→А",
+      "sortDomain": "По домену",
+      "sortActive": "Сначала активные",
+      "sortId": "По ID",
+      "filterAria": "Фильтры"
     },
     "areas": {
-      "title": "Комнаты",
-      "description": "Зоны и привязки",
+      "title": "Зоны",
+      "description": "Привязки",
       "count": "{count} зон",
       "add": "Добавить зону",
-      "emptyTitle": "Комнаты ещё не созданы",
-      "emptyDescription": "Создайте комнату и назначьте устройства. Привязки сохраняются при повторном поиске.",
+      "emptyTitle": "Зоны ещё не созданы",
+      "emptyDescription": "Создайте зону и назначьте устройства.",
       "devicesAbbrev": "устр.",
       "entitiesAbbrev": "сущн.",
       "onAbbrev": "вкл",
-      "nothingAssigned": "К этой комнате пока ничего не привязано",
+      "nothingAssigned": "К этой зоне пока ничего не привязано",
       "editTitle": "Зона",
       "newTitle": "Новая зона",
       "nameLabel": "Название",
       "namePlaceholder": "Например, Гостиная",
-      "assignDevice": "Назначить устройство",
-      "assignEntity": "Назначить объект",
-      "skip": "Пропустить"
+      "assignDevice": "Устройства",
+      "assignEntity": "Объекты",
+      "skip": "Пропустить",
+      "assignHint": "Выберите устройство — все его объекты привяжутся к зоне. Снимите галочки с тех, что не нужны.",
+      "orphanEntities": "Другие объекты",
+      "selectedCount": "{devices} устр. · {entities} объектов"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "Очистить журнал",
     "filterAll": "Все",
     "emptyTitle": "Журнал пока пуст",
-    "emptyDescription": "События появятся после управления устройствами, запуска сценариев или поиска оборудования."
+    "emptyDescription": "События появятся после управления устройствами, запуска сценариев или поиска оборудования.",
+    "searchPlaceholder": "Поиск…",
+    "filterAria": "Фильтры",
+    "filterKindLabel": "Тип события",
+    "sortLabel": "Сортировка",
+    "sortNewest": "Сначала новые",
+    "sortOldest": "Сначала старые",
+    "sortTitleAsc": "Название А → Я",
+    "sortTitleDesc": "Название Я → А",
+    "sortKindAsc": "Тип события А → Я"
   },
   "modules": {
     "metaCount": "{count} расширений",
@@ -688,7 +711,8 @@
     "logout": "Выйти",
     "navigation": "Навигация",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "Язык"
   },
   "sidebar": {
     "panelControlSubtitle": "Панель управления"

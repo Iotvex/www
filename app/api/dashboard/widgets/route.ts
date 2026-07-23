@@ -14,14 +14,36 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+    const kind = String(body.kind || "entities")
     const sb = createAdminClient()
+
+    const { data: existing, error: existingError } = await sb
+      .from("dashboard_widgets")
+      .select("id")
+      .eq("kind", kind)
+      .limit(1)
+    if (existingError) throw new Error(existingError.message)
+    if (existing?.length) {
+      return NextResponse.json({ error: "widget kind already exists" }, { status: 409 })
+    }
+
+    const { data: rows } = await sb
+      .from("dashboard_widgets")
+      .select("sort_order")
+      .order("sort_order", { ascending: false })
+      .limit(1)
+    const nextOrder =
+      body.sort_order != null
+        ? Number(body.sort_order)
+        : Number(rows?.[0]?.sort_order ?? -1) + 1
+
     const { data, error } = await sb
       .from("dashboard_widgets")
       .insert({
-        kind: body.kind || "entities",
+        kind,
         title: body.title || "",
         config: body.config || {},
-        sort_order: Number(body.sort_order) || 0,
+        sort_order: nextOrder,
       })
       .select("*")
       .single()
@@ -44,6 +66,18 @@ export async function PATCH(request: Request) {
     if (body.config != null) patch.config = body.config
     if (body.sort_order != null) patch.sort_order = Number(body.sort_order)
     const sb = createAdminClient()
+    if (patch.kind) {
+      const { data: dup, error: dupErr } = await sb
+        .from("dashboard_widgets")
+        .select("id")
+        .eq("kind", String(patch.kind))
+        .neq("id", id)
+        .limit(1)
+      if (dupErr) throw new Error(dupErr.message)
+      if (dup?.length) {
+        return NextResponse.json({ error: "widget kind already exists" }, { status: 409 })
+      }
+    }
     const { data, error } = await sb.from("dashboard_widgets").update(patch).eq("id", id).select("*").single()
     if (error) throw new Error(error.message)
     return NextResponse.json({ item: data })

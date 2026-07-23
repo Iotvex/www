@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "wwwMode": "local_published",
+  "wwwMode": "local",
   "mdnsName": "iotvex.local",
   "timezone": "Europe/Saratov",
   "publish": {
-    "httpPort": 3100,
+    "httpPort": 80,
     "httpsPort": 8443,
     "customDomain": "",
     "providers": {
@@ -19,7 +19,7 @@
         "region": ""
       },
       "cloudflare_tunnel": {
-        "enabled": false,
+        "enabled": true,
         "tunnelToken": "",
         "hostname": ""
       },
@@ -43,7 +43,7 @@
     "local": {
       "url": "http://host.docker.internal:54321",
       "browserUrl": "/supabase",
-      "publicUrl": ""
+      "publicUrl": "https://live-fare-aqua-reproductive.trycloudflare.com"
     },
     "cloudPublic": {
       "url": "",
@@ -55,11 +55,11 @@
     }
   },
   "bridge": {
-    "exposeLocalDb": false,
-    "exposeAgent": false,
-    "autoFromMatrix": true,
-    "localDbPublicUrl": "",
-    "agentPublicUrl": "",
+    "exposeLocalDb": true,
+    "exposeAgent": true,
+    "autoFromMatrix": false,
+    "localDbPublicUrl": "https://live-fare-aqua-reproductive.trycloudflare.com",
+    "agentPublicUrl": "https://trackback-corporations-inherited-identical.trycloudflare.com",
     "wwwPublicUrl": "https://<lan-or-wan-ip>:8443",
     "preferredProvider": "cloudflare_tunnel"
   }

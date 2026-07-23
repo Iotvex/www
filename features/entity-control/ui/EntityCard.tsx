@@ -21,7 +21,7 @@ import {
   ToggleLeft,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 
 function DomainIcon({ entity }: { entity: EntityState }) {
   if (entity.domain === "light") return <Lightbulb className="h-4 w-4" />
@@ -78,7 +78,6 @@ export function EntityCard({
     const c = (entity.attributes.rgb_color as number[]) || [255, 255, 255]
     return [c[0] ?? 255, c[1] ?? 255, c[2] ?? 255] as Rgb
   }, [entity.attributes.rgb_color])
-  const color = `rgb(${localRgb.join(",")})`
   const briPct = Math.round((localBri / 255) * 100)
   const fallbackEffect = t("fallbackEffect")
   const effects = useMemo(() => effectOptions(entity, fallbackEffect), [entity, fallbackEffect])
@@ -95,17 +94,6 @@ export function EntityCard({
   useEffect(() => setLocalBri(brightness), [brightness])
   useEffect(() => setLocalSpeed(speed), [speed])
   useEffect(() => setLocalRgb(rgb), [rgb])
-
-  let iconWrapStyle: CSSProperties | undefined
-  let iconStyle: CSSProperties | undefined
-  let cardGlowStyle: CSSProperties | undefined
-  if (hasCapability(entity, "color") && on) {
-    iconWrapStyle = { background: `${color}22` }
-    iconStyle = { color }
-    cardGlowStyle = {
-      background: `linear-gradient(145deg, rgba(${localRgb.join(",")},0.12), transparent 52%)`,
-    }
-  }
 
   const commitColor = (next: Rgb) => {
     setLocalRgb(next)
@@ -137,39 +125,30 @@ export function EntityCard({
 
   return (
     <Card className={cn("relative min-w-0 overflow-hidden", className)}>
-      {cardGlowStyle ? (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-[inherit]"
-          style={cardGlowStyle}
-        />
-      ) : null}
-      <CardHeader className="relative flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 pb-1.5 sm:p-3 sm:pb-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"
-            style={iconWrapStyle}
-          >
-            <span style={iconStyle}>
-              <DomainIcon entity={entity} />
-            </span>
+      <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 pb-1.5 sm:p-3 sm:pb-2">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/[0.04] text-muted-foreground">
+            <DomainIcon entity={entity} />
           </div>
           <div className="min-w-0">
             <CardTitle className="truncate text-sm">{entity.name}</CardTitle>
-            <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-1">
+            <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-1.5">
               <Badge
                 variant={
                   entity.available
                     ? on || hasCapability(entity, "value")
-                      ? "success"
+                      ? "secondary"
                       : "secondary"
                     : "danger"
                 }
+                className={cn(
+                  entity.available && (on || hasCapability(entity, "value")) && "border-transparent bg-white/[0.06] text-foreground",
+                )}
               >
                 {currentStateLabel}
               </Badge>
-              <span className="truncate text-[11px] text-muted-foreground">
-                {hasCapability(entity, "brightness") && on ? `${briPct}%` : entity.entity_id}
+              <span className="truncate font-mono text-[11px] text-muted-foreground">
+                {entity.entity_id}
               </span>
             </div>
           </div>
@@ -192,7 +171,7 @@ export function EntityCard({
         </div>
       </CardHeader>
 
-      <CardContent className="relative space-y-2 p-2.5 pt-0 sm:space-y-2.5 sm:p-3 sm:pt-0">
+      <CardContent className="space-y-2.5 p-2.5 pt-0 sm:p-3 sm:pt-0">
         {hasCapability(entity, "value") && !hasCapability(entity, "on_off") ? (
           <div className="text-xl font-semibold tracking-tight text-foreground">
             {entity.state}
@@ -205,12 +184,12 @@ export function EntityCard({
         ) : null}
 
         {isLightStrip ? (
-          <div className={cn("space-y-2 sm:space-y-2.5", !on && "opacity-60")}>
+          <div className={cn("space-y-3 border-t border-white/[0.05] pt-2.5", !on && "opacity-50")}>
             {hasCapability(entity, "brightness") ? (
-              <div>
-                <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>{t("brightness")}</span>
-                  <span className="tabular-nums">{briPct}%</span>
+                  <span className="tabular-nums text-foreground/80">{briPct}%</span>
                 </div>
                 <Slider
                   aria-label={tActions("set_brightness")}
@@ -232,8 +211,8 @@ export function EntityCard({
             ) : null}
 
             {hasCapability(entity, "color") ? (
-              <div>
-                <div className="mb-1 text-xs text-muted-foreground">{t("colorLabel")}</div>
+              <div className="space-y-1.5">
+                <div className="text-xs text-muted-foreground">{t("colorLabel")}</div>
                 <ColorPicker
                   value={localRgb}
                   disabled={!entity.available || toggling}
@@ -244,10 +223,10 @@ export function EntityCard({
             ) : null}
 
             {hasCapability(entity, "effect") || hasCapability(entity, "speed") ? (
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid gap-2.5 sm:grid-cols-2">
                 {hasCapability(entity, "effect") ? (
-                  <div className="min-w-0">
-                    <div className="mb-1 text-xs text-muted-foreground">{t("effect")}</div>
+                  <div className="min-w-0 space-y-1.5">
+                    <div className="text-xs text-muted-foreground">{t("effect")}</div>
                     <FieldSelect
                       value={String(effect)}
                       disabled={!entity.available || toggling}
@@ -269,10 +248,10 @@ export function EntityCard({
                   </div>
                 ) : null}
                 {hasCapability(entity, "speed") ? (
-                  <div className="min-w-0">
-                    <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+                  <div className="min-w-0 space-y-1.5">
+                    <div className="flex justify-between text-xs text-muted-foreground">
                       <span>{t("speed")}</span>
-                      <span className="tabular-nums">{localSpeed}</span>
+                      <span className="tabular-nums text-foreground/80">{localSpeed}</span>
                     </div>
                     <Slider
                       aria-label={tActions("set_speed")}

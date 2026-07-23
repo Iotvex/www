@@ -92,13 +92,12 @@ async function api<T>(url: string, init?: RequestInit): Promise<T> {
   return data as T
 }
 
-function SectionIntro({ title, description }: { title: string; description: string }) {
+function SectionIntro({ title }: { title: string; description?: string }) {
   return (
-    <div className="min-w-0 space-y-1">
+    <div className="min-w-0">
       <h2 className="text-sm font-semibold tracking-tight text-foreground">{title}</h2>
-      <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
     </div>
-  )
+  );
 }
 
 const WWW_MODES: WwwMode[] = ["local", "local_published", "cloud"]
@@ -359,7 +358,7 @@ export function DeploymentPanel() {
 
   return (
     <section className="space-y-5">
-      <SectionIntro title={t("title")} description={t("description")} />
+      <SectionIntro title={t("title")} />
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {message ? <p className="text-sm text-emerald-600 dark:text-emerald-400">{message}</p> : null}

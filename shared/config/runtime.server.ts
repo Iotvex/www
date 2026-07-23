@@ -430,6 +430,14 @@ function activeDbBundle(file: RuntimeFile, secrets: RuntimeSecretsFile) {
   }
 }
 
+
+function formatHttpUrl(host: string, port: number, https: boolean): string {
+  const scheme = https ? "https" : "http"
+  const def = https ? 443 : 80
+  if (!port || port === def) return `${scheme}://${host}`
+  return `${scheme}://${host}:${port}`
+}
+
 export function getRuntimeConfig(): ResolvedRuntime {
   const file = loadRuntimeFile()
   const secrets = loadSecretsFile()
@@ -459,10 +467,10 @@ export function getRuntimeConfig(): ResolvedRuntime {
     httpPort: file.publish.httpPort,
     httpsPort: file.publish.httpsPort,
     access: {
-      lanHttp: `http://<lan-ip>:${file.publish.httpPort}`,
-      lanHttps: `https://<lan-ip>:${file.publish.httpsPort}`,
-      mdnsHttp: `http://${mdns}:${file.publish.httpPort}`,
-      mdnsHttps: `https://${mdns}:${file.publish.httpsPort}`,
+      lanHttp: formatHttpUrl("<lan-ip>", file.publish.httpPort, false),
+      lanHttps: formatHttpUrl("<lan-ip>", file.publish.httpsPort, true),
+      mdnsHttp: formatHttpUrl(mdns, file.publish.httpPort, false),
+      mdnsHttps: formatHttpUrl(mdns, file.publish.httpsPort, true),
       customDomain: file.publish.customDomain || null,
       published: file.wwwMode === "local_published",
     },

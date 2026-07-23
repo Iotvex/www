@@ -26,19 +26,23 @@ const modeIcon = {
 
 function CompactThemeSwitcher() {
   const t = useTranslations("theme")
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
   const ModeIcon = mounted
-    ? modeIcon[(theme as keyof typeof modeIcon) || "system"] || Palette
+    ? modeIcon[(resolvedTheme === "light" || resolvedTheme === "dark" ? resolvedTheme : "dark")]
     : Palette
 
   const cycle = () => {
-    const order = ["system", "light", "dark"] as const
-    const current = (theme as (typeof order)[number]) || "system"
-    const idx = order.indexOf(current)
-    setTheme(order[(idx + 1) % order.length])
+    // Topbar: light ↔ dark only. System remains available in Settings → Appearance.
+    const resolved =
+      theme === "light" || theme === "dark"
+        ? theme
+        : window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light"
+    setTheme(resolved === "dark" ? "light" : "dark")
   }
 
   return (

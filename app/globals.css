@@ -33,27 +33,27 @@
   .dark {
     --background: 0 0% 0%;
     --foreground: 0 0% 96%;
-    --card: 0 0% 4%;
+    --card: 0 0% 3%;
     --card-foreground: 0 0% 96%;
-    --popover: 0 0% 6%;
+    --popover: 0 0% 4%;
     --popover-foreground: 0 0% 96%;
     --primary: 193 89% 52%;
     --primary-foreground: 0 0% 4%;
-    --secondary: 0 0% 10%;
+    --secondary: 0 0% 6%;
     --secondary-foreground: 0 0% 92%;
-    --muted: 0 0% 10%;
+    --muted: 0 0% 6%;
     --muted-foreground: 0 0% 58%;
-    --accent: 0 0% 12%;
+    --accent: 0 0% 8%;
     --accent-foreground: 0 0% 96%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14%;
-    --input: 0 0% 14%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
     --ring: 193 89% 52%;
-    --sidebar: 0 0% 3%;
+    --sidebar: 0 0% 2%;
     --sidebar-foreground: 0 0% 92%;
-    --sidebar-border: 0 0% 12%;
-    --topbar: 0 0% 2%;
+    --sidebar-border: 0 0% 10%;
+    --topbar: 0 0% 0%;
   }
 
   /* Color themes — primary/ring/accent overrides */
@@ -167,7 +167,7 @@
      * → system already places content below the status bar.
      * → NEVER pad html/body/Topbar/main with env(safe-area-inset-top)
      *   (that value stays non-zero under cover and paints a second black band).
-     * → MobileNav: pb-safe only (home indicator).
+     * → MobileNav: height includes safe-area; tabs vertically centered.
      */
     padding: 0;
     margin: 0;
@@ -491,37 +491,30 @@
 }
 
 @layer utilities {
+  /* Soft glass aliases kept for any leftover classNames — no hard gradient cuts. */
   .iotvex-glass {
-    border: 1px solid color-mix(in oklab, hsl(var(--primary)) 14%, hsl(0 0% 100% / 0.08));
-    background:
-      linear-gradient(145deg, hsl(var(--primary) / 0.07), transparent 42%),
-      linear-gradient(325deg, hsl(var(--primary) / 0.03), transparent 55%),
-      hsl(0 0% 0% / 0.48);
-    backdrop-filter: blur(18px) saturate(1.35);
-    -webkit-backdrop-filter: blur(18px) saturate(1.35);
-    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.05);
+    border: 1px solid color-mix(in oklab, hsl(var(--border)) 70%, hsl(0 0% 100% / 0.1));
+    background: hsl(var(--card) / 0.55);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
   }
   :root:not(.dark) .iotvex-glass {
-    border-color: color-mix(in oklab, hsl(var(--primary)) 16%, hsl(0 0% 0% / 0.08));
-    background:
-      linear-gradient(145deg, hsl(var(--primary) / 0.06), transparent 45%),
-      linear-gradient(325deg, hsl(var(--primary) / 0.03), transparent 58%),
-      hsl(0 0% 100% / 0.72);
-    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.55);
+    background: hsl(var(--card) / 0.72);
   }
   .iotvex-glass-muted {
-    border: 1px solid color-mix(in oklab, hsl(var(--primary)) 10%, hsl(0 0% 100% / 0.06));
-    background:
-      linear-gradient(145deg, hsl(var(--primary) / 0.05), transparent 50%),
-      hsl(0 0% 0% / 0.3);
-    backdrop-filter: blur(14px) saturate(1.2);
-    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    border: 1px solid color-mix(in oklab, hsl(var(--border)) 80%, transparent);
+    background: hsl(var(--card) / 0.35);
+    backdrop-filter: blur(16px) saturate(1.1);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
   }
   :root:not(.dark) .iotvex-glass-muted {
-    border-color: color-mix(in oklab, hsl(var(--primary)) 12%, hsl(0 0% 0% / 0.06));
-    background:
-      linear-gradient(145deg, hsl(var(--primary) / 0.04), transparent 50%),
-      hsl(0 0% 100% / 0.52);
+    background: hsl(var(--card) / 0.5);
+  }
+  .iotvex-glass-soft {
+    border: 1px solid color-mix(in oklab, hsl(var(--border)) 70%, hsl(0 0% 100% / 0.08));
+    background: hsl(var(--card) / 0.65);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
   }
 
   .iotvex-hue-range {
@@ -562,4 +555,198 @@
   .iotvex-stat-cell {
     animation: iotvex-stat-in 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
+}
+
+
+@layer utilities {
+  .iotvex-skeleton {
+    position: relative;
+    overflow: hidden;
+    background: color-mix(in oklab, hsl(var(--muted)) 92%, hsl(var(--primary)) 4%);
+  }
+  .iotvex-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%);
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      transparent 35%,
+      color-mix(in oklab, hsl(var(--foreground)) 7%, transparent) 50%,
+      transparent 65%,
+      transparent 100%
+    );
+    animation: iotvex-shimmer 1.6s ease-in-out infinite;
+  }
+  .dark .iotvex-skeleton {
+    background:
+      linear-gradient(160deg, hsl(var(--primary) / 0.045), transparent 55%),
+      color-mix(in oklab, hsl(0 0% 12%) 94%, hsl(var(--primary)) 4%);
+  }
+}
+
+@keyframes iotvex-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iotvex-skeleton::after {
+    animation: none !important;
+  }
+}
+
+/* Native temporal inputs (esp. WebKit/iOS) otherwise blow past h-10. */
+.iotvex-temporal-input {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 2.5rem;
+  max-height: 2.5rem;
+  line-height: 2.5rem;
+}
+.iotvex-temporal-input::-webkit-calendar-picker-indicator {
+  opacity: 0.7;
+  cursor: pointer;
+  margin-inline-start: 0.25rem;
+}
+.iotvex-temporal-input::-webkit-datetime-edit,
+.iotvex-temporal-input::-webkit-datetime-edit-fields-wrapper,
+.iotvex-temporal-input::-webkit-datetime-edit-hour-field,
+.iotvex-temporal-input::-webkit-datetime-edit-minute-field,
+.iotvex-temporal-input::-webkit-datetime-edit-ampm-field,
+.iotvex-temporal-input::-webkit-datetime-edit-text {
+  padding: 0;
+  line-height: 2.5rem;
+}
+
+
+/* iOS/PWA: Safari zooms focused inputs when computed font-size < 16px. */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+
+/* Soft ambient atmosphere: blurred orbs (no radial-gradient hard edges). */
+.iotvex-atmosphere {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.iotvex-orb {
+  position: absolute;
+  display: block;
+  border-radius: 9999px;
+  filter: blur(110px);
+  opacity: 0.38;
+  will-change: transform;
+  transform: translateZ(0);
+}
+.iotvex-orb-a {
+  width: min(90vmin, 720px);
+  height: min(90vmin, 720px);
+  top: -28%;
+  left: 12%;
+  background: hsl(0 0% 50% / 0.14);
+}
+.iotvex-orb-b {
+  width: min(80vmin, 640px);
+  height: min(80vmin, 640px);
+  bottom: -26%;
+  left: -16%;
+  background: hsl(var(--primary) / 0.11);
+}
+.iotvex-orb-c {
+  width: min(70vmin, 560px);
+  height: min(70vmin, 560px);
+  top: 22%;
+  right: -20%;
+  background: hsl(var(--primary) / 0.07);
+}
+.iotvex-orb-d {
+  width: min(60vmin, 480px);
+  height: min(60vmin, 480px);
+  bottom: -16%;
+  right: 8%;
+  background: hsl(0 0% 40% / 0.08);
+}
+:root:not(.dark) .iotvex-orb-a {
+  background: hsl(220 20% 70% / 0.2);
+  opacity: 0.55;
+}
+:root:not(.dark) .iotvex-orb-b {
+  background: hsl(var(--primary) / 0.1);
+}
+:root:not(.dark) .iotvex-orb-c {
+  background: hsl(var(--primary) / 0.07);
+}
+@media (prefers-reduced-motion: reduce) {
+  .iotvex-orb {
+    filter: blur(96px);
+  }
+}
+
+/* Dialog: top → down appear */
+.iotvex-dialog-overlay[data-state="open"] {
+  animation: iotvex-fade-in 200ms ease-out both;
+}
+.iotvex-dialog-overlay[data-state="closed"] {
+  animation: iotvex-fade-out 160ms ease-in both;
+}
+.iotvex-dialog-panel[data-state="open"] {
+  animation: iotvex-dialog-down-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.iotvex-dialog-panel[data-state="closed"] {
+  animation: iotvex-dialog-down-out 180ms ease-in both;
+}
+@keyframes iotvex-dialog-down-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes iotvex-dialog-down-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -1rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iotvex-dialog-overlay,
+  .iotvex-dialog-panel {
+    animation: none !important;
+  }
+}
+
+/* Hide scrollbars site-wide (scroll still works). */
+.iotvex-hide-scroll,
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.iotvex-hide-scroll::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent;
 }

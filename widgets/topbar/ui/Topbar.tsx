@@ -1,6 +1,7 @@
 "use client"
 
 import { $user } from "@/entities/auth/model/store"
+import { LanguageSwitcherCompact } from "@/features/locale/ui/LanguageSwitcher"
 import { ThemeSwitcher } from "@/features/theme/ui/ThemeSwitcher"
 import { Button } from "@/shared/ui/button"
 import {
@@ -12,7 +13,7 @@ import {
 } from "@/shared/ui/sheet"
 import { SidebarNav } from "@/widgets/sidebar/ui/AppSidebar"
 import { useUnit } from "effector-react"
-import { LogOut, Menu } from "lucide-react"
+import { Menu } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 export function Topbar({
@@ -30,7 +31,7 @@ export function Topbar({
   const t = useTranslations("topbar")
 
   return (
-    <header className="z-30 shrink-0 border-b border-border/50 bg-background/80 backdrop-blur-md">
+    <header className="z-30 shrink-0 border-b border-white/[0.06] bg-black/92 backdrop-blur-xl">
       {/* No pt-safe: apple statusBarStyle "black" already insets the webview. */}
       <div className="flex h-14 items-center justify-between gap-2 px-3 sm:px-4 md:px-6">
         <div className="flex min-w-0 items-center gap-2">
@@ -46,7 +47,7 @@ export function Topbar({
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
+            <SheetContent side="left" className="gap-0 p-0">
               <SheetHeader className="sr-only">
                 <SheetTitle>{t("navigation")}</SheetTitle>
               </SheetHeader>
@@ -71,25 +72,7 @@ export function Topbar({
           <span className="hidden max-w-[9rem] truncate text-xs text-muted-foreground xl:inline">
             {user?.email}
           </span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={t("logout")}
-            onClick={async () => {
-              try {
-                await fetch("/api/auth/logout", {
-                  method: "POST",
-                  credentials: "include",
-                })
-              } catch {
-                /* ignore */
-              }
-              window.location.href = "/login"
-            }}
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
+          <LanguageSwitcherCompact />
         </div>
       </div>
     </header>

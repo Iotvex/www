@@ -15,6 +15,7 @@ import {
 import { EntityGrid } from "@/features/entity-control/ui/EntityCard"
 import {
   EmptyState,
+  CreateCard,
   FieldSelect,
   FilterChips,
   PageToolbar,
@@ -23,18 +24,31 @@ import {
 import { Badge } from "@/shared/ui/badge"
 import { Button } from "@/shared/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card"
+import { Checkbox } from "@/shared/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/dialog"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
+import { ScrollArea } from "@/shared/ui/scroll-area"
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover"
 import { Switch } from "@/shared/ui/switch"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui/dropdown-menu"
+import {
+  ArrowUpDown,
   Boxes,
+  Check,
   MapPinned,
   Pencil,
   Plus,
   Radar,
+  SlidersHorizontal,
   Trash2,
 } from "lucide-react"
+import { cn } from "@/shared/lib/utils"
 import { useMemo, useState, useTransition } from "react"
 
 type InventoryTab = "devices" | "entities" | "areas"
@@ -101,41 +115,6 @@ function DevicesTab() {
 
   return (
     <div className="space-y-4">
-      <PageToolbar
-        title={t("devices.title")}
-        description={t("devices.description")}
-        meta={
-          <span className="inline-flex items-center gap-2">
-            <StatusDot on={nodes.length > 0 || Boolean(node)} />
-            {t("devices.count", { count: devices.length })}
-            {nodes.length || node ? (
-              <>
-                {" · "}
-                {t("devices.controllerOnline")}
-                {" · "}
-                {t("devices.nodesOnline", { count: nodes.length || (node ? 1 : 0) })}
-                {node && node.strip_count > 0 ? (
-                  <>
-                    {" · "}
-                    {t("devices.channels", { count: node.strip_count })}
-                  </>
-                ) : null}
-              </>
-            ) : (
-              <>
-                {" · "}
-                {t("devices.controllerUnavailable")}
-              </>
-            )}
-          </span>
-        }
-        actions={
-          <Button size="sm" onClick={discover} disabled={pending}>
-            <Radar className="h-4 w-4" />
-            {t("devices.discover")}
-          </Button>
-        }
-      />
       {msg ? <p className="text-sm text-muted-foreground">{msg}</p> : null}
 
       {devices.length === 0 ? (
@@ -206,6 +185,10 @@ function DevicesTab() {
         </div>
       )}
 
+      {devices.length > 0 ? (
+        <CreateCard label={t("devices.discover")} onClick={discover} />
+      ) : null}
+
       <Dialog open={Boolean(edit)} onOpenChange={(o) => !o && setEdit(null)}>
         <DialogContent>
           <DialogHeader>
@@ -252,6 +235,8 @@ function DevicesTab() {
   )
 }
 
+type EntitySort = "name_asc" | "name_desc" | "domain" | "active" | "id"
+
 function EntitiesTab() {
   const t = useTranslations("inventory")
   const common = useTranslations("common")
@@ -259,6 +244,7 @@ function EntitiesTab() {
   const areas = useUnit($areas)
   const devices = useUnit($devices)
   const [q, setQ] = useState("")
+  const [sort, setSort] = useState<EntitySort>("name_asc")
   const [areaFilter, setAreaFilter] = useState("all")
   const [domainFilter, setDomainFilter] = useState("all")
   const [pending, start] = useTransition()
@@ -277,7 +263,7 @@ function EntitiesTab() {
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
-    return entities.filter((e) => {
+    const list = entities.filter((e) => {
       if (areaFilter === "none" && e.area) return false
       if (areaFilter !== "all" && areaFilter !== "none" && e.area !== areaFilter) return false
       if (domainFilter !== "all" && e.domain !== domainFilter) return false
@@ -288,7 +274,34 @@ function EntitiesTab() {
         e.domain.includes(s)
       )
     })
-  }, [entities, q, areaFilter, domainFilter])
+
+    const collator = new Intl.Collator(undefined, { sensitivity: "base", numeric: true })
+    list.sort((a, b) => {
+      if (sort === "domain") {
+        const byDomain = collator.compare(a.domain, b.domain)
+        if (byDomain) return byDomain
+        return collator.compare(a.name, b.name)
+      }
+      if (sort === "active") {
+        const aOn = isEntityActive(a) ? 0 : 1
+        const bOn = isEntityActive(b) ? 0 : 1
+        if (aOn !== bOn) return aOn - bOn
+        return collator.compare(a.name, b.name)
+      }
+      if (sort === "id") return collator.compare(a.entity_id, b.entity_id)
+      const byName = collator.compare(a.name, b.name)
+      return sort === "name_desc" ? -byName : byName
+    })
+    return list
+  }, [entities, q, areaFilter, domainFilter, sort])
+
+  const sortOptions: Array<{ id: EntitySort; label: string }> = [
+    { id: "name_asc", label: t("entities.sortNameAsc") },
+    { id: "name_desc", label: t("entities.sortNameDesc") },
+    { id: "domain", label: t("entities.sortDomain") },
+    { id: "active", label: t("entities.sortActive") },
+    { id: "id", label: t("entities.sortId") },
+  ]
 
   const save = () => {
     if (!edit) return
@@ -326,41 +339,90 @@ function EntitiesTab() {
   return (
     <div className="space-y-4">
       <PageToolbar
-        title={t("entities.title")}
-        description={<span className="hidden sm:inline">{t("entities.description")}</span>}
-        meta={`${filtered.length} / ${entities.length}`}
         actions={
-          <Input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={t("entities.searchPlaceholder")}
-            className="h-10 w-full sm:h-9 sm:w-56"
-          />
+          <div className="flex w-full min-w-0 items-center gap-1.5">
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t("entities.searchPlaceholder")}
+              className="h-10 min-w-0 flex-1"
+            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="secondary"
+                  className={cn(
+                    "h-10 w-10 shrink-0",
+                    (areaFilter !== "all" || domainFilter !== "all") && "border border-primary/35 text-primary",
+                  )}
+                  aria-label={t("entities.filterAria")}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[min(20rem,calc(100vw-2rem))] space-y-3 p-3">
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    {t("entities.allAreas")}
+                  </div>
+                  <FilterChips
+                    value={areaFilter}
+                    onChange={setAreaFilter}
+                    items={[
+                      { id: "all", label: t("entities.allAreas") },
+                      { id: "none", label: t("entities.noArea") },
+                      ...areas.map((a) => ({ id: a.id, label: a.name })),
+                    ]}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    {t("entities.allDomains")}
+                  </div>
+                  <FilterChips
+                    value={domainFilter}
+                    onChange={setDomainFilter}
+                    items={[
+                      { id: "all", label: t("entities.allDomains") },
+                      ...domains.map((d) => ({ id: d, label: d })),
+                    ]}
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="secondary"
+                  className="h-10 w-10 shrink-0"
+                  aria-label={t("entities.sortAria")}
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[12rem]">
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.id}
+                    onSelect={() => setSort(option.id)}
+                    className="justify-between gap-3"
+                  >
+                    <span>{option.label}</span>
+                    {sort === option.id ? <Check className="h-4 w-4 text-primary" /> : null}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
 
-      <div className="space-y-2.5">
-        <FilterChips
-          value={areaFilter}
-          onChange={setAreaFilter}
-          items={[
-            { id: "all", label: t("entities.allAreas") },
-            { id: "none", label: t("entities.noArea") },
-            ...areas.map((a) => ({ id: a.id, label: a.name })),
-          ]}
-        />
-        <FilterChips
-          value={domainFilter}
-          onChange={setDomainFilter}
-          items={[
-            { id: "all", label: t("entities.allDomains") },
-            ...domains.map((d) => ({ id: d, label: d })),
-          ]}
-        />
-      </div>
-
       {areas.length > 0 && entities.some((e) => !e.area) ? (
-        <div className="iotvex-glass-muted flex flex-col gap-2 rounded-2xl px-3 py-3 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex flex-col gap-2 rounded-xl border border-border/50 bg-card/40 px-3 py-3 text-xs text-muted-foreground backdrop-blur-md sm:flex-row sm:flex-wrap sm:items-center dark:bg-card/30">
           <span className="shrink-0">{t("entities.unboundNotice")}</span>
           <div className="-mx-0.5 flex gap-1.5 overflow-x-auto overscroll-x-contain px-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {areas.map((a) => (
@@ -461,24 +523,96 @@ function AreasTab() {
   const [open, setOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [name, setName] = useState("")
-  const [assignEntity, setAssignEntity] = useState("")
-  const [assignDevice, setAssignDevice] = useState("")
+  const [selectedDevices, setSelectedDevices] = useState<Set<string>>(new Set())
+  const [selectedEntities, setSelectedEntities] = useState<Set<string>>(new Set())
   const [pending, start] = useTransition()
+
+  const entitiesByDevice = useMemo(() => {
+    const map = new Map<string, typeof entities>()
+    for (const e of entities) {
+      const key = e.device_id || ""
+      const list = map.get(key) || []
+      list.push(e)
+      map.set(key, list)
+    }
+    return map
+  }, [entities])
+
+  const orphanEntities = entitiesByDevice.get("") || []
+
+  const resetSelection = (areaId: string | null) => {
+    if (!areaId) {
+      setSelectedDevices(new Set())
+      setSelectedEntities(new Set())
+      return
+    }
+    const entsInArea = new Set(
+      entities.filter((e) => e.area === areaId).map((e) => e.entity_id),
+    )
+    setSelectedEntities(entsInArea)
+    // Device belongs to the zone if it is assigned directly OR any of its entities are.
+    const deviceIds = new Set<string>()
+    for (const d of devices) {
+      const linked = entities.filter((e) => e.device_id === d.id)
+      const anyEntityHere = linked.some((e) => entsInArea.has(e.entity_id))
+      if (d.area_id === areaId || anyEntityHere) {
+        deviceIds.add(d.id)
+      }
+    }
+    setSelectedDevices(deviceIds)
+  }
 
   const openCreate = () => {
     setEditId(null)
     setName("")
-    setAssignEntity("")
-    setAssignDevice("")
+    resetSelection(null)
     setOpen(true)
   }
 
   const openEdit = (id: string, current: string) => {
     setEditId(id)
     setName(current)
-    setAssignEntity("")
-    setAssignDevice("")
+    resetSelection(id)
     setOpen(true)
+  }
+
+  const toggleDevice = (deviceId: string, on: boolean) => {
+    const linked = entitiesByDevice.get(deviceId) || []
+    setSelectedDevices((prev) => {
+      const next = new Set(prev)
+      if (on) next.add(deviceId)
+      else next.delete(deviceId)
+      return next
+    })
+    setSelectedEntities((prev) => {
+      const next = new Set(prev)
+      for (const e of linked) {
+        if (on) next.add(e.entity_id)
+        else next.delete(e.entity_id)
+      }
+      return next
+    })
+  }
+
+  const toggleEntity = (entityId: string, deviceId: string | null | undefined, on: boolean) => {
+    setSelectedEntities((prev) => {
+      const next = new Set(prev)
+      if (on) next.add(entityId)
+      else next.delete(entityId)
+
+      if (deviceId) {
+        const linked = entitiesByDevice.get(deviceId) || []
+        setSelectedDevices((devs) => {
+          const dnext = new Set(devs)
+          // Device stays bound while at least one of its entities is selected.
+          const anySelected = linked.some((e) => next.has(e.entity_id))
+          if (anySelected) dnext.add(deviceId)
+          else dnext.delete(deviceId)
+          return dnext
+        })
+      }
+      return next
+    })
   }
 
   const save = () => {
@@ -499,20 +633,45 @@ function AreasTab() {
         const data = await res.json()
         areaId = data.item?.id
       }
-      if (areaId && assignEntity) {
-        await fetch("/api/entities", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: assignEntity, area_id: areaId }),
-        })
+      if (!areaId) {
+        setOpen(false)
+        fetchCatalogFx()
+        return
       }
-      if (areaId && assignDevice) {
+
+      // Devices: bound if selected OR any of their entities stay in this zone.
+      for (const d of devices) {
+        const linked = entitiesByDevice.get(d.id) || []
+        const anyEntitySelected = linked.some((e) => selectedEntities.has(e.entity_id))
+        const should = selectedDevices.has(d.id) || anyEntitySelected
+        const was = d.area_id === areaId
+        if (should === was) continue
         await fetch("/api/devices", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: assignDevice, area_id: areaId, cascade_area: true }),
+          body: JSON.stringify({
+            id: d.id,
+            area_id: should ? areaId : null,
+            cascade_area: false,
+          }),
         })
       }
+
+      // Entities: selected → assign; previously in zone but deselected → clear
+      for (const e of entities) {
+        const should = selectedEntities.has(e.entity_id)
+        const was = e.area === areaId
+        if (should === was) continue
+        await fetch("/api/entities", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: e.entity_id,
+            area_id: should ? areaId : null,
+          }),
+        })
+      }
+
       setOpen(false)
       fetchCatalogFx()
     })
@@ -520,17 +679,6 @@ function AreasTab() {
 
   return (
     <div className="space-y-4">
-      <PageToolbar
-        title={t("areas.title")}
-        description={t("areas.description")}
-        meta={t("areas.count", { count: areas.length })}
-        actions={
-          <Button size="sm" onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            {t("areas.add")}
-          </Button>
-        }
-      />
       {areas.length === 0 ? (
         <EmptyState
           icon={<MapPinned className="h-8 w-8" />}
@@ -547,7 +695,12 @@ function AreasTab() {
         <div className="grid gap-2 sm:grid-cols-2 sm:gap-2.5 xl:grid-cols-3">
           {areas.map((a, i) => {
             const ents = entities.filter((e) => e.area === a.id)
-            const devs = devices.filter((d) => d.area_id === a.id)
+            const entityDeviceIds = new Set(
+              ents.map((e) => e.device_id).filter((id): id is string => Boolean(id)),
+            )
+            const devs = devices.filter(
+              (d) => d.area_id === a.id || entityDeviceIds.has(d.id),
+            )
             return (
               <Card key={a.id} className="iotvex-card-in" style={{ animationDelay: `${i * 35}ms` }}>
                 <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
@@ -599,38 +752,111 @@ function AreasTab() {
         </div>
       )}
 
+      {areas.length > 0 ? (
+        <CreateCard label={t("areas.add")} onClick={openCreate} />
+      ) : null}
+
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{editId ? t("areas.editTitle") : t("areas.newTitle")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
               <Label>{t("areas.nameLabel")}</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("areas.namePlaceholder")} />
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t("areas.namePlaceholder")}
+              />
             </div>
+
             <div className="space-y-1.5">
               <Label>{t("areas.assignDevice")}</Label>
-              <FieldSelect value={assignDevice} onChange={setAssignDevice}>
-                <option value="">{t("areas.skip")}</option>
-                {devices.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
-              </FieldSelect>
+              <p className="text-[11px] text-muted-foreground">
+                {t("areas.selectedCount", {
+                  devices: selectedDevices.size,
+                  entities: selectedEntities.size,
+                })}
+              </p>
+              <ScrollArea className="h-[min(42vh,22rem)] rounded-xl border border-white/[0.08] bg-black/30">
+                <div className="space-y-3 p-3">
+                  {devices.map((d) => {
+                    const linked = entitiesByDevice.get(d.id) || []
+                    const selectedCount = linked.filter((e) =>
+                      selectedEntities.has(e.entity_id),
+                    ).length
+                    const allOn = linked.length > 0 && selectedCount === linked.length
+                    const someOn = selectedCount > 0
+                    return (
+                      <div key={d.id} className="space-y-1.5">
+                        <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-1.5 py-1.5 hover:bg-white/[0.03]">
+                          <Checkbox
+                            checked={allOn ? true : someOn ? "indeterminate" : false}
+                            onCheckedChange={(v) => toggleDevice(d.id, v === true)}
+                          />
+                          <span className="min-w-0 flex-1 break-words text-sm font-medium leading-snug">{d.name}</span>
+                          <span className="shrink-0 text-[11px] text-muted-foreground">
+                            {linked.length}
+                          </span>
+                        </label>
+                        {linked.length ? (
+                          <div className="ml-7 space-y-0.5 border-l border-white/[0.06] pl-3">
+                            {linked.map((e) => (
+                              <label
+                                key={e.entity_id}
+                                className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-1 hover:bg-white/[0.03]"
+                              >
+                                <Checkbox
+                                  checked={selectedEntities.has(e.entity_id)}
+                                  onCheckedChange={(v) =>
+                                    toggleEntity(e.entity_id, d.id, v === true)
+                                  }
+                                />
+                                <span className="min-w-0 flex-1 break-words text-xs leading-snug text-muted-foreground">
+                                  {e.name}
+                                </span>
+                              </label>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    )
+                  })}
+
+                  {orphanEntities.length ? (
+                    <div className="space-y-1.5 border-t border-white/[0.06] pt-3">
+                      <div className="px-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {t("areas.orphanEntities")}
+                      </div>
+                      {orphanEntities.map((e) => (
+                        <label
+                          key={e.entity_id}
+                          className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1 hover:bg-white/[0.03]"
+                        >
+                          <Checkbox
+                            checked={selectedEntities.has(e.entity_id)}
+                            onCheckedChange={(v) =>
+                              toggleEntity(e.entity_id, null, v === true)
+                            }
+                          />
+                          <span className="min-w-0 flex-1 break-words text-xs leading-snug text-muted-foreground">
+                            {e.name}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {devices.length === 0 && orphanEntities.length === 0 ? (
+                    <p className="px-1 py-6 text-center text-xs text-muted-foreground">
+                      {t("areas.skip")}
+                    </p>
+                  ) : null}
+                </div>
+              </ScrollArea>
             </div>
-            <div className="space-y-1.5">
-              <Label>{t("areas.assignEntity")}</Label>
-              <FieldSelect value={assignEntity} onChange={setAssignEntity}>
-                <option value="">{t("areas.skip")}</option>
-                {entities.map((e) => (
-                  <option key={e.entity_id} value={e.entity_id}>
-                    {e.name} ({e.entity_id})
-                  </option>
-                ))}
-              </FieldSelect>
-            </div>
+
             <Button className="w-full" disabled={!name.trim() || pending} onClick={save}>
               {editId ? common("save") : common("create")}
             </Button>

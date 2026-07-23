@@ -30,6 +30,7 @@ import {
   PageToolbar,
   SegmentedTabs,
 } from "@/shared/ui/page-toolbar";
+import { PageListSkeleton } from "@/shared/ui/skeleton";
 import { $entities } from "@/entities/device/model/store";
 import {
   AutomationEditor,
@@ -220,21 +221,13 @@ function AutomationsPanel() {
 
   return (
     <section className="space-y-4">
-      <PageToolbar
-        title={t("automations.title")}
-        description={<span className="hidden sm:inline">{t("automations.description")}</span>}
-        actions={
-          <Button size="sm" onClick={openCreate}>
-            {t("automations.create")}
-          </Button>
-        }
-      />
-
       {error ? (
         <Card className="iotvex-card-in border-destructive/30">
           <CardContent className="pt-6 text-sm text-destructive">{error}</CardContent>
         </Card>
       ) : null}
+
+      {loading ? <PageListSkeleton rows={3} /> : null}
 
       {!loading && items.length === 0 ? (
         <EmptyState
@@ -249,7 +242,7 @@ function AutomationsPanel() {
       ) : null}
 
       <div className="grid gap-2">
-        {items.map((item) => (
+        {!loading && items.map((item) => (
           <Card key={item.id} className="iotvex-card-in min-w-0 overflow-hidden">
             <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
               <div className="min-w-0 space-y-1.5">
@@ -350,21 +343,13 @@ function ScenesPanel() {
 
   return (
     <section className="space-y-4">
-      <PageToolbar
-        title={t("scenes.title")}
-        description={<span className="hidden sm:inline">{t("scenes.description")}</span>}
-        actions={
-          <Button size="sm" onClick={() => setDialogOpen(true)}>
-            {t("scenes.create")}
-          </Button>
-        }
-      />
-
       {error ? (
         <Card className="iotvex-card-in border-destructive/30">
           <CardContent className="pt-6 text-sm text-destructive">{error}</CardContent>
         </Card>
       ) : null}
+
+      {loading ? <PageListSkeleton rows={2} dual /> : null}
 
       {!loading && items.length === 0 ? (
         <EmptyState
@@ -379,7 +364,7 @@ function ScenesPanel() {
       ) : null}
 
       <div className="grid gap-2 md:grid-cols-2 md:gap-2.5">
-        {items.map((scene) => (
+        {!loading && items.map((scene) => (
           <Card key={scene.id} className="iotvex-card-in">
             <CardHeader className="p-2.5 sm:p-3">
               <CardTitle className="text-sm sm:text-base">{scene.name}</CardTitle>
@@ -611,21 +596,13 @@ function ScriptsPanel() {
 
   return (
     <section className="space-y-4">
-      <PageToolbar
-        title={t("scripts.title")}
-        description={<span className="hidden sm:inline">{t("scripts.description")}</span>}
-        actions={
-          <Button size="sm" onClick={() => setDialogOpen(true)}>
-            {t("scripts.create")}
-          </Button>
-        }
-      />
-
       {error ? (
         <Card className="iotvex-card-in border-destructive/30">
           <CardContent className="pt-6 text-sm text-destructive">{error}</CardContent>
         </Card>
       ) : null}
+
+      {loading ? <PageListSkeleton rows={2} /> : null}
 
       {!loading && items.length === 0 ? (
         <EmptyState
@@ -640,7 +617,7 @@ function ScriptsPanel() {
       ) : null}
 
       <div className="grid gap-2">
-        {items.map((script) => (
+        {!loading && items.map((script) => (
           <Card key={script.id} className="iotvex-card-in">
             <CardHeader className="p-2.5 sm:p-3">
               <CardTitle className="text-sm sm:text-base">{script.name}</CardTitle>

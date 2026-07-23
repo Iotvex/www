@@ -1,5 +1,6 @@
 import {
   Home,
+  Layout,
   Cpu,
   Lightbulb,
   House,
@@ -33,7 +34,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     id: "overview",
     sectionKey: null,
-    items: [{ id: "dashboard", icon: Home }],
+    items: [{ id: "dashboard", icon: Layout }],
   },
   {
     id: "home",
@@ -88,7 +89,7 @@ export type MobileTab = {
 }
 
 export const MOBILE_TABS: MobileTab[] = [
-  { group: "overview", labelKey: "overview", icon: Home },
+  { group: "overview", labelKey: "overview", icon: Layout },
   { group: "home", labelKey: "home", icon: House },
   { group: "automation", labelKey: "auto", icon: Workflow },
   { group: "settings", labelKey: "more", icon: UserRound },

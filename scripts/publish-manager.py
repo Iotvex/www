@@ -345,10 +345,14 @@ def reconcile() -> dict:
     ]
     bridge = rt.get("bridge") or {}
     if bridge.get("localDbPublicUrl"):
+        supabase_url = bridge["localDbPublicUrl"]
         env_lines += [
-            f"SUPABASE_URL={bridge['localDbPublicUrl']}",
-            f"NEXT_PUBLIC_SUPABASE_URL={bridge['localDbPublicUrl']}",
-            f"NEXT_PUBLIC_SUPABASE_BROWSER_URL={bridge['localDbPublicUrl']}",
+            f"SUPABASE_URL={supabase_url}",
+            f"NEXT_PUBLIC_SUPABASE_URL={supabase_url}",
+            # Browser should use same-origin proxy (avoids CORS).
+            "NEXT_PUBLIC_SUPABASE_BROWSER_URL=/supabase",
+            # Server DB mode (local) uses this override in runtime.server.ts.
+            f"IOTVEX_LOCAL_SUPABASE_URL={supabase_url}",
         ]
     if bridge.get("agentPublicUrl"):
         env_lines.append(f"IOTVEX_AGENT_URL={bridge['agentPublicUrl']}")

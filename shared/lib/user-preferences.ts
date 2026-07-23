@@ -49,15 +49,27 @@ export function withRemoteSuppressed<T>(fn: () => T): T {
 }
 
 /** Read cached prefs from localStorage / cookie (offline-friendly). */
+function readPrefCookie(name: string): string | null {
+  try {
+    const prefix = `${name}=`
+    for (const part of document.cookie.split("; ")) {
+      if (part.startsWith(prefix)) return decodeURIComponent(part.slice(prefix.length))
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 export function readLocalPreferences(): Partial<UserPreferences> {
   if (typeof window === "undefined") return {}
   const out: Partial<UserPreferences> = {}
   try {
-    const theme = localStorage.getItem(THEME_STORAGE_KEY)
+    const theme = localStorage.getItem(THEME_STORAGE_KEY) || readPrefCookie("iotvex-theme")
     if (theme && isThemeMode(theme)) out.theme = theme
-    const color = localStorage.getItem(COLOR_STORAGE_KEY)
+    const color = localStorage.getItem(COLOR_STORAGE_KEY) || readPrefCookie(COLOR_STORAGE_KEY)
     if (color && isColorThemeId(color)) out.color_theme = color
-    const locale = localStorage.getItem(localeCookieName)
+    const locale = localStorage.getItem(localeCookieName) || readPrefCookie(localeCookieName)
     if (locale && isAppLocale(locale)) out.locale = locale
   } catch {
     /* ignore */
@@ -66,18 +78,28 @@ export function readLocalPreferences(): Partial<UserPreferences> {
 }
 
 /** Persist prefs locally (always) — used as offline cache / FOUC boot. */
+function writePrefCookie(name: string, value: string) {
+  try {
+    document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=31536000; samesite=lax`
+  } catch {
+    /* ignore */
+  }
+}
+
 export function writeLocalPreferences(patch: Partial<UserPreferences>) {
   if (typeof window === "undefined") return
   try {
     if (patch.theme && isThemeMode(patch.theme)) {
       localStorage.setItem(THEME_STORAGE_KEY, patch.theme)
+      writePrefCookie("iotvex-theme", patch.theme)
     }
     if (patch.color_theme && isColorThemeId(patch.color_theme)) {
       localStorage.setItem(COLOR_STORAGE_KEY, patch.color_theme)
+      writePrefCookie(COLOR_STORAGE_KEY, patch.color_theme)
     }
     if (patch.locale && isAppLocale(patch.locale)) {
       localStorage.setItem(localeCookieName, patch.locale)
-      document.cookie = `${localeCookieName}=${patch.locale}; path=/; max-age=31536000; samesite=lax`
+      writePrefCookie(localeCookieName, patch.locale)
     }
   } catch {
     /* ignore */

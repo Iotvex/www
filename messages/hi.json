@@ -72,7 +72,7 @@
       "dashboard": "अवलोकन",
       "home-devices": "डिवाइस",
       "home-entities": "एंटिटी",
-      "home-areas": "कमरे",
+      "home-areas": "ज़ोन",
       "auto-scenarios": "ऑटोमेशन",
       "auto-scenes": "सीन",
       "auto-scripts": "स्क्रिप्ट",
@@ -106,8 +106,8 @@
       "subtitle": "नियंत्रित की जा सकने वाली होम एंटिटी"
     },
     "home-areas": {
-      "title": "कमरे",
-      "subtitle": "ज़ोन और असाइनमेंट"
+      "title": "ज़ोन",
+      "subtitle": "असाइनमेंट"
     },
     "auto-scenarios": {
       "title": "ऑटोमेशन",
@@ -177,7 +177,7 @@
       "entities": "एंटिटी",
       "entitiesOn": "{count} चालू",
       "entitiesWaitingDiscovery": "डिस्कवरी की प्रतीक्षा",
-      "rooms": "कमरे",
+      "rooms": "ज़ोन",
       "roomExample": "जैसे {name}",
       "roomsUnassigned": "असाइन नहीं",
       "connection": "कनेक्शन",
@@ -187,7 +187,8 @@
       "controllerAvailable": "कंट्रोलर उपलब्ध",
       "agentNoResponse": "एजेंट जवाब नहीं दे रहा",
       "checkingValue": "…",
-      "checkingHint": "कनेक्शन जाँच"
+      "checkingHint": "कनेक्शन जाँच",
+      "agentStatus": "एजेंट स्थिति"
     },
     "widgets": {
       "emptyTitle": "अपने पहले विजेट से शुरू करें",
@@ -198,7 +199,7 @@
       "nameLabel": "नाम",
       "namePlaceholder": "लिविंग रूम",
       "typeLabel": "प्रकार",
-      "roomLabel": "कमरा",
+      "roomLabel": "ज़ोन",
       "moveUpAria": "विजेट ऊपर ले जाएँ",
       "moveDownAria": "विजेट नीचे ले जाएँ",
       "deleteConfirm": "विजेट “{title}” हटाएँ?",
@@ -209,11 +210,11 @@
       "kinds": {
         "entities": "एंटिटी",
         "lights": "लाइटें",
-        "area": "कमरा",
+        "area": "ज़ोन",
         "status": "स्थिति",
         "activity": "गतिविधि"
       },
-      "kindArea": "कमरा: {room}",
+      "kindArea": "ज़ोन: {room}",
       "noRoomSelected": "चयनित नहीं",
       "unnamed": "शीर्षकहीन",
       "noMatchingTitle": "कोई मिलती-जुलती एंटिटी नहीं",
@@ -223,7 +224,10 @@
       "andMore": "और {count} अधिक",
       "moveUp": "ऊपर ले जाएँ",
       "moveDown": "नीचे ले जाएँ",
-      "menuAria": "विजेट क्रियाएँ"
+      "menuAria": "विजेट क्रियाएँ",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "dragAria": "Drag widget"
     },
     "statusWidget": {
       "controller": "कंट्रोलर",
@@ -232,7 +236,7 @@
       "catalog": "कैटलॉग",
       "active": "सक्रिय",
       "channels": "चैनल",
-      "roomsCount": "कमरे: {count}",
+      "roomsCount": "ज़ोन: {count}",
       "devicesAbbrev": "डिव."
     },
     "activityWidget": {
@@ -254,7 +258,7 @@
       "discoverError": "डिवाइस खोजे नहीं जा सके",
       "discoverSuccess": "एंटिटी मिलीं: {count}। नाम और असाइनमेंट सहेजे गए।",
       "emptyTitle": "अभी कोई डिवाइस नहीं जोड़ा गया",
-      "emptyDescription": "नेटवर्क पर डिस्कवरी शुरू करें — मिले हुए डिवाइस यहाँ दिखाई देंगे। आपके नाम और असाइनमेंट सुरक्षित रहेंगे।",
+      "emptyDescription": "नेटवर्क खोज शुरू करें — मिले डिवाइस यहाँ दिखेंगे।",
       "onCount": "{on}/{total} चालू",
       "areaLabel": "क्षेत्र",
       "unassignedArea": "असाइन नहीं",
@@ -262,7 +266,7 @@
       "nameLabel": "नाम",
       "areaSelectLabel": "क्षेत्र",
       "noArea": "कोई क्षेत्र नहीं",
-      "cascadeArea": "कमरे को डिवाइस की सभी एंटिटी पर लागू करें",
+      "cascadeArea": "Apply zone to all device entities",
       "nodesOnline": "ऑनलाइन नोड: {count}"
     },
     "entities": {
@@ -281,26 +285,36 @@
       "deviceLabel": "डिवाइस",
       "areaLabel": "क्षेत्र",
       "noDevice": "कोई डिवाइस नहीं",
-      "areaSuffixNone": "कोई क्षेत्र नहीं"
+      "areaSuffixNone": "कोई क्षेत्र नहीं",
+      "sortAria": "क्रमबद्ध करें",
+      "sortNameAsc": "नाम A→Z",
+      "sortNameDesc": "नाम Z→A",
+      "sortDomain": "डोमेन के अनुसार",
+      "sortActive": "पहले सक्रिय",
+      "sortId": "ID के अनुसार",
+      "filterAria": "Filters"
     },
     "areas": {
-      "title": "कमरे",
+      "title": "ज़ोन",
       "description": "ज़ोन और असाइनमेंट",
-      "count": "{count} क्षेत्र",
-      "add": "क्षेत्र जोड़ें",
-      "emptyTitle": "अभी कोई कमरा नहीं बनाया गया",
-      "emptyDescription": "एक कमरा बनाएँ और डिवाइस असाइन करें। फिर से खोजने पर असाइनमेंट सुरक्षित रहेंगे।",
+      "count": "{count} ज़ोन",
+      "add": "ज़ोन जोड़ें",
+      "emptyTitle": "No zones created yet",
+      "emptyDescription": "Create a zone and assign devices.",
       "devicesAbbrev": "डिव.",
       "entitiesAbbrev": "एंट.",
       "onAbbrev": "चालू",
-      "nothingAssigned": "इस कमरे को अभी कुछ भी असाइन नहीं किया गया है",
-      "editTitle": "क्षेत्र",
-      "newTitle": "नया क्षेत्र",
+      "nothingAssigned": "Nothing is assigned to this zone yet",
+      "editTitle": "ज़ोन",
+      "newTitle": "नया ज़ोन",
       "nameLabel": "नाम",
       "namePlaceholder": "उदाहरण के लिए, लिविंग रूम",
       "assignDevice": "डिवाइस असाइन करें",
       "assignEntity": "एंटिटी असाइन करें",
-      "skip": "छोड़ें"
+      "skip": "छोड़ें",
+      "assignHint": "Select a device to attach all its entities. Uncheck ones you want to leave out.",
+      "orphanEntities": "Other entities",
+      "selectedCount": "{devices} devices · {entities} entities"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "लॉग साफ़ करें",
     "filterAll": "सभी",
     "emptyTitle": "लॉग खाली है",
-    "emptyDescription": "डिवाइस नियंत्रित करने, ऑटोमेशन चलाने या उपकरण खोजने के बाद इवेंट दिखाई देंगे।"
+    "emptyDescription": "डिवाइस नियंत्रित करने, ऑटोमेशन चलाने या उपकरण खोजने के बाद इवेंट दिखाई देंगे।",
+    "searchPlaceholder": "Search…",
+    "filterAria": "Filters",
+    "filterKindLabel": "Event type",
+    "sortLabel": "Sort",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTitleAsc": "Title A → Z",
+    "sortTitleDesc": "Title Z → A",
+    "sortKindAsc": "Event type A → Z"
   },
   "modules": {
     "metaCount": "{count} एक्सटेंशन",
@@ -688,7 +711,8 @@
     "logout": "लॉग आउट",
     "navigation": "नेविगेशन",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "भाषा"
   },
   "sidebar": {
     "panelControlSubtitle": "नियंत्रण पैनल"

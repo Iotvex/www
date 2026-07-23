@@ -13,7 +13,7 @@ import { ExternalLink, Plus, Trash2, RefreshCw } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState, useTransition } from "react"
 import { cn } from "@/shared/lib/utils"
-import { EmptyState, PageToolbar } from "@/shared/ui/page-toolbar"
+import { EmptyState, CreateCard, PageToolbar } from "@/shared/ui/page-toolbar"
 
 type Mod = {
   id: string
@@ -84,18 +84,13 @@ export function ModulesPage() {
   return (
     <div className="iotvex-page space-y-4">
       <PageToolbar
-        meta={items.length ? t("metaCount", { count: items.length }) : t("metaEmpty")}
         actions={
-          <>
+          items.length > 0 ? (
             <Button variant="outline" size="sm" disabled={pending} onClick={() => void load()}>
               <RefreshCw className={cn("h-4 w-4", pending && "animate-spin")} />
               {t("refresh")}
             </Button>
-            <Button size="sm" onClick={() => setOpen(true)}>
-              <Plus className="h-4 w-4" />
-              {t("connect")}
-            </Button>
-          </>
+          ) : undefined
         }
       />
 
@@ -103,13 +98,19 @@ export function ModulesPage() {
         <EmptyState
           title={t("emptyTitle")}
           description={t("emptyDescription")}
+          action={
+            <Button size="sm" onClick={() => setOpen(true)}>
+              <Plus className="h-4 w-4" />
+              {t("connect")}
+            </Button>
+          }
         />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {items.map((m, i) => (
             <article
               key={m.id}
-              className="iotvex-card-in iotvex-glass rounded-2xl p-4 transition-colors duration-300 hover:bg-white/[0.06]"
+              className="iotvex-card-in rounded-xl border border-border/60 bg-card/55 p-4 backdrop-blur-xl transition-colors duration-300 hover:bg-card/70 dark:border-white/[0.08] dark:bg-card/40"
               style={{ animationDelay: `${i * 40}ms` }}
             >
               <div className="flex items-start justify-between gap-2">
@@ -154,6 +155,10 @@ export function ModulesPage() {
           ))}
         </div>
       )}
+
+      {items.length > 0 ? (
+        <CreateCard label={t("connect")} onClick={() => setOpen(true)} />
+      ) : null}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

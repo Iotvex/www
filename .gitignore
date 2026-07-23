@@ -1,5 +1,6 @@
 node_modules
 .next
+.env
 .env.local
 .env*.local
 .env.cron
@@ -7,3 +8,10 @@ dist
 supabase/.temp
 supabase/.branches
 config/runtime.secrets.json
+config/cloud-client.env
+config/publish-state.json
+config/publish-run/
+config/runtime.json.bak
+*.log
+.DS_Store
+.vercel

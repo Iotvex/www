@@ -11,8 +11,11 @@ export function MobileNav() {
   const t = useTranslations("nav.mobile")
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/55 pb-safe pl-safe pr-safe backdrop-blur-xl md:hidden">
-      <div className="mx-auto grid max-w-lg grid-cols-4 gap-1 px-2 py-1.5">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 flex items-center border-t border-white/[0.06] bg-black/92 backdrop-blur-xl md:hidden pl-safe pr-safe"
+      style={{ height: "calc(3.25rem + env(safe-area-inset-bottom, 0px))" }}
+    >
+      <div className="relative mx-auto grid w-full max-w-lg grid-cols-4 items-center gap-0.5 px-1">
         {MOBILE_TABS.map((tab) => {
           const active =
             tab.group === "settings"
@@ -28,13 +31,15 @@ export function MobileNav() {
                 e.currentTarget.blur()
               }}
               className={cn(
-                "flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-medium outline-none transition-colors duration-150",
+                "flex h-11 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-medium outline-none transition-colors duration-150",
                 "focus-visible:ring-1 focus-visible:ring-ring/40",
-                active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground",
+                active
+                  ? "bg-primary/12 text-primary"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <Icon className="h-5 w-5" />
-              <span className="truncate">{t(tab.labelKey)}</span>
+              <Icon className="h-6 w-6 shrink-0" strokeWidth={1.75} />
+              <span className="max-w-full truncate leading-none">{t(tab.labelKey)}</span>
             </button>
           )
         })}

@@ -15,7 +15,6 @@ export function DashboardApp() {
   const view = getViewMeta(viewId)
   const tViews = useTranslations("views")
   const title = tViews(`${viewId}.title`)
-  const subtitle = tViews(`${viewId}.subtitle`)
   const [navOpen, setNavOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -91,13 +90,17 @@ export function DashboardApp() {
 
   return (
     <div className="iotvex-shell relative flex overflow-hidden overscroll-none bg-background text-foreground touch-pan-y">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_hsl(var(--primary)/0.05),_transparent_40%)]" />
+      <div className="iotvex-atmosphere" aria-hidden>
+        <span className="iotvex-orb iotvex-orb-a" />
+        <span className="iotvex-orb iotvex-orb-b" />
+        <span className="iotvex-orb iotvex-orb-c" />
+        <span className="iotvex-orb iotvex-orb-d" />
+      </div>
       <div className="relative z-10 flex h-full w-full">
         <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col pl-safe pr-safe">
           <Topbar
             title={title}
-            subtitle={subtitle}
             navOpen={navOpen}
             onNavOpenChange={(open) => {
               blurActive()
@@ -105,7 +108,7 @@ export function DashboardApp() {
             }}
           />
           {/* No top safe-area: opaque status bar already insets. Bottom: home indicator. */}
-          <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-6 md:pb-6">
+          <main className="iotvex-hide-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-6 md:pb-6">
             <ViewHost viewId={viewId} />
           </main>
         </div>

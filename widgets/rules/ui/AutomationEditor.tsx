@@ -387,7 +387,7 @@ export function AutomationEditor({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid max-h-[min(70dvh,640px)] gap-5 overflow-y-auto py-1 pr-1">
+        <div className="grid max-h-[min(70dvh,640px)] gap-4 overflow-y-auto overscroll-contain py-1 [scrollbar-gutter:stable]">
           <div className="grid gap-2">
             <Label htmlFor="automation-name">{t("nameLabel")}</Label>
             <Input
@@ -398,7 +398,7 @@ export function AutomationEditor({
             />
           </div>
 
-          <section className="grid gap-3 rounded-xl border border-border/70 p-3">
+          <section className="grid gap-3 rounded-xl border border-border/60 bg-background/20 p-3">
             <div className="text-sm font-medium">{t("triggerSection")}</div>
             <SegmentedTabs
               value={triggerKind}
@@ -419,6 +419,7 @@ export function AutomationEditor({
                     type="time"
                     value={time}
                     onChange={(event) => setTime(event.target.value)}
+                    className="h-10 max-h-10"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -433,8 +434,8 @@ export function AutomationEditor({
                           onClick={() => toggleDay(d)}
                           className={
                             active
-                              ? "rounded-lg border border-primary/40 bg-primary/12 px-2.5 py-1 text-xs font-medium text-primary"
-                              : "rounded-lg border border-border/70 px-2.5 py-1 text-xs text-muted-foreground"
+                              ? "inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-primary/40 bg-primary/12 px-2.5 text-xs font-medium text-primary"
+                              : "inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-border/70 px-2.5 text-xs text-muted-foreground"
                           }
                         >
                           {t(`weekdays.${d}`)}
@@ -511,7 +512,7 @@ export function AutomationEditor({
             ) : null}
           </section>
 
-          <section className="grid gap-3 rounded-xl border border-border/70 p-3">
+          <section className="grid gap-3 rounded-xl border border-border/60 bg-background/20 p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="text-sm font-medium">{t("conditionsSection")}</div>
               <Button
@@ -648,6 +649,7 @@ export function AutomationEditor({
                       <Label>{t("afterLabel")}</Label>
                       <Input
                         type="time"
+                        className="h-10 max-h-10"
                         value={c.after}
                         onChange={(e) =>
                           setConditions((list) =>
@@ -662,6 +664,7 @@ export function AutomationEditor({
                       <Label>{t("beforeLabel")}</Label>
                       <Input
                         type="time"
+                        className="h-10 max-h-10"
                         value={c.before}
                         onChange={(e) =>
                           setConditions((list) =>
@@ -678,7 +681,7 @@ export function AutomationEditor({
             ))}
           </section>
 
-          <section className="grid gap-3 rounded-xl border border-border/70 p-3">
+          <section className="grid gap-3 rounded-xl border border-border/60 bg-background/20 p-3">
             <div className="text-sm font-medium">{t("actionSection")}</div>
             <FieldSelect
               label={t("entityLabel")}

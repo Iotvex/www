@@ -2,9 +2,12 @@ import type { Metadata, Viewport } from "next"
 import { Manrope, JetBrains_Mono } from "next/font/google"
 import Script from "next/script"
 import { getLocale } from "next-intl/server"
+import { cookies } from "next/headers"
 import { FC, PropsWithChildren } from "react"
 import { getDirection, localeCookieName, type AppLocale } from "@/i18n/config"
 import { getRuntimeConfig } from "@/shared/config/runtime.server"
+import { COLOR_STORAGE_KEY } from "@/shared/config/themes"
+import { isColorThemeId } from "@/shared/lib/user-preferences"
 import "./globals.css"
 
 const manrope = Manrope({ subsets: ["latin", "cyrillic", "cyrillic-ext", "latin-ext"], variable: "--font-sans" })
@@ -45,6 +48,9 @@ export const viewport: Viewport = {
 const RootLayout: FC<PropsWithChildren> = async ({ children }) => {
   const locale = (await getLocale()) as AppLocale
   const dir = getDirection(locale)
+  const cookieStore = await cookies()
+  const colorCookie = cookieStore.get(COLOR_STORAGE_KEY)?.value
+  const bootColor = colorCookie && isColorThemeId(colorCookie) ? colorCookie : "default"
   const runtime = getRuntimeConfig()
   const browserRuntime = {
     supabaseBrowserUrl: runtime.supabaseBrowserUrl,
@@ -56,12 +62,12 @@ const RootLayout: FC<PropsWithChildren> = async ({ children }) => {
   const runtimeBoot = `window.__IOTVEX_RUNTIME__=${JSON.stringify(browserRuntime)};`
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning data-color="default">
+    <html lang={locale} dir={dir} suppressHydrationWarning data-color={bootColor}>
       <body
         className={`${manrope.variable} ${mono.variable} min-h-dvh overscroll-none bg-background font-sans antialiased`}
       >
         <Script id="iotvex-runtime" strategy="beforeInteractive">{runtimeBoot}</Script>
-        <Script id="iotvex-boot" strategy="beforeInteractive">{`(function(){try{var c=localStorage.getItem("iotvex-color-theme");if(c)document.documentElement.setAttribute("data-color",c);var l=localStorage.getItem("${localeCookieName}");if(l){document.cookie="${localeCookieName}="+l+"; path=/; max-age=31536000; samesite=lax";document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";}}catch(e){}})();`}</Script>
+        <Script id="iotvex-boot" strategy="beforeInteractive">{`(function(){try{var d=document.documentElement;function cookie(n){var p=n+"=";var parts=document.cookie.split("; ");for(var i=0;i<parts.length;i++){if(parts[i].indexOf(p)===0)return decodeURIComponent(parts[i].slice(p.length));}return null}var c=localStorage.getItem("iotvex-color-theme")||cookie("iotvex-color-theme");if(c)d.setAttribute("data-color",c);var t=localStorage.getItem("theme")||cookie("iotvex-theme");var dark=t==="dark"||(t!=="light"&&window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);d.classList.toggle("dark",!!dark);d.style.colorScheme=dark?"dark":"light";var l=localStorage.getItem("${localeCookieName}")||cookie("${localeCookieName}");if(l){document.cookie="${localeCookieName}="+l+"; path=/; max-age=31536000; samesite=lax";d.lang=l;d.dir=l==="ar"?"rtl":"ltr";}d.setAttribute("data-boot","1");}catch(e){}})();`}</Script>
         {children}
       </body>
     </html>

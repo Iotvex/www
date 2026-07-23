@@ -15,12 +15,16 @@ const LoginPage: FC = async () => {
   return (
     <RootProvider locale={locale} messages={messages}>
       <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom,0px))] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsl(var(--primary)/0.20),_transparent_55%),radial-gradient(ellipse_at_bottom,_hsl(var(--primary)/0.08),_transparent_50%)]" />
+        <div className="iotvex-atmosphere" aria-hidden>
+          <span className="iotvex-orb iotvex-orb-a" />
+          <span className="iotvex-orb iotvex-orb-b" />
+          <span className="iotvex-orb iotvex-orb-c" />
+        </div>
         <div className="pointer-events-none absolute inset-0 opacity-[0.035] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:48px_48px]" />
         <div className="absolute right-[max(0.75rem,env(safe-area-inset-right,0px))] top-3 z-10 flex items-center gap-2 sm:right-[max(1.5rem,env(safe-area-inset-right,0px))] sm:top-6">
           <ThemeSwitcher />
         </div>
-        <div className="relative w-full max-w-md animate-[iotvex-card-in_480ms_cubic-bezier(0.22,1,0.36,1)_both] iotvex-glass rounded-2xl p-6 shadow-2xl sm:p-8">
+        <div className="relative w-full max-w-md animate-[iotvex-card-in_480ms_cubic-bezier(0.22,1,0.36,1)_both] rounded-xl border border-border/60 bg-card/70 p-6 shadow-2xl backdrop-blur-2xl dark:border-white/[0.08] dark:bg-card/50 sm:p-8">
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
               <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current">

@@ -17,6 +17,18 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       return NextResponse.json({ error: "nothing to update" }, { status: 400 })
     }
     const sb = createAdminClient()
+    if (patch.kind) {
+      const { data: dup, error: dupErr } = await sb
+        .from("dashboard_widgets")
+        .select("id")
+        .eq("kind", String(patch.kind))
+        .neq("id", id)
+        .limit(1)
+      if (dupErr) throw new Error(dupErr.message)
+      if (dup?.length) {
+        return NextResponse.json({ error: "widget kind already exists" }, { status: 409 })
+      }
+    }
     const { data, error } = await sb
       .from("dashboard_widgets")
       .update(patch)

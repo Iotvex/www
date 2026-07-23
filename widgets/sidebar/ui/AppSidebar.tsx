@@ -14,9 +14,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-white/10 px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary">
-          <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-current">
+      <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-white/[0.06] px-3.5 pr-10">
+        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/15 text-primary">
+          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
             <path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8z" />
           </svg>
         </div>
@@ -25,17 +25,17 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           <div className="text-[11px] text-muted-foreground">{tSidebar("panelControlSubtitle")}</div>
         </div>
       </div>
-      <ScrollArea className="flex-1 px-2 py-3">
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 px-2.5 py-2.5">
+        <div className="space-y-3.5">
           {NAV_SECTIONS.map((section, sectionIndex) => (
             <div key={section.id}>
               {sectionIndex > 0 ? (
-                <div className="mb-3 px-3">
-                  <div className="h-px bg-white/10" />
+                <div className="mb-2.5 px-2.5">
+                  <div className="h-px bg-white/[0.06]" />
                 </div>
               ) : null}
               {section.sectionKey ? (
-                <div className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <div className="px-2.5 pb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   {tNav(`sections.${section.sectionKey}`)}
                 </div>
               ) : null}
@@ -53,10 +53,10 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                         e.currentTarget.blur()
                       }}
                       className={cn(
-                        "flex w-full min-h-9 items-center gap-3 rounded-lg px-3 py-2 text-left text-sm outline-none transition-colors duration-150 focus-visible:ring-1 focus-visible:ring-ring/40",
+                        "flex w-full min-h-9 items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm outline-none transition-colors duration-150 focus-visible:ring-1 focus-visible:ring-ring/40",
                         active
                           ? "bg-primary/12 text-primary"
-                          : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground",
+                          : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
                       )}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -75,7 +75,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppSidebar() {
   return (
-    <aside className="iotvex-sidebar-enter hidden h-full w-60 shrink-0 flex-col border-r border-white/10 bg-black/40 text-sidebar-foreground backdrop-blur-xl md:flex">
+    <aside className="iotvex-sidebar-enter hidden h-full w-52 shrink-0 flex-col border-r border-white/[0.08] bg-black/80 text-sidebar-foreground backdrop-blur-2xl md:flex">
       <SidebarNav />
     </aside>
   )

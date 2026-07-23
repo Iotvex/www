@@ -72,7 +72,7 @@
       "dashboard": "Overview",
       "home-devices": "Devices",
       "home-entities": "Entities",
-      "home-areas": "Rooms",
+      "home-areas": "Zones",
       "auto-scenarios": "Automations",
       "auto-scenes": "Scenes",
       "auto-scripts": "Scripts",
@@ -106,8 +106,8 @@
       "subtitle": "Controllable home entities"
     },
     "home-areas": {
-      "title": "Rooms",
-      "subtitle": "Zones and assignments"
+      "title": "Zones",
+      "subtitle": "Assignments"
     },
     "auto-scenarios": {
       "title": "Automations",
@@ -177,7 +177,7 @@
       "entities": "Entities",
       "entitiesOn": "{count} on",
       "entitiesWaitingDiscovery": "waiting for discovery",
-      "rooms": "Rooms",
+      "rooms": "Zones",
       "roomExample": "e.g. {name}",
       "roomsUnassigned": "unassigned",
       "connection": "Connection",
@@ -187,18 +187,19 @@
       "checkingHint": "checking connection",
       "channels": "{count} channels",
       "controllerAvailable": "controller available",
-      "agentNoResponse": "agent is not responding"
+      "agentNoResponse": "agent is not responding",
+      "agentStatus": "Agent status"
     },
     "widgets": {
       "emptyTitle": "Start with your first widget",
-      "emptyDescription": "Add lighting, room, system status, or event log widgets.",
+      "emptyDescription": "Add lighting, zone, system status, or event log widgets.",
       "addFirstWidget": "Add first widget",
       "newTitle": "New widget",
       "editTitle": "Edit widget",
       "nameLabel": "Name",
       "namePlaceholder": "Living room",
       "typeLabel": "Type",
-      "roomLabel": "Room",
+      "roomLabel": "Zone",
       "moveUpAria": "Move widget up",
       "moveDownAria": "Move widget down",
       "moveUp": "Move up",
@@ -212,18 +213,21 @@
       "kinds": {
         "entities": "Entities",
         "lights": "Lights",
-        "area": "Room",
+        "area": "Zone",
         "status": "Status",
         "activity": "Activity"
       },
-      "kindArea": "Room: {room}",
+      "kindArea": "Zone: {room}",
       "noRoomSelected": "not selected",
       "unnamed": "Untitled",
       "noMatchingTitle": "No matching entities",
       "noMatchingAreaDescription": "There are no entities in “{room}” yet.",
       "noMatchingGenericDescription": "Change the filter or add devices in Home.",
       "noData": "no data",
-      "andMore": "And {count} more"
+      "andMore": "And {count} more",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "dragAria": "Drag widget"
     },
     "statusWidget": {
       "controller": "Controller",
@@ -232,7 +236,7 @@
       "catalog": "Catalog",
       "active": "Active",
       "channels": "Channels",
-      "roomsCount": "Rooms: {count}",
+      "roomsCount": "Zones: {count}",
       "devicesAbbrev": "dev."
     },
     "activityWidget": {
@@ -253,9 +257,9 @@
       "controllerUnavailable": "controller unavailable",
       "discover": "Find devices",
       "discoverError": "Could not search for devices",
-      "discoverSuccess": "Found entities: {count}. Names and assignments were saved.",
+      "discoverSuccess": "Found items: {count}.",
       "emptyTitle": "No devices added yet",
-      "emptyDescription": "Start discovery on the network — found devices will appear here. Your names and assignments will be preserved.",
+      "emptyDescription": "Start network discovery — found devices will appear here.",
       "onCount": "{on}/{total} on",
       "areaLabel": "area",
       "unassignedArea": "unassigned",
@@ -263,7 +267,7 @@
       "nameLabel": "Name",
       "areaSelectLabel": "Area",
       "noArea": "No area",
-      "cascadeArea": "Apply room to all device entities"
+      "cascadeArea": "Apply zone to all device entities"
     },
     "entities": {
       "title": "Entities",
@@ -281,26 +285,36 @@
       "deviceLabel": "Device",
       "areaLabel": "Area",
       "noDevice": "No device",
-      "areaSuffixNone": "no area"
+      "areaSuffixNone": "no area",
+      "sortAria": "Sort",
+      "sortNameAsc": "Name A→Z",
+      "sortNameDesc": "Name Z→A",
+      "sortDomain": "By domain",
+      "sortActive": "Active first",
+      "sortId": "By ID",
+      "filterAria": "Filters"
     },
     "areas": {
-      "title": "Rooms",
-      "description": "Zones and assignments",
-      "count": "{count} areas",
-      "add": "Add area",
-      "emptyTitle": "No rooms created yet",
-      "emptyDescription": "Create a room and assign devices. Assignments are preserved during rediscovery.",
+      "title": "Zones",
+      "description": "Assignments",
+      "count": "{count} zones",
+      "add": "Add zone",
+      "emptyTitle": "No zones created yet",
+      "emptyDescription": "Create a zone and assign devices.",
       "devicesAbbrev": "dev.",
       "entitiesAbbrev": "ent.",
       "onAbbrev": "on",
-      "nothingAssigned": "Nothing is assigned to this room yet",
-      "editTitle": "Area",
-      "newTitle": "New area",
+      "nothingAssigned": "Nothing is assigned to this zone yet",
+      "editTitle": "Zone",
+      "newTitle": "New zone",
       "nameLabel": "Name",
       "namePlaceholder": "For example, Living room",
-      "assignDevice": "Assign device",
-      "assignEntity": "Assign entity",
-      "skip": "Skip"
+      "assignDevice": "Devices",
+      "assignEntity": "Entities",
+      "skip": "Skip",
+      "assignHint": "Select a device to attach all its entities. Uncheck ones you want to leave out.",
+      "orphanEntities": "Other entities",
+      "selectedCount": "{devices} devices · {entities} entities"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "Clear log",
     "filterAll": "All",
     "emptyTitle": "Log is empty",
-    "emptyDescription": "Events will appear after controlling devices, running automations, or discovering equipment."
+    "emptyDescription": "Events will appear after controlling devices, running automations, or discovering equipment.",
+    "searchPlaceholder": "Search…",
+    "filterAria": "Filters",
+    "filterKindLabel": "Event type",
+    "sortLabel": "Sort",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTitleAsc": "Title A → Z",
+    "sortTitleDesc": "Title Z → A",
+    "sortKindAsc": "Event type A → Z"
   },
   "modules": {
     "metaCount": "{count} extensions",
@@ -688,7 +711,8 @@
     "logout": "Log out",
     "navigation": "Navigation",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "Language"
   },
   "sidebar": {
     "panelControlSubtitle": "Control panel"

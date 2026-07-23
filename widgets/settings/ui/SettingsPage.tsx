@@ -98,13 +98,8 @@ async function api<T>(url: string, init?: RequestInit, options?: ApiOptions): Pr
   return response.json() as Promise<T>;
 }
 
-function SectionIntro({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="min-w-0 space-y-1">
-      <h2 className="text-sm font-semibold tracking-tight text-foreground">{title}</h2>
-      <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
-    </div>
-  );
+function SectionIntro(_props: { title: string; description?: string }) {
+  return null
 }
 
 export function SettingsPage({ tab = "account" }: { tab?: SettingsTab }) {
@@ -125,11 +120,11 @@ export function SettingsPage({ tab = "account" }: { tab?: SettingsTab }) {
 function AccountPanel() {
   const t = useTranslations("settings");
   const common = useTranslations("common");
+  const tTop = useTranslations("topbar");
   const user = useUnit($user) as CurrentUser | null;
 
   return (
     <section className="space-y-4">
-      <SectionIntro title={t("account.title")} description={t("account.description")} />
       <Card className="iotvex-card-in overflow-hidden">
         <CardHeader className="space-y-1">
           <CardTitle className="text-base">{t("account.profileTitle")}</CardTitle>
@@ -140,6 +135,20 @@ function AccountPanel() {
           <InfoTile label={t("account.idLabel")} value={user?.id ?? common("unknown")} mono />
         </CardContent>
       </Card>
+      <Button
+        variant="secondary"
+        className="w-full"
+        onClick={async () => {
+          try {
+            await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+          } catch {
+            /* ignore */
+          }
+          window.location.href = "/login";
+        }}
+      >
+        {tTop("logout")}
+      </Button>
     </section>
   );
 }
@@ -149,7 +158,6 @@ function AppearanceSection() {
 
   return (
     <section className="space-y-4">
-      <SectionIntro title={t("appearance.title")} description={t("appearance.description")} />
       <Card className="iotvex-card-in overflow-hidden">
         <CardContent className="pt-6">
           <AppearancePanel />
@@ -257,7 +265,6 @@ function ServicesPanel() {
 
   return (
     <section className="space-y-4">
-      <SectionIntro title={t("services.title")} description={t("services.description")} />
       <div className="grid gap-3 sm:grid-cols-2">
         {services.map((service) => (
           <Card key={service.title} className="iotvex-card-in overflow-hidden">
@@ -340,7 +347,6 @@ function UsersPanel() {
 
   return (
     <section className="space-y-4">
-      <SectionIntro title={t("users.title")} description={t("users.description")} />
 
       <Card className="iotvex-card-in overflow-hidden">
         <CardHeader className="space-y-1">
@@ -502,7 +508,6 @@ function BackupPanel() {
 
   return (
     <section className="space-y-4">
-      <SectionIntro title={t("backup.title")} description={t("backup.description")} />
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Card className="iotvex-card-in overflow-hidden">
@@ -606,7 +611,6 @@ function ToolsPanel() {
 
   return (
     <section className="space-y-4">
-      <SectionIntro title={t("tools.title")} description={t("tools.description")} />
 
       <div className="grid gap-3 sm:grid-cols-3">
         <ToolCard

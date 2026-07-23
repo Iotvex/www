@@ -72,7 +72,7 @@
       "dashboard": "概要",
       "home-devices": "デバイス",
       "home-entities": "エンティティ",
-      "home-areas": "部屋",
+      "home-areas": "ゾーン",
       "auto-scenarios": "オートメーション",
       "auto-scenes": "シーン",
       "auto-scripts": "スクリプト",
@@ -106,8 +106,8 @@
       "subtitle": "制御可能なホームエンティティ"
     },
     "home-areas": {
-      "title": "部屋",
-      "subtitle": "ゾーンと割り当て"
+      "title": "ゾーン",
+      "subtitle": "割り当て"
     },
     "auto-scenarios": {
       "title": "オートメーション",
@@ -177,7 +177,7 @@
       "entities": "エンティティ",
       "entitiesOn": "{count} 件オン",
       "entitiesWaitingDiscovery": "検出待ち",
-      "rooms": "部屋",
+      "rooms": "ゾーン",
       "roomExample": "例: {name}",
       "roomsUnassigned": "未割り当て",
       "connection": "接続",
@@ -187,7 +187,8 @@
       "controllerAvailable": "コントローラー利用可能",
       "agentNoResponse": "エージェントが応答していません",
       "checkingValue": "…",
-      "checkingHint": "接続を確認中"
+      "checkingHint": "接続を確認中",
+      "agentStatus": "エージェント状態"
     },
     "widgets": {
       "emptyTitle": "最初のウィジェットから始めましょう",
@@ -198,7 +199,7 @@
       "nameLabel": "名前",
       "namePlaceholder": "リビング",
       "typeLabel": "タイプ",
-      "roomLabel": "部屋",
+      "roomLabel": "ゾーン",
       "moveUpAria": "ウィジェットを上へ移動",
       "moveDownAria": "ウィジェットを下へ移動",
       "deleteConfirm": "ウィジェット「{title}」を削除しますか？",
@@ -209,11 +210,11 @@
       "kinds": {
         "entities": "エンティティ",
         "lights": "照明",
-        "area": "部屋",
+        "area": "ゾーン",
         "status": "状態",
         "activity": "アクティビティ"
       },
-      "kindArea": "部屋: {room}",
+      "kindArea": "ゾーン: {room}",
       "noRoomSelected": "未選択",
       "unnamed": "無題",
       "noMatchingTitle": "一致するエンティティはありません",
@@ -223,7 +224,10 @@
       "andMore": "ほか {count} 件",
       "moveUp": "上へ",
       "moveDown": "下へ",
-      "menuAria": "ウィジェット操作"
+      "menuAria": "ウィジェット操作",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "dragAria": "Drag widget"
     },
     "statusWidget": {
       "controller": "コントローラー",
@@ -232,7 +236,7 @@
       "catalog": "カタログ",
       "active": "アクティブ",
       "channels": "チャンネル",
-      "roomsCount": "部屋: {count}",
+      "roomsCount": "ゾーン: {count}",
       "devicesAbbrev": "デバイス"
     },
     "activityWidget": {
@@ -254,7 +258,7 @@
       "discoverError": "デバイスを検索できませんでした",
       "discoverSuccess": "検出されたエンティティ: {count}。名前と割り当てを保存しました。",
       "emptyTitle": "まだデバイスが追加されていません",
-      "emptyDescription": "ネットワークで検出を開始してください。見つかったデバイスがここに表示されます。名前と割り当ては保持されます。",
+      "emptyDescription": "ネットワーク検出を開始すると、見つかったデバイスがここに表示されます。",
       "onCount": "{on}/{total} オン",
       "areaLabel": "エリア",
       "unassignedArea": "未割り当て",
@@ -262,7 +266,7 @@
       "nameLabel": "名前",
       "areaSelectLabel": "エリア",
       "noArea": "エリアなし",
-      "cascadeArea": "部屋をデバイスのすべてのエンティティに適用",
+      "cascadeArea": "Apply zone to all device entities",
       "nodesOnline": "オンラインノード: {count}"
     },
     "entities": {
@@ -281,26 +285,36 @@
       "deviceLabel": "デバイス",
       "areaLabel": "エリア",
       "noDevice": "デバイスなし",
-      "areaSuffixNone": "エリアなし"
+      "areaSuffixNone": "エリアなし",
+      "sortAria": "並べ替え",
+      "sortNameAsc": "名前 A→Z",
+      "sortNameDesc": "名前 Z→A",
+      "sortDomain": "ドメイン順",
+      "sortActive": "稼働中を先に",
+      "sortId": "ID順",
+      "filterAria": "Filters"
     },
     "areas": {
-      "title": "部屋",
+      "title": "ゾーン",
       "description": "ゾーンと割り当て",
-      "count": "{count} 件のエリア",
-      "add": "エリアを追加",
-      "emptyTitle": "まだ部屋が作成されていません",
-      "emptyDescription": "部屋を作成してデバイスを割り当ててください。再検出時も割り当ては保持されます。",
+      "count": "{count} ゾーン",
+      "add": "ゾーンを追加",
+      "emptyTitle": "No zones created yet",
+      "emptyDescription": "Create a zone and assign devices.",
       "devicesAbbrev": "デバイス",
       "entitiesAbbrev": "エンティティ",
       "onAbbrev": "オン",
-      "nothingAssigned": "この部屋にはまだ何も割り当てられていません",
-      "editTitle": "エリア",
-      "newTitle": "新しいエリア",
+      "nothingAssigned": "Nothing is assigned to this zone yet",
+      "editTitle": "ゾーン",
+      "newTitle": "新しいゾーン",
       "nameLabel": "名前",
       "namePlaceholder": "例: リビング",
       "assignDevice": "デバイスを割り当て",
       "assignEntity": "エンティティを割り当て",
-      "skip": "スキップ"
+      "skip": "スキップ",
+      "assignHint": "Select a device to attach all its entities. Uncheck ones you want to leave out.",
+      "orphanEntities": "Other entities",
+      "selectedCount": "{devices} devices · {entities} entities"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "ログをクリア",
     "filterAll": "すべて",
     "emptyTitle": "ログは空です",
-    "emptyDescription": "デバイス操作、オートメーション実行、機器検出の後にイベントが表示されます。"
+    "emptyDescription": "デバイス操作、オートメーション実行、機器検出の後にイベントが表示されます。",
+    "searchPlaceholder": "Search…",
+    "filterAria": "Filters",
+    "filterKindLabel": "Event type",
+    "sortLabel": "Sort",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTitleAsc": "Title A → Z",
+    "sortTitleDesc": "Title Z → A",
+    "sortKindAsc": "Event type A → Z"
   },
   "modules": {
     "metaCount": "{count} 件の拡張機能",
@@ -688,7 +711,8 @@
     "logout": "ログアウト",
     "navigation": "ナビゲーション",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "言語"
   },
   "sidebar": {
     "panelControlSubtitle": "コントロールパネル"

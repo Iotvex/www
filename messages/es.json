@@ -72,7 +72,7 @@
       "dashboard": "Resumen",
       "home-devices": "Dispositivos",
       "home-entities": "Entidades",
-      "home-areas": "Habitaciones",
+      "home-areas": "Zonas",
       "auto-scenarios": "Automatizaciones",
       "auto-scenes": "Escenas",
       "auto-scripts": "Scripts",
@@ -106,8 +106,8 @@
       "subtitle": "Entidades del hogar controlables"
     },
     "home-areas": {
-      "title": "Habitaciones",
-      "subtitle": "Zonas y asignaciones"
+      "title": "Zonas",
+      "subtitle": "Asignaciones"
     },
     "auto-scenarios": {
       "title": "Automatizaciones",
@@ -177,7 +177,7 @@
       "entities": "Entidades",
       "entitiesOn": "{count} encendidas",
       "entitiesWaitingDiscovery": "en espera de descubrimiento",
-      "rooms": "Habitaciones",
+      "rooms": "Zonas",
       "roomExample": "p. ej., {name}",
       "roomsUnassigned": "sin asignar",
       "connection": "Conexión",
@@ -187,7 +187,8 @@
       "controllerAvailable": "controlador disponible",
       "agentNoResponse": "el agente no responde",
       "checkingValue": "…",
-      "checkingHint": "comprobando conexión"
+      "checkingHint": "comprobando conexión",
+      "agentStatus": "Estado del agente"
     },
     "widgets": {
       "emptyTitle": "Comience con su primer widget",
@@ -198,7 +199,7 @@
       "nameLabel": "Nombre",
       "namePlaceholder": "Sala",
       "typeLabel": "Tipo",
-      "roomLabel": "Habitación",
+      "roomLabel": "Zona",
       "moveUpAria": "Mover widget hacia arriba",
       "moveDownAria": "Mover widget hacia abajo",
       "deleteConfirm": "¿Eliminar el widget “{title}”?",
@@ -209,11 +210,11 @@
       "kinds": {
         "entities": "Entidades",
         "lights": "Luces",
-        "area": "Habitación",
+        "area": "Zona",
         "status": "Estado",
         "activity": "Actividad"
       },
-      "kindArea": "Habitación: {room}",
+      "kindArea": "Zona: {room}",
       "noRoomSelected": "sin seleccionar",
       "unnamed": "Sin título",
       "noMatchingTitle": "No hay entidades coincidentes",
@@ -223,7 +224,10 @@
       "andMore": "Y {count} más",
       "moveUp": "Subir",
       "moveDown": "Bajar",
-      "menuAria": "Acciones del widget"
+      "menuAria": "Acciones del widget",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "dragAria": "Drag widget"
     },
     "statusWidget": {
       "controller": "Controlador",
@@ -232,7 +236,7 @@
       "catalog": "Catálogo",
       "active": "Activo",
       "channels": "Canales",
-      "roomsCount": "Habitaciones: {count}",
+      "roomsCount": "Zonas: {count}",
       "devicesAbbrev": "disp."
     },
     "activityWidget": {
@@ -254,7 +258,7 @@
       "discoverError": "No se pudieron buscar dispositivos",
       "discoverSuccess": "Entidades encontradas: {count}. Se guardaron los nombres y las asignaciones.",
       "emptyTitle": "Aún no se agregaron dispositivos",
-      "emptyDescription": "Inicie el descubrimiento en la red; los dispositivos encontrados aparecerán aquí. Sus nombres y asignaciones se conservarán.",
+      "emptyDescription": "Inicia la detección en la red: los dispositivos encontrados aparecerán aquí.",
       "onCount": "{on}/{total} encendidos",
       "areaLabel": "área",
       "unassignedArea": "sin asignar",
@@ -262,7 +266,7 @@
       "nameLabel": "Nombre",
       "areaSelectLabel": "Área",
       "noArea": "Sin área",
-      "cascadeArea": "Aplicar habitación a todas las entidades del dispositivo",
+      "cascadeArea": "Apply zone to all device entities",
       "nodesOnline": "nodos en línea: {count}"
     },
     "entities": {
@@ -281,26 +285,36 @@
       "deviceLabel": "Dispositivo",
       "areaLabel": "Área",
       "noDevice": "Sin dispositivo",
-      "areaSuffixNone": "sin área"
+      "areaSuffixNone": "sin área",
+      "sortAria": "Ordenar",
+      "sortNameAsc": "Nombre A→Z",
+      "sortNameDesc": "Nombre Z→A",
+      "sortDomain": "Por dominio",
+      "sortActive": "Activos primero",
+      "sortId": "Por ID",
+      "filterAria": "Filters"
     },
     "areas": {
-      "title": "Habitaciones",
+      "title": "Zonas",
       "description": "Zonas y asignaciones",
-      "count": "{count} áreas",
-      "add": "Agregar área",
-      "emptyTitle": "Aún no se crearon habitaciones",
-      "emptyDescription": "Cree una habitación y asigne dispositivos. Las asignaciones se conservan durante el redescubrimiento.",
+      "count": "{count} zonas",
+      "add": "Añadir zona",
+      "emptyTitle": "No zones created yet",
+      "emptyDescription": "Create a zone and assign devices.",
       "devicesAbbrev": "disp.",
       "entitiesAbbrev": "ent.",
       "onAbbrev": "enc.",
-      "nothingAssigned": "Aún no hay nada asignado a esta habitación",
-      "editTitle": "Área",
-      "newTitle": "Nueva área",
+      "nothingAssigned": "Nothing is assigned to this zone yet",
+      "editTitle": "Zona",
+      "newTitle": "Nueva zona",
       "nameLabel": "Nombre",
       "namePlaceholder": "Por ejemplo, Sala",
       "assignDevice": "Asignar dispositivo",
       "assignEntity": "Asignar entidad",
-      "skip": "Omitir"
+      "skip": "Omitir",
+      "assignHint": "Select a device to attach all its entities. Uncheck ones you want to leave out.",
+      "orphanEntities": "Other entities",
+      "selectedCount": "{devices} devices · {entities} entities"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "Limpiar registro",
     "filterAll": "Todo",
     "emptyTitle": "El registro está vacío",
-    "emptyDescription": "Los eventos aparecerán después de controlar dispositivos, ejecutar automatizaciones o descubrir equipos."
+    "emptyDescription": "Los eventos aparecerán después de controlar dispositivos, ejecutar automatizaciones o descubrir equipos.",
+    "searchPlaceholder": "Search…",
+    "filterAria": "Filters",
+    "filterKindLabel": "Event type",
+    "sortLabel": "Sort",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTitleAsc": "Title A → Z",
+    "sortTitleDesc": "Title Z → A",
+    "sortKindAsc": "Event type A → Z"
   },
   "modules": {
     "metaCount": "{count} extensiones",
@@ -688,7 +711,8 @@
     "logout": "Cerrar sesión",
     "navigation": "Navegación",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "Idioma"
   },
   "sidebar": {
     "panelControlSubtitle": "Panel de control"

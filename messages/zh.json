@@ -72,7 +72,7 @@
       "dashboard": "概览",
       "home-devices": "设备",
       "home-entities": "实体",
-      "home-areas": "房间",
+      "home-areas": "区域",
       "auto-scenarios": "自动化",
       "auto-scenes": "场景",
       "auto-scripts": "脚本",
@@ -106,8 +106,8 @@
       "subtitle": "可控制的家庭实体"
     },
     "home-areas": {
-      "title": "房间",
-      "subtitle": "区域与分配"
+      "title": "区域",
+      "subtitle": "绑定"
     },
     "auto-scenarios": {
       "title": "自动化",
@@ -177,7 +177,7 @@
       "entities": "实体",
       "entitiesOn": "{count} 个开启",
       "entitiesWaitingDiscovery": "等待发现",
-      "rooms": "房间",
+      "rooms": "区域",
       "roomExample": "例如 {name}",
       "roomsUnassigned": "未分配",
       "connection": "连接",
@@ -187,7 +187,8 @@
       "controllerAvailable": "控制器可用",
       "agentNoResponse": "代理无响应",
       "checkingValue": "…",
-      "checkingHint": "正在检查连接"
+      "checkingHint": "正在检查连接",
+      "agentStatus": "代理状态"
     },
     "widgets": {
       "emptyTitle": "从第一个小组件开始",
@@ -198,7 +199,7 @@
       "nameLabel": "名称",
       "namePlaceholder": "客厅",
       "typeLabel": "类型",
-      "roomLabel": "房间",
+      "roomLabel": "区域",
       "moveUpAria": "上移小组件",
       "moveDownAria": "下移小组件",
       "deleteConfirm": "删除小组件“{title}”？",
@@ -209,11 +210,11 @@
       "kinds": {
         "entities": "实体",
         "lights": "灯光",
-        "area": "房间",
+        "area": "区域",
         "status": "状态",
         "activity": "活动"
       },
-      "kindArea": "房间：{room}",
+      "kindArea": "区域: {room}",
       "noRoomSelected": "未选择",
       "unnamed": "未命名",
       "noMatchingTitle": "没有匹配的实体",
@@ -223,7 +224,10 @@
       "andMore": "另有 {count} 个",
       "moveUp": "上移",
       "moveDown": "下移",
-      "menuAria": "小组件操作"
+      "menuAria": "小组件操作",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "dragAria": "Drag widget"
     },
     "statusWidget": {
       "controller": "控制器",
@@ -232,7 +236,7 @@
       "catalog": "目录",
       "active": "活跃",
       "channels": "通道",
-      "roomsCount": "房间：{count}",
+      "roomsCount": "区域: {count}",
       "devicesAbbrev": "设备"
     },
     "activityWidget": {
@@ -254,7 +258,7 @@
       "discoverError": "无法搜索设备",
       "discoverSuccess": "已发现实体：{count}。名称和分配已保存。",
       "emptyTitle": "尚未添加设备",
-      "emptyDescription": "在网络中启动发现，找到的设备将显示在这里。您的名称和分配会被保留。",
+      "emptyDescription": "在网络中启动发现，找到的设备将显示在这里。",
       "onCount": "{on}/{total} 开启",
       "areaLabel": "区域",
       "unassignedArea": "未分配",
@@ -262,7 +266,7 @@
       "nameLabel": "名称",
       "areaSelectLabel": "区域",
       "noArea": "无区域",
-      "cascadeArea": "将房间应用到此设备的所有实体",
+      "cascadeArea": "Apply zone to all device entities",
       "nodesOnline": "在线节点: {count}"
     },
     "entities": {
@@ -281,26 +285,36 @@
       "deviceLabel": "设备",
       "areaLabel": "区域",
       "noDevice": "无设备",
-      "areaSuffixNone": "无区域"
+      "areaSuffixNone": "无区域",
+      "sortAria": "排序",
+      "sortNameAsc": "名称 A→Z",
+      "sortNameDesc": "名称 Z→A",
+      "sortDomain": "按域",
+      "sortActive": "活跃优先",
+      "sortId": "按 ID",
+      "filterAria": "Filters"
     },
     "areas": {
-      "title": "房间",
+      "title": "区域",
       "description": "区域与分配",
-      "count": "{count} 个区域",
+      "count": "{count} 区域",
       "add": "添加区域",
-      "emptyTitle": "尚未创建房间",
-      "emptyDescription": "创建房间并分配设备。重新发现时会保留分配。",
+      "emptyTitle": "No zones created yet",
+      "emptyDescription": "Create a zone and assign devices.",
       "devicesAbbrev": "设备",
       "entitiesAbbrev": "实体",
       "onAbbrev": "开",
-      "nothingAssigned": "这个房间还没有分配任何内容",
+      "nothingAssigned": "Nothing is assigned to this zone yet",
       "editTitle": "区域",
       "newTitle": "新建区域",
       "nameLabel": "名称",
       "namePlaceholder": "例如，客厅",
       "assignDevice": "分配设备",
       "assignEntity": "分配实体",
-      "skip": "跳过"
+      "skip": "跳过",
+      "assignHint": "Select a device to attach all its entities. Uncheck ones you want to leave out.",
+      "orphanEntities": "Other entities",
+      "selectedCount": "{devices} devices · {entities} entities"
     }
   },
   "rules": {
@@ -592,7 +606,16 @@
     "clearJournal": "清除日志",
     "filterAll": "全部",
     "emptyTitle": "日志为空",
-    "emptyDescription": "控制设备、运行自动化或发现设备后，事件会显示在这里。"
+    "emptyDescription": "控制设备、运行自动化或发现设备后，事件会显示在这里。",
+    "searchPlaceholder": "Search…",
+    "filterAria": "Filters",
+    "filterKindLabel": "Event type",
+    "sortLabel": "Sort",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "sortTitleAsc": "Title A → Z",
+    "sortTitleDesc": "Title Z → A",
+    "sortKindAsc": "Event type A → Z"
   },
   "modules": {
     "metaCount": "{count} 个扩展",
@@ -688,7 +711,8 @@
     "logout": "退出登录",
     "navigation": "导航",
     "onlineBadge": "online",
-    "documentTitle": "{title} · Iotvex"
+    "documentTitle": "{title} · Iotvex",
+    "language": "语言"
   },
   "sidebar": {
     "panelControlSubtitle": "控制面板"

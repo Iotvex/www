@@ -32,14 +32,14 @@ export function ColorPicker({
         disabled={disabled}
         aria-label="Open color picker"
         className={cn(
-          "h-8 w-8 shrink-0 rounded-md border border-border/70 shadow-sm transition",
-          "hover:ring-2 hover:ring-ring/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "h-8 w-8 shrink-0 rounded-md border border-white/15 transition",
+          "hover:border-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
         style={{ background: preview }}
         onClick={() => setOpen(true)}
       />
-      <span className="truncate font-mono text-xs tabular-nums text-muted-foreground">
+      <span className="truncate font-mono text-[11px] tabular-nums text-muted-foreground/80">
         #{value.map((c) => c.toString(16).padStart(2, "0")).join("")}
       </span>
       <ColorPickerDialog
