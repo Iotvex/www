@@ -161,20 +161,28 @@ export function isObservableEntity(entity: CapEntityLike): boolean {
 /** Intersection of capability lists across selected targets. */
 export function sharedCapabilities(entities: CapEntityLike[]): string[] {
   if (!entities.length) return []
-  let shared: Set<string> | null = null
+  let shared: string[] | null = null
   for (const entity of entities) {
-    const caps = new Set(
-      (entity.capabilities?.length
-        ? entity.capabilities
-        : CONTROLLABLE_DOMAINS.has(domainOf(entity))
-          ? domainOf(entity) === "light"
-            ? ["on_off", "brightness", "color", "effect", "speed"]
-            : ["on_off"]
-          : []) as string[],
-    )
-    shared = shared == null ? caps : new Set([...shared].filter((c) => caps.has(c)))
+    const domain = domainOf(entity)
+    const caps = [
+      ...new Set(
+        (entity.capabilities?.length
+          ? [...entity.capabilities]
+          : CONTROLLABLE_DOMAINS.has(domain)
+            ? domain === "light"
+              ? ["on_off", "brightness", "color", "effect", "speed"]
+              : ["on_off"]
+            : []) as string[],
+      ),
+    ]
+    if (shared == null) {
+      shared = caps
+      continue
+    }
+    const allow = new Set(caps)
+    shared = shared.filter((c) => allow.has(c))
   }
-  return shared ? [...shared] : []
+  return shared ?? []
 }
 
 /** Map 1..100% UI ↔ 1..255 wire byte. */
