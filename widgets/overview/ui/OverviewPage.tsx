@@ -33,9 +33,8 @@ import {
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/shared/lib/utils";
-import { stackItemOffsetClass, stackRadiusStyle } from "@/shared/lib/stack-radius";
+import { stackItemOffsetClass, stackItemOffsetStyle, stackRadiusStyle } from "@/shared/lib/stack-radius";
 
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import {
   Card,
@@ -78,7 +77,8 @@ import {
   type AgentConnection,
 } from "@/entities/device/model/store";
 import { setView } from "@/entities/nav/model/store";
-import { groupEntitiesByDevice } from "@/features/entity-control/ui/EntityCard";
+import { EntityGrid } from "@/features/entity-control/ui/EntityCard";
+import type { DeviceDomain, EntityCapability, EntityState } from "@/entities/device/model/types";
 import { useDashboardEntityViewPrefs } from "@/shared/lib/ui-view-prefs";
 
 type Entity = {
@@ -573,7 +573,6 @@ function SortableWidgetCard({
   areas,
   entities,
   devices,
-  node,
   agentOnline,
   agentConnection,
   onMove,
@@ -896,7 +895,6 @@ function WidgetBody({
   entities,
   areas,
   devices,
-  node,
   agentOnline,
   agentConnection,
   groupByDevice = true,
@@ -905,7 +903,7 @@ function WidgetBody({
   entities: Entity[];
   areas: Area[];
   devices: Device[];
-  node: NodeStatus | null;
+  node?: NodeStatus | null;
   agentOnline: boolean;
   agentConnection: AgentConnection;
   groupByDevice?: boolean;
@@ -974,35 +972,6 @@ function WidgetBody({
     );
   }
 
-  if (!groupByDevice) {
-    const rows = source.slice(0, 8)
-    return (
-      <div className="flex min-w-0 flex-col">
-        {rows.map((entity, index) => (
-          <div
-            key={entityId(entity)}
-            className={cn(
-              "flex min-w-0 items-center justify-between gap-2 border border-white/[0.1] bg-white/[0.04] px-2.5 py-2",
-              stackItemOffsetClass(index),
-            )}
-            style={stackRadiusStyle(index, rows.length, "xl")}
-          >
-            <p className="truncate font-medium text-sm">{entityName(entity)}</p>
-            <Badge variant={entity.state === "on" ? "default" : "secondary"}>
-              {String(entity.state ?? t("widgets.noData"))}
-            </Badge>
-          </div>
-        ))}
-        {source.length > 8 ? (
-          <p className="mt-1.5 text-xs text-muted-foreground">
-            {t("widgets.andMore", { count: source.length - 8 })}
-          </p>
-        ) : null}
-      </div>
-    )
-  }
-
-
   const deviceModels = devices
     .filter((d): d is Device & { id: string; name: string } => Boolean(d.id && d.name))
     .map((d) => ({
@@ -1016,63 +985,27 @@ function WidgetBody({
       meta: d.meta || {},
     }))
 
-  const normalized = source.map((entity) => ({
+  const flatLimit = 8
+  const limited = source.slice(0, flatLimit)
+  const normalized: EntityState[] = limited.map((entity) => ({
     entity_id: entityId(entity),
-    domain: (entity.domain || "other") as import("@/entities/device/model/types").DeviceDomain,
+    domain: (entity.domain || "other") as DeviceDomain,
     name: entityName(entity),
     state: String(entity.state ?? ""),
     attributes: (entity.attributes as Record<string, unknown>) || {},
-    capabilities: [] as import("@/entities/device/model/types").EntityCapability[],
+    capabilities: (entity.capabilities || []) as EntityCapability[],
     area: (entity.area ?? entity.area_id ?? undefined) || undefined,
     device_id: entity.device_id ?? null,
     available: entity.available !== false,
   }))
 
-  const groups = groupEntitiesByDevice(normalized, deviceModels, t("widgets.ungroupedDevice"))
-  const flatLimit = 8
-  let shown = 0
-
-  const visibleGroups = [] as Array<{ key: string; title: string; entities: (typeof normalized)[number][] }>
-  for (const group of groups) {
-    const remaining = flatLimit - shown
-    if (remaining <= 0) break
-    const slice = group.entities.slice(0, remaining) as (typeof normalized)[number][]
-    shown += slice.length
-    visibleGroups.push({ key: group.key, title: group.title, entities: slice })
-  }
-
   return (
-    <div className="flex min-w-0 flex-col">
-      {visibleGroups.map((group, groupIndex) => (
-        <section
-          key={group.key}
-          className={cn(
-            "min-w-0 overflow-hidden border border-white/[0.1] bg-white/[0.04]",
-            stackItemOffsetClass(groupIndex),
-          )}
-          style={stackRadiusStyle(groupIndex, visibleGroups.length, "xl")}
-        >
-          <div className="px-2.5 py-1.5 sm:px-3">
-            <p className="truncate text-xs font-semibold tracking-tight text-foreground/90">
-              {group.title}
-            </p>
-          </div>
-          {group.entities.map((entity) => (
-            <div key={entity.entity_id} className="min-w-0">
-              <div className="h-px w-full bg-white/[0.1]" aria-hidden />
-              <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2 sm:px-3">
-                <p className="truncate text-sm font-medium">{entity.name}</p>
-                <Badge variant={entity.state === "on" ? "default" : "secondary"}>
-                  {entity.state || t("widgets.noData")}
-                  {entity.attributes.unit_of_measurement
-                    ? ` ${String(entity.attributes.unit_of_measurement)}`
-                    : ""}
-                </Badge>
-              </div>
-            </div>
-          ))}
-        </section>
-      ))}
+    <div className="min-w-0">
+      <EntityGrid
+        entities={normalized}
+        devices={deviceModels}
+        groupByDevice={groupByDevice}
+      />
       {source.length > flatLimit ? (
         <p className="mt-1.5 text-xs text-muted-foreground">
           {t("widgets.andMore", { count: source.length - flatLimit })}
@@ -1081,6 +1014,8 @@ function WidgetBody({
     </div>
   );
 }
+
+
 
 function ActivityList() {
   const t = useTranslations("overview");
@@ -1129,7 +1064,7 @@ function ActivityList() {
             "min-w-0 border border-white/[0.1] bg-white/[0.04] px-2.5 py-2",
             stackItemOffsetClass(index),
           )}
-          style={stackRadiusStyle(index, items.length, "xl")}
+          style={{ ...stackItemOffsetStyle(index), ...stackRadiusStyle(index, items.length, "xl") }}
         >
           <div className="flex min-w-0 items-start justify-between gap-2">
             <p className="min-w-0 flex-1 break-words font-medium text-sm leading-snug">

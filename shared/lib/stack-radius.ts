@@ -70,3 +70,8 @@ export function stackRadiusClass(
 export function stackItemOffsetClass(index: number): string {
   return index > 0 ? "-mt-px" : ""
 }
+
+/** Inline overlap so adjacent borders share one pixel (beats margin utilities). */
+export function stackItemOffsetStyle(index: number): CSSProperties {
+  return index > 0 ? { marginTop: -1 } : {}
+}

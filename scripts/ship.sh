@@ -26,13 +26,27 @@ if ! command -v vercel >/dev/null 2>&1; then
   exit 0
 fi
 
-# Until Vercel GitHub App is installed on the Iotvex org, deploy from the tree.
+if ! vercel whoami >/dev/null 2>&1; then
+  echo "vercel CLI token invalid — GitHub push done; alias skipped"
+  echo "Repo: https://github.com/Iotvex/www"
+  echo "Prod (current): https://iotvex-www.vercel.app"
+  echo "Prod (alias may be stale): https://iotvex.vercel.app"
+  echo "Re-auth: vercel login"
+  exit 0
+fi
+
+# GitHub→Vercel builds Production; CLI deploy+alias keeps custom domains in sync.
 DEPLOY_URL="$(vercel deploy --prod --yes --scope xlebp-rjanois-projects | tee /dev/stderr | grep -Eo 'https://iotvex-[a-z0-9]+-xlebp-rjanois-projects\.vercel\.app' | tail -1 || true)"
 if [[ -n "${DEPLOY_URL:-}" ]]; then
-  vercel alias set "$DEPLOY_URL" iotvex.vercel.app --scope xlebp-rjanois-projects || true
-  vercel alias set "$DEPLOY_URL" iotvex-www.vercel.app --scope xlebp-rjanois-projects || true
+  if ! vercel alias set "$DEPLOY_URL" iotvex-www.vercel.app --scope xlebp-rjanois-projects; then
+    echo "WARN: could not alias iotvex-www.vercel.app (vercel token?)"
+  fi
+  if ! vercel alias set "$DEPLOY_URL" iotvex.vercel.app --scope xlebp-rjanois-projects; then
+    echo "WARN: iotvex.vercel.app alias failed — use https://iotvex-www.vercel.app until CLI re-auth"
+  fi
 fi
 
 echo "Shipped."
 echo "Repo: https://github.com/Iotvex/www"
-echo "Prod: https://iotvex.vercel.app"
+echo "Prod (current): https://iotvex-www.vercel.app"
+echo "Prod (alias may be stale): https://iotvex.vercel.app"

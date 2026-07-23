@@ -34,7 +34,7 @@ import {
   pctToByte,
 } from "@/shared/lib/home/action-options"
 import { cn } from "@/shared/lib/utils"
-import { stackItemOffsetClass, stackRadiusClass, stackRadiusStyle } from "@/shared/lib/stack-radius"
+import { stackItemOffsetClass, stackItemOffsetStyle, stackRadiusClass, stackRadiusStyle } from "@/shared/lib/stack-radius"
 import {
   Atom,
   Binary,
@@ -595,7 +595,7 @@ function DeviceEntityCard({
 
   return (
     <div
-      style={{ ...style, ...stackRadiusStyle(stackIndex, stackTotal, "xl") }}
+      style={{ ...style, ...stackItemOffsetStyle(stackIndex), ...stackRadiusStyle(stackIndex, stackTotal, "xl") }}
       className={cn(
         "iotvex-card-in relative min-w-0 overflow-hidden border border-white/[0.1] bg-black/50 transition-[background-color,box-shadow] duration-300",
         "hover:z-[1] hover:bg-black/60",
