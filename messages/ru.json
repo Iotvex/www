@@ -339,7 +339,9 @@
       "deleteConfirm": "Удалить сценарий «{name}»?",
       "loadError": "Не удалось загрузить",
       "updateError": "Не удалось обновить",
-      "deleteError": "Не удалось удалить"
+      "deleteError": "Не удалось удалить",
+      "runError": "Не удалось запустить сценарий",
+      "running": "Запуск…"
     },
     "scenes": {
       "title": "Сцены",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "Действие не задано",
       "fallbackAction": "действие",
-      "fallbackTarget": "объект"
-    }
+      "fallbackTarget": "объект",
+      "multi": "{kind} → {count} целей"
+    },
+    "targetsLabel": "Цели",
+    "selectAllTargets": "Выбрать все",
+    "targetsHint": "{count, plural, one {Выбрано # устройство} few {Выбрано # устройства} many {Выбрано # устройств} other {Выбрано # устройств}}",
+    "targetsRequired": "Выберите хотя бы одну цель"
   },
   "settings": {
     "account": {

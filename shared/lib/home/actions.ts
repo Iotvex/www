@@ -13,11 +13,49 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function asEntityIds(
+  target: Record<string, unknown> | undefined,
+  fallback?: unknown,
+): string[] {
+  const raw = target?.entity_id ?? fallback
+  if (Array.isArray(raw)) {
+    return [...new Set(raw.map((v) => String(v || "").trim()).filter(Boolean))]
+  }
+  const one = String(raw || "").trim()
+  return one ? [one] : []
+}
+
 function asEntityId(target: Record<string, unknown> | undefined): string {
-  if (!target) return ""
-  const raw = target.entity_id
-  if (Array.isArray(raw)) return String(raw[0] || "")
-  return String(raw || "")
+  return asEntityIds(target)[0] || ""
+}
+
+const EFFECT_NAME_TO_ID: Record<string, number> = {
+  solid: 0,
+  rainbow: 1,
+  chase: 2,
+  pulse: 3,
+  sparkle: 4,
+  theater: 5,
+  fire: 6,
+  comet: 7,
+  wave: 8,
+  scanner: 9,
+  twinkle: 10,
+  gradient: 11,
+  color_loop: 12,
+  snow: 13,
+}
+
+/** Accept wire id or effect name string from older automations. */
+function resolveEffectId(value: unknown): number | undefined {
+  if (value == null) return undefined
+  if (typeof value === "number" && Number.isFinite(value)) return Math.trunc(value)
+  const raw = String(value).trim()
+  if (!raw) return undefined
+  const asNum = Number(raw)
+  if (Number.isFinite(asNum)) return Math.trunc(asNum)
+  const named = EFFECT_NAME_TO_ID[raw.toLowerCase()]
+  return named != null ? named : undefined
 }
 
 /** Normalize HA-style or short verbs into a domain-agnostic verb. */
@@ -92,8 +130,8 @@ async function controlIotvexStrip(
   if (typeof data.g === "number") body.g = data.g
   if (typeof data.b === "number") body.b = data.b
 
-  if (data.effect != null) body.effect = Number(data.effect)
-  if (data.effect_id != null) body.effect = Number(data.effect_id)
+  const effectId = resolveEffectId(data.effect ?? data.effect_id)
+  if (effectId != null) body.effect = effectId
   if (typeof data.speed === "number") body.speed = Number(data.speed)
 
   const strip: ProtoStrip = {
@@ -179,9 +217,30 @@ export async function runHomeAction(action: Record<string, unknown>): Promise<Re
   }
 
   const target = (action.target || {}) as Record<string, unknown>
-  const entityId = asEntityId(target) || String(action.entity_id || "")
-  if (!entityId) return { ok: false, skipped: true, reason: "no entity_id" }
+  const entityIds = asEntityIds(target, action.entity_id)
+  if (!entityIds.length) return { ok: false, skipped: true, reason: "no entity_id" }
 
+  // One action → many targets (same payload), not N duplicate automation rows.
+  if (entityIds.length > 1) {
+    const results = []
+    for (const id of entityIds) {
+      results.push(
+        await runHomeAction({
+          ...action,
+          entity_id: id,
+          target: { entity_id: id },
+        }),
+      )
+    }
+    return {
+      ok: results.every((r) => Boolean((r as { ok?: boolean }).ok)),
+      multi: true,
+      entity_ids: entityIds,
+      results,
+    }
+  }
+
+  const entityId = entityIds[0]
   const entity = await loadEntity(entityId)
   const state = await loadState(entityId)
   const domain = entity?.domain || entityId.split(".")[0] || "home"

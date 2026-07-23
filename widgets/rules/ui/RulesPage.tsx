@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useUnit } from "effector-react";
 import { useTranslations } from "next-intl";
+import { Play } from "lucide-react";
 
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -31,6 +32,12 @@ import {
   SegmentedTabs,
 } from "@/shared/ui/page-toolbar";
 import { PageListSkeleton } from "@/shared/ui/skeleton";
+import { cn } from "@/shared/lib/utils";
+import {
+  stackItemOffsetClass,
+  stackItemOffsetStyle,
+  stackRadiusStyle,
+} from "@/shared/lib/stack-radius";
 import { $entities } from "@/entities/device/model/store";
 import {
   AutomationEditor,
@@ -159,6 +166,7 @@ function AutomationsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<AutomationItem | null>(null);
+  const [runningId, setRunningId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -209,6 +217,18 @@ function AutomationsPanel() {
     }
   };
 
+  const runNow = async (item: AutomationItem) => {
+    setRunningId(item.id);
+    setError(null);
+    try {
+      await api(`/api/automations/${item.id}/run`, { method: "POST" }, requestError);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : t("automations.runError"));
+    } finally {
+      setRunningId(null);
+    }
+  };
+
   const openCreate = () => {
     setEditing(null);
     setDialogOpen(true);
@@ -241,40 +261,64 @@ function AutomationsPanel() {
         />
       ) : null}
 
-      <div className="grid gap-2">
-        {!loading && items.map((item) => (
-          <Card key={item.id} className="iotvex-card-in min-w-0 overflow-hidden">
-            <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-2.5 sm:p-3">
-              <div className="min-w-0 space-y-1.5">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <CardTitle className="truncate text-sm sm:text-base">{item.name}</CardTitle>
-                  <Badge variant={item.enabled === false ? "secondary" : "success"}>
-                    {item.enabled === false ? t("automations.inactive") : t("automations.active")}
-                  </Badge>
+      <div className="grid gap-0">
+        {!loading &&
+          items.map((item, index) => (
+            <div
+              key={item.id}
+              className={cn(
+                "iotvex-card-in iotvex-surface min-w-0 overflow-hidden border border-border/50",
+                stackItemOffsetClass(index),
+              )}
+              style={{
+                ...stackItemOffsetStyle(index),
+                ...stackRadiusStyle(index, items.length, "xl"),
+              }}
+            >
+              <div className="flex flex-row items-start justify-between gap-2 p-2.5 sm:p-3">
+                <div className="min-w-0 space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <h3 className="truncate text-sm font-semibold tracking-tight sm:text-base">
+                      {item.name}
+                    </h3>
+                    <Badge variant={item.enabled === false ? "secondary" : "success"}>
+                      {item.enabled === false
+                        ? t("automations.inactive")
+                        : t("automations.active")}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant="outline">{triggerLabel(item, tEditor)}</Badge>
+                    <Badge variant="outline">{actionLabel(item, tEditor)}</Badge>
+                  </div>
                 </div>
-                <CardDescription className="flex flex-wrap gap-1.5">
-                  <Badge variant="outline">{triggerLabel(item, tEditor)}</Badge>
-                  <Badge variant="outline">{actionLabel(item, tEditor)}</Badge>
-                </CardDescription>
+                <div className="flex items-center gap-2 self-start">
+                  <Switch
+                    checked={item.enabled !== false}
+                    onCheckedChange={(checked: boolean) => void toggleEnabled(item, checked)}
+                    aria-label={t("automations.enableAria")}
+                  />
+                </div>
               </div>
-              <div className="flex items-center gap-2 self-start">
-                <Switch
-                  checked={item.enabled !== false}
-                  onCheckedChange={(checked: boolean) => void toggleEnabled(item, checked)}
-                  aria-label={t("automations.enableAria")}
-                />
+              <div className="flex flex-wrap gap-1.5 px-2.5 pb-2.5 sm:px-3 sm:pb-3">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={runningId === item.id}
+                  onClick={() => void runNow(item)}
+                >
+                  <Play className="mr-1.5 h-3.5 w-3.5" />
+                  {runningId === item.id ? t("automations.running") : common("run")}
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => openEdit(item)}>
+                  {common("edit")}
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => void remove(item)}>
+                  {common("delete")}
+                </Button>
               </div>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-1.5 p-2.5 pt-0 sm:p-3 sm:pt-0">
-              <Button size="sm" variant="secondary" onClick={() => openEdit(item)}>
-                {common("edit")}
-              </Button>
-              <Button size="sm" variant="destructive" onClick={() => void remove(item)}>
-                {common("delete")}
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+          ))}
       </div>
 
       {items.length > 0 ? (

@@ -339,7 +339,9 @@
       "deleteConfirm": "¿Eliminar la automatización “{name}”?",
       "loadError": "No se pudo cargar",
       "updateError": "No se pudo actualizar",
-      "deleteError": "No se pudo eliminar"
+      "deleteError": "No se pudo eliminar",
+      "runError": "Could not run automation",
+      "running": "Running…"
     },
     "scenes": {
       "title": "Escenas",
@@ -443,8 +445,13 @@
     "actionLabels": {
       "undefined": "La acción no está definida",
       "fallbackAction": "acción",
-      "fallbackTarget": "entidad"
-    }
+      "fallbackTarget": "entidad",
+      "multi": "{kind} → {count} targets"
+    },
+    "targetsLabel": "Targets",
+    "selectAllTargets": "Select all",
+    "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
+    "targetsRequired": "Select at least one target"
   },
   "settings": {
     "account": {
