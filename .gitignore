@@ -15,3 +15,5 @@ config/runtime.json.bak
 *.log
 .DS_Store
 .vercel
+tsconfig.tsbuildinfo
+docker-compose.yml.bak.port
