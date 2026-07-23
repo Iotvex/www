@@ -291,8 +291,8 @@
       "sortNameDesc": "名前 Z→A",
       "sortDomain": "ドメイン順",
       "sortActive": "稼働中を先に",
-      "sortId": "ID順",
-      "filterAria": "Filters"
+      "filterAria": "Filters",
+      "sortDevice": "デバイス別"
     },
     "areas": {
       "title": "ゾーン",
@@ -668,7 +668,9 @@
         "hex": "Hex",
         "presets": "プリセット"
       }
-    }
+    },
+    "unboundDevice": "未割当",
+    "groupCount": "{count} 件"
   },
   "theme": {
     "ariaLabel": "外観",

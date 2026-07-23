@@ -291,8 +291,8 @@
       "sortNameDesc": "Nombre Z→A",
       "sortDomain": "Por dominio",
       "sortActive": "Activos primero",
-      "sortId": "Por ID",
-      "filterAria": "Filters"
+      "filterAria": "Filters",
+      "sortDevice": "Por dispositivo"
     },
     "areas": {
       "title": "Zonas",
@@ -668,7 +668,9 @@
         "hex": "Hex",
         "presets": "Presets"
       }
-    }
+    },
+    "unboundDevice": "Sin asignar",
+    "groupCount": "{count} en el grupo"
   },
   "theme": {
     "ariaLabel": "Apariencia",

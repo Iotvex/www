@@ -291,8 +291,8 @@
       "sortNameDesc": "名称 Z→A",
       "sortDomain": "按域",
       "sortActive": "活跃优先",
-      "sortId": "按 ID",
-      "filterAria": "Filters"
+      "filterAria": "Filters",
+      "sortDevice": "按设备"
     },
     "areas": {
       "title": "区域",
@@ -668,7 +668,9 @@
         "hex": "Hex",
         "presets": "预设"
       }
-    }
+    },
+    "unboundDevice": "未分配",
+    "groupCount": "{count} 个"
   },
   "theme": {
     "ariaLabel": "外观",

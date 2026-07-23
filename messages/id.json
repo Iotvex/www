@@ -291,8 +291,8 @@
       "sortNameDesc": "Nama Z→A",
       "sortDomain": "Berdasarkan domain",
       "sortActive": "Aktif dulu",
-      "sortId": "Berdasarkan ID",
-      "filterAria": "Filters"
+      "filterAria": "Filters",
+      "sortDevice": "By device"
     },
     "areas": {
       "title": "Zona",
@@ -668,7 +668,9 @@
         "hex": "Hex",
         "presets": "Preset"
       }
-    }
+    },
+    "unboundDevice": "Unassigned",
+    "groupCount": "{count} in group"
   },
   "theme": {
     "ariaLabel": "Tampilan",

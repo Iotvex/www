@@ -291,8 +291,8 @@
       "sortNameDesc": "الاسم ي→أ",
       "sortDomain": "حسب المجال",
       "sortActive": "النشطة أولاً",
-      "sortId": "حسب المعرف",
-      "filterAria": "Filters"
+      "filterAria": "Filters",
+      "sortDevice": "By device"
     },
     "areas": {
       "title": "المناطق",
@@ -668,7 +668,9 @@
         "hex": "Hex",
         "presets": "إعدادات"
       }
-    }
+    },
+    "unboundDevice": "Unassigned",
+    "groupCount": "{count} in group"
   },
   "theme": {
     "ariaLabel": "المظهر",

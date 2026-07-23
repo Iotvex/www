@@ -291,8 +291,8 @@
       "sortNameDesc": "नाम Z→A",
       "sortDomain": "डोमेन के अनुसार",
       "sortActive": "पहले सक्रिय",
-      "sortId": "ID के अनुसार",
-      "filterAria": "Filters"
+      "filterAria": "Filters",
+      "sortDevice": "डिवाइस से"
     },
     "areas": {
       "title": "ज़ोन",
@@ -668,7 +668,9 @@
         "hex": "Hex",
         "presets": "प्रीसेट"
       }
-    }
+    },
+    "unboundDevice": "असाइन नहीं",
+    "groupCount": "{count} समूह में"
   },
   "theme": {
     "ariaLabel": "दिखावट",
