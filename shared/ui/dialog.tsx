@@ -32,11 +32,16 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, onOpenAutoFocus, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      onOpenAutoFocus={(event) => {
+        // Never auto-focus inputs on open (avoids mobile keyboard popping up).
+        event.preventDefault()
+        onOpenAutoFocus?.(event)
+      }}
       className={cn(
         // Always top-anchored; custom CSS animates top → down (no left/right slide).
         "iotvex-dialog-panel fixed left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-md -translate-x-1/2 gap-4 border border-border/60 bg-background p-5 shadow-lg",
@@ -77,7 +82,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:space-x-2 sm:gap-0",
+      "flex flex-row flex-wrap items-center justify-end gap-2",
       className
     )}
     {...props}

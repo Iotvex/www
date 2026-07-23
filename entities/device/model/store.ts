@@ -363,18 +363,20 @@ export const fetchAgentHealthFx = createEffect(async (): Promise<boolean> => {
   }
 })
 
-export const setStripFx = createEffect(async (payload: StripPatch) => {
-  const { index, ...body } = payload
+export const setStripFx = createEffect(async (payload: StripPatch & { node_id?: number }) => {
+  const { index, node_id, ...body } = payload
   const res = await fetch(`/api/iotvex/strips/${index}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...body, ...(node_id != null ? { node_id } : {}) }),
+    signal: abortAfter(3000),
   })
   if (!res.ok) {
     const t = await res.text()
     throw new Error(t || `HTTP ${res.status}`)
   }
-  return (await res.json()) as IotvexNode
+  // Fire-and-forget: server no longer returns a full decoded node.
+  return null as IotvexNode | null
 })
 
 export const callEntityFx = createEffect(
@@ -383,17 +385,23 @@ export const callEntityFx = createEffect(
     if (!patch) {
       throw new Error(`Strip control unavailable for ${cmd.entity_id}`)
     }
+    const entity = entities.find((e) => e.entity_id === cmd.entity_id)
+    const nodeId = Number(entity?.attributes.node_id)
     const { index, ...body } = patch
     const res = await fetch(`/api/iotvex/strips/${index}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        ...body,
+        ...(Number.isFinite(nodeId) ? { node_id: nodeId } : {}),
+      }),
+      signal: abortAfter(3000),
     })
     if (!res.ok) {
       const txt = await res.text()
       throw new Error(txt || `HTTP ${res.status}`)
     }
-    return (await res.json()) as IotvexNode
+    return null as IotvexNode | null
   },
 )
 
@@ -417,28 +425,11 @@ export const $devices = createStore<Device[]>([])
 export const $nodes = createStore<IotvexNode[]>([])
   .on(setNodes, (_, v) => v)
   .on(fetchNodeFx.doneData, (_, v) => v.nodes)
-  .on(setStripFx.doneData, (prev, node) => {
-    const i = prev.findIndex((n) => n.node_id === node.node_id)
-    if (i === -1) return [...prev, node]
-    const next = prev.slice()
-    next[i] = node
-    return next
-  })
-  .on(callEntityFx.doneData, (prev, node) => {
-    if (!node) return prev
-    const i = prev.findIndex((n) => n.node_id === node.node_id)
-    if (i === -1) return [...prev, node]
-    const next = prev.slice()
-    next[i] = node
-    return next
-  })
 
 /** Primary light node (compat for strip count / host in overview). */
 export const $node = createStore<IotvexNode | null>(null)
   .on(setNode, (_, v) => v)
   .on(fetchNodeFx.doneData, (_, v) => pickLightNodeView(v.nodes) ?? v.nodes[0] ?? null)
-  .on(setStripFx.doneData, (_, v) => v)
-  .on(callEntityFx.doneData, (state, v) => v ?? state)
 
 export const $nodeError = createStore<string | null>(null)
   .on(setNodeError, (_, v) => v)
@@ -663,36 +654,6 @@ sample({
   source: combine($devices, $stripLiveMergePaused),
   filter: ([, paused]) => !paused,
   fn: ([prev], payload) => mergeLiveDevicesOntoCatalog(prev, payload.nodes),
-  target: setDevices,
-})
-
-sample({
-  clock: setStripFx.doneData,
-  source: $entities,
-  fn: (prev, node) => mergeLiveOntoCatalog(prev, [node]),
-  target: setEntities,
-})
-
-sample({
-  clock: setStripFx.doneData,
-  source: $devices,
-  fn: (prev, node) => mergeLiveDevicesOntoCatalog(prev, [node]),
-  target: setDevices,
-})
-
-sample({
-  clock: callEntityFx.doneData,
-  source: $entities,
-  filter: (_prev, node) => node != null,
-  fn: (prev, node) => mergeLiveOntoCatalog(prev, [node as IotvexNode]),
-  target: setEntities,
-})
-
-sample({
-  clock: callEntityFx.doneData,
-  source: $devices,
-  filter: (_prev, node) => node != null,
-  fn: (prev, node) => mergeLiveDevicesOntoCatalog(prev, [node as IotvexNode]),
   target: setDevices,
 })
 

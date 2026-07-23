@@ -780,8 +780,3 @@ body::-webkit-scrollbar,
   background: rgba(0, 0, 0, 0.03);
   border-color: rgba(0, 0, 0, 0.08);
 }
-
-.iotvex-strip-matrix {
-  display: block;
-  image-rendering: auto;
-}

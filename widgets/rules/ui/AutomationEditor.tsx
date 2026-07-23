@@ -360,7 +360,10 @@ export function AutomationEditor({
     setEffect(resolveEffectNumber(data.effect ?? data.effect_id ?? 0))
     setSpeedPct(byteToPct(Number(data.speed ?? 128)))
     setError(null)
-  }, [firstEntityId, item, lightIds, open])
+    // Only re-hydrate when the dialog opens or the edited automation changes —
+    // never when live entity lists refresh (that was resetting the color picker).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, item?.id])
 
   useEffect(() => {
     if (!verbOptions.some((o) => o.value === verb)) {

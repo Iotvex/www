@@ -40,23 +40,40 @@ import {
   Binary,
   Droplets,
   Gauge,
+  Lightbulb,
   MoreHorizontal,
   Pencil,
   Power,
+  Sparkles,
   Sun,
+  SunDim,
   Thermometer,
   Timer,
   ToggleLeft,
   Wind,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { StripMatrixIcon } from "@/features/entity-control/ui/StripMatrixIcon"
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react"
 
+/** Pick a Lucide mark from entity kind — LED strip vs dimmable/PWM vs sensors. */
 function DomainIcon({ entity, className }: { entity: EntityState; className?: string }) {
   const cls = String(entity.attributes.device_class || "")
   const iconCls = cn("h-4 w-4", className)
-  if (entity.domain === "light") return <Power className={iconCls} />
+  const stripIndex = Number(entity.attributes.strip_index)
+  const isLedStrip =
+    entity.domain === "light" &&
+    (Number.isFinite(stripIndex) ||
+      hasCapability(entity, "effect") ||
+      hasCapability(entity, "speed") ||
+      entity.attributes.platform === "iotvex")
+  const isPwmLike =
+    entity.domain === "light" &&
+    !isLedStrip &&
+    (hasCapability(entity, "brightness") || hasCapability(entity, "color"))
+
+  if (isLedStrip) return <Sparkles className={iconCls} />
+  if (isPwmLike) return <SunDim className={iconCls} />
+  if (entity.domain === "light") return <Lightbulb className={iconCls} />
   if (entity.domain === "switch") return <ToggleLeft className={iconCls} />
   if (hasCapability(entity, "temperature") || cls === "temperature")
     return <Thermometer className={iconCls} />
@@ -205,6 +222,7 @@ export function EntityControls({
   const [localBriPct, setLocalBriPct] = useState(() => byteToPct(brightness))
   const [localSpeedPct, setLocalSpeedPct] = useState(() => byteToPct(speed))
   const [localRgb, setLocalRgb] = useState<Rgb>([255, 255, 255])
+  const [colorOpen, setColorOpen] = useState(false)
   const [toggling, setToggling] = useState(false)
   const [briOpen, setBriOpen] = useState(false)
   const [speedOpen, setSpeedOpen] = useState(false)
@@ -229,7 +247,11 @@ export function EntityControls({
 
   useEffect(() => setLocalBriPct(byteToPct(brightness)), [brightness])
   useEffect(() => setLocalSpeedPct(byteToPct(speed)), [speed])
-  useEffect(() => setLocalRgb(rgb), [rgb])
+  useEffect(() => {
+    // Do not clobber the draft while the color picker dialog is open.
+    if (colorOpen) return
+    setLocalRgb(rgb)
+  }, [rgb, colorOpen])
 
   const commitColor = (next: Rgb) => {
     setLocalRgb(next)
@@ -330,18 +352,14 @@ export function EntityControls({
     <div className={cn("space-y-2", compact ? "py-2.5" : "")}>
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
-          {isLightStrip ? (
-            <StripMatrixIcon entity={entity} />
-          ) : (
-            <div
-              className={cn(
-                "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.03] text-muted-foreground backdrop-blur-md",
-                entity.available && on && "border-primary/20 bg-primary/10 text-primary",
-              )}
-            >
-              <DomainIcon entity={entity} className="h-3.5 w-3.5" />
-            </div>
-          )}
+          <div
+            className={cn(
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.03] text-muted-foreground backdrop-blur-md",
+              entity.available && on && "border-primary/20 bg-primary/10 text-primary",
+            )}
+          >
+            <DomainIcon entity={entity} className="h-3.5 w-3.5" />
+          </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium tracking-tight">{entity.name}</p>
             {!entity.available ? (
@@ -458,6 +476,7 @@ export function EntityControls({
                     disabled={!entity.available || toggling}
                     onChange={setLocalRgb}
                     onCommit={commitColor}
+                    onOpenChange={setColorOpen}
                   />
                 </div>
               ) : null}

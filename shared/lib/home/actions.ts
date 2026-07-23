@@ -101,6 +101,14 @@ async function controlIotvexStrip(
   data: Record<string, unknown>,
   currentOn?: boolean,
   preferredNodeId?: number,
+  current?: {
+    brightness?: number
+    r?: number
+    g?: number
+    b?: number
+    effect?: number
+    speed?: number
+  },
 ) {
   const body: Record<string, unknown> = {}
 
@@ -137,40 +145,51 @@ async function controlIotvexStrip(
   const strip: ProtoStrip = {
     index,
     on: Boolean(body.on ?? true),
-    brightness: Number(body.brightness ?? 255),
-    r: Number(body.r ?? 255),
-    g: Number(body.g ?? 255),
-    b: Number(body.b ?? 255),
-    effect: Number(body.effect ?? 0),
-    speed: Number(body.speed ?? 128),
+    brightness: Number(body.brightness ?? current?.brightness ?? 255),
+    r: Number(body.r ?? current?.r ?? 255),
+    g: Number(body.g ?? current?.g ?? 255),
+    b: Number(body.b ?? current?.b ?? 255),
+    effect: Number(body.effect ?? current?.effect ?? 0),
+    speed: Number(body.speed ?? current?.speed ?? 128),
   }
 
-  // Agent is opaque pipe — pack SET_STRIP here, never /node/strips/*
-  const listRes = await fetch(`${AGENT}/nodes`, { cache: "no-store" })
-  if (!listRes.ok) {
-    return { ok: false, status: listRes.status, platform: "iotvex", index, body: strip }
-  }
-  const listBody = (await listRes.json()) as { nodes?: AgentOpaqueNode[] }
-  const nodes = listBody.nodes || []
-  const byId =
-    preferredNodeId != null
-      ? nodes.find((n) => Number(n.node_id) === Number(preferredNodeId))
-      : undefined
-  const light = byId || pickLightOpaqueNode(nodes)
-  if (!light) {
-    return { ok: false, status: 503, platform: "iotvex", index, body: strip, error: "no light node" }
+  // Prefer known node_id — skip slow /nodes round-trip when possible.
+  let nodeId =
+    preferredNodeId != null && Number.isFinite(preferredNodeId) && preferredNodeId > 0
+      ? Number(preferredNodeId)
+      : null
+
+  if (nodeId == null) {
+    try {
+      const listRes = await fetch(`${AGENT}/nodes`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(1500),
+      })
+      if (!listRes.ok) {
+        return { ok: false, status: listRes.status, platform: "iotvex", index, body: strip }
+      }
+      const listBody = (await listRes.json()) as { nodes?: AgentOpaqueNode[] }
+      const light = pickLightOpaqueNode(listBody.nodes || [])
+      if (!light) {
+        return { ok: false, status: 503, platform: "iotvex", index, body: strip, error: "no light node" }
+      }
+      nodeId = Number(light.node_id)
+    } catch (e) {
+      return { ok: false, status: 502, platform: "iotvex", index, body: strip, error: String(e) }
+    }
   }
 
-  const res = await fetch(`${AGENT}/node/${light.node_id}/command`, {
+  const res = await fetch(`${AGENT}/node/${nodeId}/command`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(2500),
     body: JSON.stringify({
       msg_type: MSG.SET_STRIP,
       payload_b64: packSetStripPayload(strip),
-      need_ack: true,
+      need_ack: false,
     }),
   })
-  return { ok: res.ok, status: res.status, platform: "iotvex", index, body: strip, node_id: light.node_id }
+  return { ok: res.ok, status: res.status, platform: "iotvex", index, body: strip, node_id: nodeId }
 }
 
 /**
@@ -222,16 +241,15 @@ export async function runHomeAction(action: Record<string, unknown>): Promise<Re
 
   // One action → many targets (same payload), not N duplicate automation rows.
   if (entityIds.length > 1) {
-    const results = []
-    for (const id of entityIds) {
-      results.push(
-        await runHomeAction({
+    const results = await Promise.all(
+      entityIds.map((id) =>
+        runHomeAction({
           ...action,
           entity_id: id,
           target: { entity_id: id },
         }),
-      )
-    }
+      ),
+    )
     return {
       ok: results.every((r) => Boolean((r as { ok?: boolean }).ok)),
       multi: true,
@@ -273,6 +291,13 @@ export async function runHomeAction(action: Record<string, unknown>): Promise<Re
     }
     const currentOn = state?.state === "on"
     const preferredNodeId = Number(attrs.node_id)
+    const rgb = (attrs.rgb_color as number[] | undefined) || []
+    const curBri = Number(attrs.brightness)
+    const curR = Number(rgb[0])
+    const curG = Number(rgb[1])
+    const curB = Number(rgb[2])
+    const curEffect = resolveEffectId(attrs.effect)
+    const curSpeed = Number(attrs.speed)
     return {
       ...(await controlIotvexStrip(
         index,
@@ -280,6 +305,14 @@ export async function runHomeAction(action: Record<string, unknown>): Promise<Re
         data,
         currentOn,
         Number.isFinite(preferredNodeId) ? preferredNodeId : undefined,
+        {
+          brightness: Number.isFinite(curBri) ? curBri : undefined,
+          r: Number.isFinite(curR) ? curR : undefined,
+          g: Number.isFinite(curG) ? curG : undefined,
+          b: Number.isFinite(curB) ? curB : undefined,
+          effect: curEffect,
+          speed: Number.isFinite(curSpeed) ? curSpeed : undefined,
+        },
       )),
       entityId,
       service: serviceName(domain, verb),
@@ -310,9 +343,16 @@ export async function runHomeAction(action: Record<string, unknown>): Promise<Re
 }
 
 export async function runHomeActions(actions: unknown[]) {
-  const results = []
-  for (const step of actions || []) {
-    results.push(await runHomeAction((step || {}) as Record<string, unknown>))
+  // Parallel when steps are independent (no delay meta between them).
+  const steps = (actions || []).map((step) => (step || {}) as Record<string, unknown>)
+  const hasDelay = steps.some((s) => {
+    const kind = String(s.action || s.service || s.type || "")
+    return kind === "delay" || s.delay != null
+  })
+  if (hasDelay || steps.length <= 1) {
+    const results = []
+    for (const step of steps) results.push(await runHomeAction(step))
+    return results
   }
-  return results
+  return Promise.all(steps.map((step) => runHomeAction(step)))
 }
