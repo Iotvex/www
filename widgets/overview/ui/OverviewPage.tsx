@@ -73,7 +73,6 @@ import {
   $entities,
   $agentConnection,
   $agentOnline,
-  $node,
   type AgentConnection,
 } from "@/entities/device/model/store";
 import { setView } from "@/entities/nav/model/store";
@@ -113,17 +112,6 @@ type Device = {
   meta?: Record<string, unknown>;
 };
 
-type NodeStatus = {
-  id?: string;
-  name?: string;
-  online?: boolean;
-  status?: string;
-  version?: string;
-  host?: string;
-  strip_count?: number;
-  strips?: Array<{ on?: boolean }>;
-  ts?: number;
-};
 
 type WidgetKind = "entities" | "lights" | "area" | "status" | "activity";
 
@@ -233,7 +221,6 @@ export function OverviewPage() {
   const rawDevices = useUnit($devices);
   const rawEntities = useUnit($entities);
   const rawAreas = useUnit($areas);
-  const node = useUnit($node) as NodeStatus | null;
   const agentOnline = useUnit($agentOnline);
   const agentConnection = useUnit($agentConnection);
   const navigate = useUnit(setView);
@@ -412,7 +399,6 @@ export function OverviewPage() {
                     areas={areas}
                     entities={entities}
                     devices={devices}
-                    node={node}
                     agentOnline={agentOnline}
                     agentConnection={agentConnection}
                     onMove={(direction) => void moveWidget(widget, direction)}
@@ -585,7 +571,6 @@ function SortableWidgetCard({
   areas: Area[];
   entities: Entity[];
   devices: Device[];
-  node: NodeStatus | null;
   agentOnline: boolean;
   agentConnection: AgentConnection;
   onMove: (direction: number) => void;
@@ -711,7 +696,6 @@ function SortableWidgetCard({
           entities={entities}
           areas={areas}
           devices={devices}
-          node={node}
           agentOnline={agentOnline}
           agentConnection={agentConnection}
           groupByDevice={dashPrefs.groupByDevice}
@@ -903,7 +887,6 @@ function WidgetBody({
   entities: Entity[];
   areas: Area[];
   devices: Device[];
-  node?: NodeStatus | null;
   agentOnline: boolean;
   agentConnection: AgentConnection;
   groupByDevice?: boolean;
