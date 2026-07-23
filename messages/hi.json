@@ -299,7 +299,8 @@
       "viewMenuAria": "View options",
       "viewMenuLabel": "View",
       "groupByDevice": "Group by device",
-      "ungroupDevices": "Show separately"
+      "ungroupDevices": "Show separately",
+      "deviceLockedHint": "अपने हार्डवेयर डिवाइस से बंधा है और बदला नहीं जा सकता।"
     },
     "areas": {
       "title": "ज़ोन",

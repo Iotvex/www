@@ -299,7 +299,8 @@
       "viewMenuAria": "Параметры вида",
       "viewMenuLabel": "Вид",
       "groupByDevice": "Группировать по устройству",
-      "ungroupDevices": "Показывать отдельно"
+      "ungroupDevices": "Показывать отдельно",
+      "deviceLockedHint": "Привязано к своему устройству и не может быть переназначено."
     },
     "areas": {
       "title": "Зоны",

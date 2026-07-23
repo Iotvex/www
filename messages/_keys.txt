@@ -197,6 +197,7 @@ inventory.entities.areaSuffixNone
 inventory.entities.controlHeading
 inventory.entities.description
 inventory.entities.deviceLabel
+inventory.entities.deviceLockedHint
 inventory.entities.emptyDescription
 inventory.entities.emptyTitle
 inventory.entities.filterAria

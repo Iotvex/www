@@ -20,10 +20,17 @@ export async function PATCH(request: Request) {
     const patch: Record<string, unknown> = {}
     if (body.name != null) patch.name = String(body.name).trim()
     if ("area_id" in body) patch.area_id = body.area_id ? String(body.area_id) : null
-    if ("device_id" in body) patch.device_id = body.device_id ? String(body.device_id) : null
     if (typeof body.enabled === "boolean") patch.enabled = body.enabled
     if (body.capabilities) patch.capabilities = body.capabilities
     if (body.attributes) patch.attributes = body.attributes
+
+    // device_id is hardware-owned (discover/catalog only) — never rebind via API
+    if ("device_id" in body) {
+      return NextResponse.json(
+        { error: "entity device_id is fixed to its hardware device" },
+        { status: 400 },
+      )
+    }
 
     if (!Object.keys(patch).length) {
       return NextResponse.json({ error: "nothing to update" }, { status: 400 })

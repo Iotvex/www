@@ -299,7 +299,8 @@
       "viewMenuAria": "View options",
       "viewMenuLabel": "View",
       "groupByDevice": "Group by device",
-      "ungroupDevices": "Show separately"
+      "ungroupDevices": "Show separately",
+      "deviceLockedHint": "ハードウェアデバイスに固定されており、変更できません。"
     },
     "areas": {
       "title": "ゾーン",

@@ -252,6 +252,7 @@ function EntitiesTab() {
     name: string
     area_id: string
     device_id: string
+    device_name: string
     enabled: boolean
   } | null>(null)
 
@@ -311,7 +312,6 @@ function EntitiesTab() {
           id: edit.id,
           name: edit.name,
           area_id: edit.area_id || null,
-          device_id: edit.device_id || null,
           enabled: edit.enabled,
         }),
       })
@@ -436,6 +436,7 @@ function EntitiesTab() {
               name: e.name,
               area_id: e.area || "",
               device_id: e.device_id || "",
+              device_name: devices.find((d) => d.id === e.device_id)?.name || "",
               enabled: true,
             })
           }
@@ -458,17 +459,12 @@ function EntitiesTab() {
               </div>
               <div className="space-y-1.5">
                 <Label>{t("entities.deviceLabel")}</Label>
-                <FieldSelect
-                  value={edit.device_id}
-                  onChange={(v) => setEdit({ ...edit, device_id: v })}
-                >
-                  <option value="">{t("entities.noDevice")}</option>
-                  {devices.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}
-                    </option>
-                  ))}
-                </FieldSelect>
+                <Input
+                  value={edit.device_name || t("entities.noDevice")}
+                  disabled
+                  readOnly
+                />
+                <p className="text-xs text-muted-foreground">{t("entities.deviceLockedHint")}</p>
               </div>
               <div className="space-y-1.5">
                 <Label>{t("entities.areaLabel")}</Label>

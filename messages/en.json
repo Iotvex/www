@@ -299,7 +299,8 @@
       "viewMenuAria": "View options",
       "viewMenuLabel": "View",
       "groupByDevice": "Group by device",
-      "ungroupDevices": "Show separately"
+      "ungroupDevices": "Show separately",
+      "deviceLockedHint": "Bound to its hardware device and cannot be reassigned."
     },
     "areas": {
       "title": "Zones",
