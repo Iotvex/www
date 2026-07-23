@@ -597,10 +597,10 @@ function DeviceEntityCard({
     <div
       style={style}
       className={cn(
-        "iotvex-card-in relative min-w-0 overflow-hidden border border-white/[0.07] bg-black/50 shadow-sm backdrop-blur-2xl transition-[transform,box-shadow,border-color,background-color] duration-300",
-        "hover:z-[1] hover:border-white/[0.12] hover:bg-black/65 hover:shadow-[0_14px_44px_-18px_rgba(0,0,0,0.7)]",
-        stackRadiusClass(stackIndex, stackTotal, "xl"),
-        stackItemOffsetClass(stackIndex),
+        "iotvex-card-in relative min-w-0 overflow-hidden bg-black/50 transition-[background-color,box-shadow] duration-300",
+        "hover:z-[1] hover:bg-black/60",
+        // Radius owned by parent stack shell; segments stay sharp at joins.
+        stackIndex === 0 && stackTotal === 1 && "rounded-xl",
       )}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -688,17 +688,24 @@ export function EntityGrid({
   }
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div
+      className={cn(
+        "flex flex-col overflow-hidden rounded-xl border border-white/[0.1] bg-black/40 shadow-sm backdrop-blur-2xl",
+        className,
+      )}
+    >
       {groups.map((group, gi) => (
-        <DeviceEntityCard
-          key={group.key}
-          group={group}
-          onEdit={onEdit}
-          style={{ animationDelay: `${gi * 55}ms` }}
-          menu={headerMenu?.(group)}
-          stackIndex={gi}
-          stackTotal={groups.length}
-        />
+        <div key={group.key} className="min-w-0">
+          {gi > 0 ? <div className="h-px w-full bg-white/[0.1]" aria-hidden /> : null}
+          <DeviceEntityCard
+            group={group}
+            onEdit={onEdit}
+            style={{ animationDelay: `${gi * 55}ms` }}
+            menu={headerMenu?.(group)}
+            stackIndex={gi}
+            stackTotal={groups.length}
+          />
+        </div>
       ))}
     </div>
   )
