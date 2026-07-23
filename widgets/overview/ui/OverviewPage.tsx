@@ -78,7 +78,6 @@ import {
 } from "@/entities/device/model/store";
 import { setView } from "@/entities/nav/model/store";
 import { groupEntitiesByDevice } from "@/features/entity-control/ui/EntityCard";
-import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius";
 import { useDashboardEntityViewPrefs } from "@/shared/lib/ui-view-prefs";
 
 type Entity = {
@@ -702,7 +701,11 @@ function SortableWidgetCard({
       </CardHeader>
       <CardContent
         className={
-          widget.kind === "status"
+          widget.kind === "status" ||
+          widget.kind === "entities" ||
+          widget.kind === "lights" ||
+          widget.kind === "area" ||
+          widget.kind === "activity"
             ? "min-w-0 overflow-hidden p-0"
             : "min-w-0 overflow-hidden p-2.5 pt-0 sm:p-3 sm:pt-0"
         }
@@ -978,27 +981,27 @@ function WidgetBody({
     const rows = source.slice(0, 8)
     return (
       <div className="flex min-w-0 flex-col overflow-hidden">
+        <div className="h-px w-full bg-white/[0.08]" aria-hidden />
         {rows.map((entity, index) => (
-          <div
-            key={entityId(entity)}
-            className={cn(
-              "flex min-w-0 items-center justify-between gap-2 overflow-hidden border border-white/[0.05] bg-white/[0.03] px-2.5 py-2",
-              stackRadiusClass(index, rows.length, "lg"),
-              stackItemOffsetClass(index),
-            )}
-          >
-            <p className="truncate font-medium text-sm">{entityName(entity)}</p>
-            <Badge variant={entity.state === "on" ? "default" : "secondary"}>
-              {String(entity.state ?? t("widgets.noData"))}
-            </Badge>
+          <div key={entityId(entity)} className="min-w-0">
+            {index > 0 ? <div className="h-px w-full bg-white/[0.06]" aria-hidden /> : null}
+            <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2 sm:px-3">
+              <p className="truncate font-medium text-sm">{entityName(entity)}</p>
+              <Badge variant={entity.state === "on" ? "default" : "secondary"}>
+                {String(entity.state ?? t("widgets.noData"))}
+              </Badge>
+            </div>
           </div>
         ))}
         {source.length > 8 ? (
-          <p className="mt-1.5 text-xs text-muted-foreground">{t("widgets.andMore", { count: source.length - 8 })}</p>
+          <p className="border-t border-white/[0.06] px-2.5 py-2 text-xs text-muted-foreground sm:px-3">
+            {t("widgets.andMore", { count: source.length - 8 })}
+          </p>
         ) : null}
       </div>
     )
   }
+
 
   const deviceModels = devices
     .filter((d): d is Device & { id: string; name: string } => Boolean(d.id && d.name))
@@ -1041,24 +1044,21 @@ function WidgetBody({
   return (
     <div className="flex min-w-0 flex-col overflow-hidden">
       {visibleGroups.map((group, groupIndex) => (
-        <div
-          key={group.key}
-          className={cn(
-            "min-w-0 overflow-hidden border border-white/[0.06] bg-white/[0.03]",
-            stackRadiusClass(groupIndex, visibleGroups.length, "xl"),
-            stackItemOffsetClass(groupIndex),
+        <div key={group.key} className="min-w-0 bg-white/[0.02]">
+          {groupIndex > 0 ? (
+            <div className="h-px w-full bg-white/[0.1]" aria-hidden />
+          ) : (
+            <div className="h-px w-full bg-white/[0.08]" aria-hidden />
           )}
-        >
-          <div className="px-2.5 py-1.5">
+          <div className="px-2.5 py-1.5 sm:px-3">
             <p className="truncate text-xs font-semibold tracking-tight text-foreground/90">
               {group.title}
             </p>
           </div>
-          <div>
-            {group.entities.map((entity) => (
-              <div key={entity.entity_id} className="min-w-0">
-                <div className="h-px w-full bg-white/[0.08]" aria-hidden />
-                <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2">
+          {group.entities.map((entity) => (
+            <div key={entity.entity_id} className="min-w-0">
+              <div className="h-px w-full bg-white/[0.06]" aria-hidden />
+              <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2 sm:px-3">
                 <p className="truncate text-sm font-medium">{entity.name}</p>
                 <Badge variant={entity.state === "on" ? "default" : "secondary"}>
                   {entity.state || t("widgets.noData")}
@@ -1066,14 +1066,15 @@ function WidgetBody({
                     ? ` ${String(entity.attributes.unit_of_measurement)}`
                     : ""}
                 </Badge>
-                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       ))}
       {source.length > flatLimit ? (
-        <p className="mt-1.5 text-xs text-muted-foreground">{t("widgets.andMore", { count: source.length - flatLimit })}</p>
+        <p className="border-t border-white/[0.06] px-2.5 py-2 text-xs text-muted-foreground sm:px-3">
+          {t("widgets.andMore", { count: source.length - flatLimit })}
+        </p>
       ) : null}
     </div>
   );
@@ -1119,15 +1120,11 @@ function ActivityList() {
 
   return (
     <div className="flex min-w-0 flex-col overflow-hidden">
+      <div className="h-px w-full bg-white/[0.08]" aria-hidden />
       {items.map((event, index) => (
-        <div
-          key={event.id ?? `${event.created_at}-${index}`}
-          className={cn(
-            "min-w-0 overflow-hidden border border-white/[0.05] bg-white/[0.03] px-2.5 py-2",
-            stackRadiusClass(index, items.length, "lg"),
-            stackItemOffsetClass(index),
-          )}
-        >
+        <div key={event.id ?? `${event.created_at}-${index}`} className="min-w-0">
+          {index > 0 ? <div className="h-px w-full bg-white/[0.06]" aria-hidden /> : null}
+          <div className="min-w-0 px-2.5 py-2 sm:px-3">
           <div className="flex min-w-0 items-start justify-between gap-2">
             <p className="min-w-0 flex-1 break-words font-medium text-sm leading-snug">
               {event.title ?? event.type ?? t("activityWidget.fallbackTitle")}
@@ -1141,6 +1138,7 @@ function ActivityList() {
           <p className="iotvex-hide-scroll mt-0.5 min-w-0 overflow-x-auto whitespace-nowrap text-xs text-muted-foreground">
             {event.detail || event.kind || ""}
           </p>
+          </div>
         </div>
       ))}
     </div>
