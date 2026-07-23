@@ -280,30 +280,76 @@ export function EntityControls({
     })
   }
 
+  if (sensor) {
+    return (
+      <div className={cn("flex items-center gap-2.5", compact ? "py-2" : "py-1")}>
+        <div
+          className={cn(
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.05] text-foreground/75",
+            !entity.available && "opacity-50",
+          )}
+        >
+          <DomainIcon entity={entity} className="h-3.5 w-3.5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-2">
+            <p className="min-w-0 flex-1 truncate text-[13px] font-medium tracking-tight text-foreground/90">
+              {entity.name}
+            </p>
+            {!entity.available ? (
+              <Badge variant="danger" className="shrink-0 font-normal">
+                {t("states.offline")}
+              </Badge>
+            ) : (
+              <p className="iotvex-stat-value shrink-0 text-right text-[13px] font-semibold tabular-nums tracking-tight text-foreground">
+                <span>{entity.state}</span>
+                {unitOf(entity) ? (
+                  <span className="ml-1 text-[11px] font-medium text-muted-foreground">
+                    {unitOf(entity)}
+                  </span>
+                ) : null}
+              </p>
+            )}
+          </div>
+        </div>
+        {onEdit ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="h-7 w-7 shrink-0 text-muted-foreground"
+            onClick={() => onEdit(entity)}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+        ) : null}
+      </div>
+    )
+  }
+
   return (
-    <div className={cn("space-y-2.5", compact ? "py-3" : "")}>
-      <div className="flex items-start justify-between gap-2">
+    <div className={cn("space-y-2", compact ? "py-2.5" : "")}>
+      <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
           <div
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.04] text-muted-foreground backdrop-blur-md",
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.04] text-muted-foreground backdrop-blur-md",
               entity.available && on && "border-primary/20 bg-primary/10 text-primary",
-              sensor && entity.available && "border-white/[0.08] bg-white/[0.06] text-foreground/80",
             )}
           >
-            <DomainIcon entity={entity} />
+            <DomainIcon entity={entity} className="h-3.5 w-3.5" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium tracking-tight">{entity.name}</p>
             {!entity.available ? (
-              <Badge variant="danger" className="mt-1 font-normal">
+              <Badge variant="danger" className="mt-0.5 font-normal">
                 {t("states.offline")}
               </Badge>
             ) : hasCapability(entity, "on_off") || hasCapability(entity, "binary") ? (
               <Badge
                 variant="secondary"
                 className={cn(
-                  "mt-1 border-transparent font-normal",
+                  "mt-0.5 border-transparent font-normal",
                   on ? "bg-primary/15 text-primary" : "bg-white/[0.06] text-muted-foreground",
                 )}
               >
@@ -329,17 +375,6 @@ export function EntityControls({
           ) : null}
         </div>
       </div>
-
-      {sensor ? (
-        <div className="iotvex-stat-value flex items-baseline gap-1.5 pl-[2.875rem]">
-          <span className="text-2xl font-semibold tracking-tight tabular-nums text-foreground">
-            {entity.state}
-          </span>
-          {unitOf(entity) ? (
-            <span className="text-sm font-medium text-muted-foreground">{unitOf(entity)}</span>
-          ) : null}
-        </div>
-      ) : null}
 
       {isLightStrip ? (
         <div className={cn("space-y-2.5 pt-0.5", !on && "opacity-50")}>
@@ -570,14 +605,14 @@ function DeviceEntityCard({
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
 
-      <div className="flex flex-row items-start justify-between gap-2 p-3 sm:p-3.5">
+      <div className="flex flex-row items-center justify-between gap-2 px-3 py-2.5 sm:px-3.5">
         <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.05] text-foreground/85 backdrop-blur-md">
-            <Icon className="h-5 w-5" strokeWidth={1.75} />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.05] text-foreground/85 backdrop-blur-md">
+            <Icon className="h-4 w-4" strokeWidth={1.75} />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-base font-semibold tracking-tight">{group.title}</p>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            <p className="truncate text-sm font-semibold tracking-tight">{group.title}</p>
+            <p className="truncate text-[11px] text-muted-foreground">
               {group.subtitle || t("groupCount", { count: group.entities.length })}
             </p>
           </div>
@@ -589,7 +624,7 @@ function DeviceEntityCard({
         {group.entities.map((entity) => (
           <div key={entity.entity_id} className="min-w-0">
             <div className="h-px w-full bg-white/[0.08]" aria-hidden />
-            <div className="px-3 sm:px-3.5">
+            <div className="px-2.5 sm:px-3">
               <EntityControls entity={entity} onEdit={onEdit} compact />
             </div>
           </div>
