@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import {
   MSG,
-  decodeAgentNode,
   packSetStripPayload,
   pickLightOpaqueNode,
   type AgentOpaqueNode,
@@ -11,10 +10,24 @@ import {
 export const dynamic = "force-dynamic"
 const AGENT = process.env.IOTVEX_AGENT_URL || "http://127.0.0.1:7421"
 
+async function resolveLightNodeId(preferred?: number): Promise<number | null> {
+  if (preferred != null && Number.isFinite(preferred) && preferred > 0) {
+    return preferred
+  }
+  const listRes = await fetch(`${AGENT}/nodes`, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(1500),
+  })
+  if (!listRes.ok) return null
+  const listBody = (await listRes.json()) as { nodes?: AgentOpaqueNode[] }
+  const light = pickLightOpaqueNode(listBody.nodes || [])
+  return light ? Number(light.node_id) : null
+}
+
 /**
- * Build a full SET_STRIP frame payload and forward via the agent pipe.
- * Strip merge / field defaults belong here (or the client) — not the agent.
- * Targets the light node explicitly when weather + light are both online.
+ * Fire SET_STRIP via the agent pipe.
+ * Prefer client-provided node_id to skip /nodes. need_ack=false so the UI stays snappy;
+ * optimistic client state + live poll reconcile the strip.
  */
 export async function POST(
   request: Request,
@@ -43,40 +56,36 @@ export async function POST(
     speed: Number(b.speed ?? 128),
   }
 
+  const preferredNodeId = Number(b.node_id)
   try {
-    const listRes = await fetch(`${AGENT}/nodes`, { cache: "no-store" })
-    if (!listRes.ok) {
-      const text = await listRes.text().catch(() => "")
-      return NextResponse.json(
-        { error: text || `agent ${listRes.status}` },
-        { status: listRes.status },
-      )
-    }
-    const listBody = (await listRes.json()) as { nodes?: AgentOpaqueNode[] }
-    const light = pickLightOpaqueNode(listBody.nodes || [])
-    if (!light) {
+    const nodeId = await resolveLightNodeId(
+      Number.isFinite(preferredNodeId) ? preferredNodeId : undefined,
+    )
+    if (nodeId == null) {
       return NextResponse.json({ error: "no light node online" }, { status: 503 })
     }
 
-    const res = await fetch(`${AGENT}/node/${light.node_id}/command`, {
+    const res = await fetch(`${AGENT}/node/${nodeId}/command`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(2500),
       body: JSON.stringify({
         msg_type: MSG.SET_STRIP,
         payload_b64: packSetStripPayload(strip),
-        need_ack: true,
+        // Do not block the HTTP round-trip on Thread ACK — that was ~3–4s of lag.
+        need_ack: false,
       }),
     })
     const text = await res.text()
     if (!res.ok) {
-      return new NextResponse(text, {
+      return new NextResponse(text || `agent ${res.status}`, {
         status: res.status,
         headers: { "Content-Type": "application/json" },
       })
     }
-    const opaque = JSON.parse(text) as AgentOpaqueNode
-    const node = decodeAgentNode(opaque)
-    return NextResponse.json(node)
+
+    // Return lightly so the client can keep optimistic state (no stale ACK merge).
+    return NextResponse.json({ ok: true, node_id: nodeId, strip })
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 502 })
   }

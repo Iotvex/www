@@ -14,16 +14,23 @@ export function ColorPicker({
   disabled,
   onChange,
   onCommit,
+  onOpenChange,
   className,
 }: {
   value: Rgb
   disabled?: boolean
   onChange?: (rgb: Rgb) => void
   onCommit: (rgb: Rgb) => void
+  onOpenChange?: (open: boolean) => void
   className?: string
 }) {
   const [open, setOpen] = useState(false)
   const preview = useMemo(() => `rgb(${value.join(",")})`, [value])
+
+  const setOpenBoth = (next: boolean) => {
+    setOpen(next)
+    onOpenChange?.(next)
+  }
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -37,14 +44,14 @@ export function ColorPicker({
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
         style={{ background: preview }}
-        onClick={() => setOpen(true)}
+        onClick={() => setOpenBoth(true)}
       />
       <span className="truncate font-mono text-[11px] tabular-nums text-muted-foreground/80">
         #{value.map((c) => c.toString(16).padStart(2, "0")).join("")}
       </span>
       <ColorPickerDialog
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={setOpenBoth}
         value={value}
         disabled={disabled}
         onChange={onChange}

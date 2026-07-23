@@ -189,12 +189,15 @@ export function ColorPickerDialog({
 
   useEffect(() => {
     if (!open) return
-    setHue(h0)
-    setSat(s0)
-    setVal(Math.max(v0, 0.01))
+    // Init only when the dialog opens — never while the user is picking a color.
+    const [h, s, v] = rgbToHsv(value[0], value[1], value[2])
+    setHue(h)
+    setSat(s)
+    setVal(Math.max(v, 0.01))
     setHexText(rgbToHex(value))
     setPresets(loadPresets())
-  }, [open, h0, s0, v0, value])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally seed once per open
+  }, [open])
 
   const live = useMemo(() => hsvToRgb(hue, sat, val), [hue, sat, val])
   const preview = `rgb(${live.join(",")})`
