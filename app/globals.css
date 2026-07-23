@@ -782,5 +782,5 @@ body::-webkit-scrollbar,
 }
 
 .iotvex-strip-matrix span {
-  transition: background-color 60ms linear, box-shadow 60ms linear;
+  will-change: background-color, box-shadow;
 }
