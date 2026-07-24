@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     # Model tag available in ollama
     ollama_model: str = Field(default="gemma2:2b")
     # Use LLM only when rule-based NLU confidence is below this threshold
-    llm_confidence_threshold: float = Field(default=0.5)
+    llm_confidence_threshold: float = Field(default=0.55)
 
     # ── Wake word ─────────────────────────────────────────────────────────
     # Canonical wake word displayed to users

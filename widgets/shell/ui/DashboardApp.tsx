@@ -1,18 +1,18 @@
 "use client"
 
-import { $viewId, getViewMeta } from "@/entities/nav/model/store"
+import { $viewId } from "@/entities/nav/model/store"
 import { useEdgeSwipe } from "@/features/mobile-shell/useEdgeSwipe"
 import { AppSidebar } from "@/widgets/sidebar/ui/AppSidebar"
 import { MobileNav } from "@/widgets/shell/ui/MobileNav"
 import { Topbar } from "@/widgets/topbar/ui/Topbar"
 import { ViewHost } from "@/widgets/shell/ui/ViewHost"
+import { AlexaListener } from "@/features/voice-assistant/ui/AlexaListener"
 import { useUnit } from "effector-react"
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
 
 export function DashboardApp() {
   const viewId = useUnit($viewId)
-  const view = getViewMeta(viewId)
   const tViews = useTranslations("views")
   const title = tViews(`${viewId}.title`)
   const [navOpen, setNavOpen] = useState(false)
@@ -113,6 +113,7 @@ export function DashboardApp() {
           </main>
         </div>
         <MobileNav />
+        <AlexaListener />
       </div>
     </div>
   )

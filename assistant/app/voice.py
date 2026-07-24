@@ -39,14 +39,19 @@ logger = logging.getLogger(__name__)
 _REPLIES_RU: dict[str, str] = {
     "lights_on":       "Хорошо, включаю свет{target_suffix}!",
     "lights_off":      "Выключаю свет{target_suffix}.",
+    "toggle":          "Переключаю свет{target_suffix}.",
     "set_brightness":  "Устанавливаю яркость{target_suffix} на {brightness}%.",
     "set_color":       "Меняю цвет{target_suffix} на {color_name}.",
     "set_effect":      "Включаю эффект «{effect}»{target_suffix}.",
+    "set_speed":       "Скорость{target_suffix}: {speed}%.",
+    "activate_scene":  "Активирую сцену{detail_suffix}.",
+    "run_automation":  "Запускаю автоматизацию{detail_suffix}.",
+    "run_script":      "Запускаю скрипт{detail_suffix}.",
     "greeting":        "Привет! Я Алекса, ваш умный помощник. Чем могу помочь?",
     "help":            (
-        "Я умею: включать и выключать свет, менять яркость (например «яркость 70%»), "
-        "цвет (красный, синий, тёплый белый…) и эффекты (радуга, дыхание, огонь…). "
-        "Просто скажите «Алекса» и команду!"
+        "Я умею: включать, выключать и переключать свет, менять яркость, цвет, эффекты и скорость, "
+        "а также запускать сцены, автоматизации и скрипты. "
+        "Скажите «Алекса» и команду своими словами!"
     ),
     "status":          "Система работает. Все сервисы в норме.",
     "unknown":         "Извините, я не поняла команду. Скажите «Алекса, помощь», чтобы узнать, что я умею.",
@@ -55,14 +60,19 @@ _REPLIES_RU: dict[str, str] = {
 _REPLIES_EN: dict[str, str] = {
     "lights_on":       "Sure, turning on the lights{target_suffix}!",
     "lights_off":      "Turning off the lights{target_suffix}.",
+    "toggle":          "Toggling the lights{target_suffix}.",
     "set_brightness":  "Setting brightness{target_suffix} to {brightness}%.",
     "set_color":       "Changing the color{target_suffix} to {color_name}.",
     "set_effect":      "Setting effect to {effect}{target_suffix}.",
+    "set_speed":       "Speed{target_suffix}: {speed}%.",
+    "activate_scene":  "Activating scene{detail_suffix}.",
+    "run_automation":  "Running automation{detail_suffix}.",
+    "run_script":      "Running script{detail_suffix}.",
     "greeting":        "Hi there! I'm Alexa, your smart home assistant. How can I help?",
     "help":            (
-        "I can: turn lights on or off, set brightness (e.g. 'brightness 70%'), "
-        "color (red, blue, warm white…), and effects (rainbow, breathing, fire…). "
-        "Just say 'Alexa' followed by a command!"
+        "I can turn lights on, off or toggle them, set brightness, color, effects and speed, "
+        "and run scenes, automations and scripts. "
+        "Just say 'Alexa' plus a command in your own words!"
     ),
     "status":          "System is running. All services are healthy.",
     "unknown":         "Sorry, I didn't understand that. Say 'Alexa help' to see what I can do.",
@@ -77,16 +87,28 @@ def _target_suffix(target: str, lang: str) -> str:
     return " (left strip)" if target == "left" else " (right strip)"
 
 
-def _format_reply(intent: str, entities: dict, lang: str) -> str:
+def _detail_suffix(detail: str, lang: str) -> str:
+    if not detail:
+        return ""
+    return f" «{detail}»" if lang == "ru" else f" {detail}"
+
+
+def _format_reply(intent: str, entities: dict, lang: str, detail: str = "") -> str:
     templates = _REPLIES_RU if lang == "ru" else _REPLIES_EN
     template = templates.get(intent, templates["unknown"])
     target = entities.get("target", "all")
+    brightness = entities.get("brightness", "?")
+    if brightness == "?" and entities.get("relative") is not None and not detail:
+        # relative step applied — value filled after action when available
+        brightness = entities.get("brightness", "?")
     try:
         return template.format(
             target_suffix=_target_suffix(target, lang),
-            brightness=entities.get("brightness", "?"),
+            brightness=brightness,
             color_name=entities.get("color_name", entities.get("color_hex", "?")),
             effect=entities.get("effect", "?"),
+            speed=entities.get("speed", "?"),
+            detail_suffix=_detail_suffix(detail, lang),
         )
     except KeyError:
         return templates.get("unknown", "?")
@@ -113,6 +135,20 @@ class PipelineResult:
 # Home action dispatcher
 # ─────────────────────────────────────────────
 
+_HOME_INTENTS = frozenset({
+    "lights_on",
+    "lights_off",
+    "toggle",
+    "set_brightness",
+    "set_color",
+    "set_effect",
+    "set_speed",
+    "activate_scene",
+    "run_automation",
+    "run_script",
+})
+
+
 async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
     """
     Call the appropriate home.py function based on intent.
@@ -125,11 +161,18 @@ async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
     try:
         if intent.name == "lights_on":
             r = await home.lights_on(strip=strip)
-            results.append({"action": "lights_on", "strip": strip, "success": r.success, "backend": r.backend})
+            results.append({"action": "lights_on", "strip": strip, "success": r.success,
+                            "backend": r.backend, "detail": r.detail})
 
         elif intent.name == "lights_off":
             r = await home.lights_off(strip=strip)
-            results.append({"action": "lights_off", "strip": strip, "success": r.success, "backend": r.backend})
+            results.append({"action": "lights_off", "strip": strip, "success": r.success,
+                            "backend": r.backend, "detail": r.detail})
+
+        elif intent.name == "toggle":
+            r = await home.toggle(strip=strip)
+            results.append({"action": "toggle", "strip": strip, "success": r.success,
+                            "backend": r.backend, "detail": r.detail})
 
         elif intent.name == "set_brightness":
             value = ent.get("brightness")
@@ -137,7 +180,7 @@ async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
             if value is not None:
                 r = await home.set_brightness(value, strip=strip)
                 results.append({"action": "set_brightness", "strip": strip, "value": value,
-                                 "success": r.success, "backend": r.backend})
+                                 "success": r.success, "backend": r.backend, "detail": r.detail})
             elif relative is not None:
                 # Approximate relative step from current strip brightness (percent).
                 strips = await home.list_strips()
@@ -147,6 +190,7 @@ async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
                     bri = int(picked[0].get("brightness") or 128)
                     current_pct = max(0, min(100, round(bri * 100 / 255)))
                 value = max(0, min(100, current_pct + int(relative)))
+                ent["brightness"] = value
                 r = await home.set_brightness(value, strip=strip)
                 results.append({
                     "action": "set_brightness",
@@ -155,19 +199,41 @@ async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
                     "relative": relative,
                     "success": r.success,
                     "backend": r.backend,
+                    "detail": r.detail,
                 })
 
         elif intent.name == "set_color":
             hex_val = ent.get("color_hex", "#FFFFFF")
             r = await home.set_color(hex_val, strip=strip)
             results.append({"action": "set_color", "strip": strip, "color": hex_val,
-                             "success": r.success, "backend": r.backend})
+                             "success": r.success, "backend": r.backend, "detail": r.detail})
 
         elif intent.name == "set_effect":
             effect = ent.get("effect", "solid")
             r = await home.set_effect(effect, strip=strip)
             results.append({"action": "set_effect", "strip": strip, "effect": effect,
-                             "success": r.success, "backend": r.backend})
+                             "success": r.success, "backend": r.backend, "detail": r.detail})
+
+        elif intent.name == "set_speed":
+            speed = ent.get("speed", 50)
+            r = await home.set_speed(int(speed), strip=strip)
+            results.append({"action": "set_speed", "strip": strip, "speed": speed,
+                             "success": r.success, "backend": r.backend, "detail": r.detail})
+
+        elif intent.name == "activate_scene":
+            r = await home.activate_scene(ent.get("scene_query"))
+            results.append({"action": "activate_scene", "success": r.success,
+                            "backend": r.backend, "detail": r.detail})
+
+        elif intent.name == "run_automation":
+            r = await home.run_automation(ent.get("automation_query"))
+            results.append({"action": "run_automation", "success": r.success,
+                            "backend": r.backend, "detail": r.detail})
+
+        elif intent.name == "run_script":
+            r = await home.run_script(ent.get("script_query"))
+            results.append({"action": "run_script", "success": r.success,
+                            "backend": r.backend, "detail": r.detail})
 
     except Exception as exc:
         logger.error("Home action error (intent=%s): %s", intent.name, exc)
@@ -208,17 +274,36 @@ async def process_text(text: str, include_audio: Optional[bool] = None) -> Pipel
 
     # 3. Execute home action (fire-and-forget style, don't block reply on failure)
     action_list: list[dict] = []
-    if intent.name in ("lights_on", "lights_off", "set_brightness", "set_color", "set_effect"):
+    if intent.name in _HOME_INTENTS:
         action_list = await _execute_home_action(intent)
 
     # 4. Build reply text
-    # Check if LLM provided a custom reply
-    llm_reply = ""
-    if settings.llm_enabled and intent.confidence >= settings.llm_confidence_threshold:
-        # Could still ask LLM for a natural reply — skip for performance
-        pass
+    action_detail = ""
+    if action_list:
+        action_detail = str(action_list[0].get("detail") or "")
+        if intent.name in ("activate_scene", "run_automation", "run_script") and not action_list[0].get("success"):
+            fail = action_detail or "error"
+            reply_text = (
+                f"Не получилось: {fail}"
+                if intent.lang == "ru"
+                else f"Failed: {fail}"
+            )
+            audio_b64: Optional[str] = None
+            if include_audio:
+                audio_bytes = await tts.synthesize(reply_text, lang=intent.lang)
+                if audio_bytes:
+                    audio_b64 = base64.b64encode(audio_bytes).decode()
+            return PipelineResult(
+                reply=reply_text,
+                intent=intent.name,
+                confidence=intent.confidence,
+                lang=intent.lang,
+                entities=intent.entities,
+                actions=action_list,
+                audio_b64=audio_b64,
+            )
 
-    reply_text = _format_reply(intent.name, intent.entities, intent.lang)
+    reply_text = _format_reply(intent.name, intent.entities, intent.lang, detail=action_detail)
 
     # 5. TTS
     audio_b64: Optional[str] = None

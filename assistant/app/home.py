@@ -1,13 +1,15 @@
-"""Smart-home bridge — talks to the Iotvex www strip API.
+"""Smart-home bridge — talks to the Iotvex www strip / rules API.
 
 Voice pipeline expects:
-  lights_on / lights_off / set_brightness / set_color / set_effect
+  lights_on / lights_off / toggle / set_brightness / set_color /
+  set_effect / set_speed / activate_scene / run_automation / run_script
 each returning ActionResult(success, backend, detail).
 """
 
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -73,11 +75,58 @@ async def _get(path: str) -> Any:
         return r.json()
 
 
-async def _post(path: str, body: dict[str, Any]) -> Any:
+async def _post(path: str, body: dict[str, Any] | None = None) -> Any:
     async with httpx.AsyncClient(timeout=_timeout()) as client:
-        r = await client.post(f"{_base()}{path}", headers=_headers(), json=body)
+        r = await client.post(
+            f"{_base()}{path}",
+            headers=_headers(),
+            json=body if body is not None else {},
+        )
         r.raise_for_status()
         return r.json()
+
+
+def _items_from(data: Any) -> list[dict[str, Any]]:
+    if isinstance(data, list):
+        return [x for x in data if isinstance(x, dict)]
+    if isinstance(data, dict):
+        for key in ("items", "scenes", "automations", "scripts", "data"):
+            val = data.get(key)
+            if isinstance(val, list):
+                return [x for x in val if isinstance(x, dict)]
+    return []
+
+
+def fuzzy_find(
+    items: list[dict[str, Any]],
+    query: str | None,
+) -> dict[str, Any] | None:
+    """Fuzzy name/id match — exact, substring, then token overlap."""
+    if not items:
+        return None
+    if not query or not str(query).strip():
+        return items[0]
+    q = str(query).lower().strip()
+    for i in items:
+        name = str(i.get("name") or "").lower()
+        iid = str(i.get("id") or "").lower()
+        if name == q or iid == q:
+            return i
+    for i in items:
+        name = str(i.get("name") or "").lower()
+        iid = str(i.get("id") or "").lower()
+        if q in name or name in q or q in iid:
+            return i
+    q_tokens = [t for t in re.split(r"\s+", q) if t]
+    best: dict[str, Any] | None = None
+    best_score = 0
+    for i in items:
+        name = str(i.get("name") or "").lower()
+        score = sum(1 for tok in q_tokens if tok in name)
+        if score > best_score:
+            best_score = score
+            best = i
+    return best if best_score > 0 else None
 
 
 async def list_strips() -> list[dict[str, Any]]:
@@ -140,7 +189,6 @@ def _pick_strips(strips: list[dict[str, Any]], target: str) -> list[dict[str, An
         hit = [s for s in strips if match(s, ("right", "прав", "1")) or int(s.get("index", -1)) == 1]
         return hit or strips[1:2] or strips[:1]
 
-    # Fuzzy name match
     hit = []
     for s in strips:
         blob = f"{s.get('name', '')} {s.get('id', '')}".lower()
@@ -235,6 +283,8 @@ async def _run_on_targets(
                     if isinstance(eff, int) or (isinstance(eff, str) and str(eff).isdigit())
                     else EFFECT_IDS.get(str(eff).lower(), 0)
                 )
+            if "speed" in kwargs and kwargs["speed"] is not None:
+                s["speed"] = int(kwargs["speed"])
         names = ", ".join(str(s.get("name") or s.get("id") or s.get("index")) for s in picked)
         return ActionResult(success=True, detail=names, data=last if isinstance(last, dict) else None)
     except Exception as exc:  # noqa: BLE001
@@ -250,6 +300,25 @@ async def lights_off(strip: str = "all") -> ActionResult:
     return await _run_on_targets(strip, on=False)
 
 
+async def toggle(strip: str = "all") -> ActionResult:
+    """Flip on/off for each matched strip based on current state."""
+    try:
+        strips = await list_strips()
+        picked = _pick_strips(strips, strip)
+        if not picked:
+            return ActionResult(success=False, detail="no_strips")
+        last: dict[str, Any] | None = None
+        for s in picked:
+            new_on = not bool(s.get("on"))
+            last = await apply_strip(s, on=new_on)
+            s["on"] = new_on
+        names = ", ".join(str(s.get("name") or s.get("id") or s.get("index")) for s in picked)
+        return ActionResult(success=True, detail=names, data=last if isinstance(last, dict) else None)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("toggle failed strip=%s", strip)
+        return ActionResult(success=False, detail=str(exc))
+
+
 async def set_brightness(value: int, strip: str = "all") -> ActionResult:
     """value is 0–100 percent from NLU."""
     return await _run_on_targets(strip, on=True, brightness=_pct_to_bri(value))
@@ -262,3 +331,67 @@ async def set_color(hex_color: str, strip: str = "all") -> ActionResult:
 
 async def set_effect(effect: str, strip: str = "all") -> ActionResult:
     return await _run_on_targets(strip, on=True, effect=effect)
+
+
+async def set_speed(value: int, strip: str = "all") -> ActionResult:
+    """value is 0–100 percent from NLU → firmware 1–255."""
+    return await _run_on_targets(strip, on=True, speed=_pct_to_bri(value) or 1)
+
+
+# ── Scenes / automations / scripts ───────────────────────────────────────
+
+async def list_scenes() -> list[dict[str, Any]]:
+    return _items_from(await _get("/api/scenes"))
+
+
+async def list_automations() -> list[dict[str, Any]]:
+    return _items_from(await _get("/api/automations"))
+
+
+async def list_scripts() -> list[dict[str, Any]]:
+    return _items_from(await _get("/api/scripts"))
+
+
+async def activate_scene(query: str | None = None) -> ActionResult:
+    try:
+        items = await list_scenes()
+        scene = fuzzy_find(items, query)
+        if not scene:
+            return ActionResult(success=False, detail="scene_not_found")
+        sid = scene.get("id")
+        data = await _post(f"/api/scenes/{sid}/activate")
+        name = str(scene.get("name") or sid)
+        return ActionResult(success=True, detail=name, data=data if isinstance(data, dict) else None)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("activate_scene failed query=%s", query)
+        return ActionResult(success=False, detail=str(exc))
+
+
+async def run_automation(query: str | None = None) -> ActionResult:
+    try:
+        items = await list_automations()
+        auto = fuzzy_find(items, query)
+        if not auto:
+            return ActionResult(success=False, detail="automation_not_found")
+        aid = auto.get("id")
+        data = await _post(f"/api/automations/{aid}/run")
+        name = str(auto.get("name") or aid)
+        return ActionResult(success=True, detail=name, data=data if isinstance(data, dict) else None)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("run_automation failed query=%s", query)
+        return ActionResult(success=False, detail=str(exc))
+
+
+async def run_script(query: str | None = None) -> ActionResult:
+    try:
+        items = await list_scripts()
+        script = fuzzy_find(items, query)
+        if not script:
+            return ActionResult(success=False, detail="script_not_found")
+        sid = script.get("id")
+        data = await _post(f"/api/scripts/{sid}/run")
+        name = str(script.get("name") or sid)
+        return ActionResult(success=True, detail=name, data=data if isinstance(data, dict) else None)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("run_script failed query=%s", query)
+        return ActionResult(success=False, detail=str(exc))
