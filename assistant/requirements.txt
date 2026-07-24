@@ -1,0 +1,30 @@
+# Core web framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# HTTP client (home control)
+httpx>=0.25.0
+
+# Settings / env
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# TTS — edge-tts is the primary (Microsoft Neural voices, Russian female)
+edge-tts>=6.1.9
+
+# TTS fallbacks (optional, uncomment if edge-tts unavailable offline)
+# gTTS>=2.3.2
+# pyttsx3>=2.90
+
+# STT — stubs work without these; install one to enable real STT
+# openai-whisper>=20231117
+# vosk>=0.3.45
+
+# Audio processing helpers (for audio endpoint, optional)
+# soundfile>=0.12.1
+# pydub>=0.25.1
+
+# Optional local LLM via Ollama REST API (no extra Python deps needed)
+# ollama client is plain httpx calls

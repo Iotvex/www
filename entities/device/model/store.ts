@@ -35,20 +35,54 @@ export const catalogLoaded = createEvent<{
   entities: EntityState[]
 }>()
 
-/** Pause agent→entity merges while strip commands / fades are in flight. */
-export const pauseStripLiveMerge = createEvent()
-export const resumeStripLiveMerge = createEvent()
-export const $stripLiveMergePaused = createStore(false)
-  .on(pauseStripLiveMerge, () => true)
-  .on(resumeStripLiveMerge, () => false)
+type PendingStrip = {
+  entityId: string
+  version: number
+  deadlineAt: number
+  expected: Omit<StripState, "index">
+}
 
-let stripMergeResumeTimer: ReturnType<typeof setTimeout> | null = null
-function scheduleStripLiveMergeResume(delayMs = 900) {
-  if (stripMergeResumeTimer) clearTimeout(stripMergeResumeTimer)
-  stripMergeResumeTimer = setTimeout(() => {
-    stripMergeResumeTimer = null
-    resumeStripLiveMerge()
-  }, delayMs)
+/** Last-write-wins expectations — live polls must not clobber these until confirmed/timeout. */
+const pendingByEntity = new Map<string, PendingStrip>()
+let pendingVersion = 0
+
+const PENDING_TTL_MS = 8_000
+
+function stripCloseEnough(live: Omit<StripState, "index">, expected: Omit<StripState, "index">) {
+  if (Boolean(live.on) !== Boolean(expected.on)) return false
+  if (Math.abs(Number(live.brightness) - Number(expected.brightness)) > 2) return false
+  if (Math.abs(Number(live.r) - Number(expected.r)) > 2) return false
+  if (Math.abs(Number(live.g) - Number(expected.g)) > 2) return false
+  if (Math.abs(Number(live.b) - Number(expected.b)) > 2) return false
+  if (Number(live.effect) !== Number(expected.effect)) return false
+  if (Math.abs(Number(live.speed) - Number(expected.speed)) > 2) return false
+  return true
+}
+
+function rememberPending(entityId: string, expected: Omit<StripState, "index">) {
+  pendingVersion += 1
+  pendingByEntity.set(entityId, {
+    entityId,
+    version: pendingVersion,
+    deadlineAt: Date.now() + PENDING_TTL_MS,
+    expected: { ...expected },
+  })
+}
+
+function clearPending(entityId: string) {
+  pendingByEntity.delete(entityId)
+}
+
+function pruneExpiredPending() {
+  const now = Date.now()
+  for (const [id, p] of pendingByEntity) {
+    if (p.deadlineAt <= now) pendingByEntity.delete(id)
+  }
+}
+
+function hasFreshPending(entityId: string) {
+  pruneExpiredPending()
+  return pendingByEntity.has(entityId)
 }
 
 type StripPatch = { index: number } & Partial<StripState>
@@ -97,6 +131,7 @@ function applyEntityCommand(entities: EntityState[], cmd: EntityCommand): Entity
     if (cmd.action === "set_color") {
       state = "on"
       attrs.rgb_color = [cmd.r, cmd.g, cmd.b]
+      attrs.effect = 0
     }
     if (cmd.action === "set_effect") {
       state = "on"
@@ -141,7 +176,7 @@ function commandToStripPatch(entities: EntityState[], cmd: EntityCommand): Strip
     return { index, ...base, brightness: cmd.brightness, on: true }
   }
   if (cmd.action === "set_color") {
-    return { index, ...base, r: cmd.r, g: cmd.g, b: cmd.b, on: true }
+    return { index, ...base, r: cmd.r, g: cmd.g, b: cmd.b, effect: 0, on: true }
   }
   if (cmd.action === "set_effect") {
     return {
@@ -161,6 +196,59 @@ function mergeLightNode(byId: Map<string, EntityState>, node: IotvexNode) {
   node.strips.forEach((s, idx) => {
     const entityId = lightStripEntityId(node.node_id, idx)
     const existing = byId.get(entityId)
+    const live: Omit<StripState, "index"> = {
+      on: s.on,
+      brightness: s.brightness,
+      r: s.r,
+      g: s.g,
+      b: s.b,
+      effect: s.effect,
+      speed: s.speed,
+    }
+
+    const pending = pendingByEntity.get(entityId)
+    if (pending) {
+      if (stripCloseEnough(live, pending.expected)) {
+        clearPending(entityId)
+      } else if (pending.deadlineAt > Date.now()) {
+        // Preserve optimistic expected fields (catalog/poll snapshots are stale).
+        const exp = pending.expected
+        const attributes: Record<string, unknown> = {
+          ...(existing?.attributes || {}),
+          brightness: exp.brightness,
+          rgb_color: [exp.r, exp.g, exp.b],
+          effect: exp.effect,
+          speed: exp.speed,
+          supported_color_modes: ["rgb", "brightness"],
+          color_mode: "rgb",
+          strip_index: idx,
+          node_id: node.node_id,
+          platform: "iotvex",
+          effect_list: existing?.attributes?.effect_list || DEFAULT_EFFECT_LIST,
+          friendly_name: existing?.name || defaultStripName(idx),
+        }
+        const caps =
+          existing?.capabilities?.length
+            ? existing.capabilities
+            : inferCapabilities("light", attributes)
+        byId.set(entityId, {
+          entity_id: entityId,
+          domain: "light",
+          name: existing?.name || defaultStripName(idx),
+          state: exp.on ? "on" : "off",
+          available: true,
+          area: existing?.area,
+          device_id: deviceId,
+          last_changed: existing?.last_changed || new Date().toISOString(),
+          attributes,
+          capabilities: caps,
+        })
+        return
+      } else {
+        clearPending(entityId)
+      }
+    }
+
     const attributes: Record<string, unknown> = {
       ...(existing?.attributes || {}),
       brightness: s.brightness,
@@ -332,7 +420,10 @@ function abortAfter(ms: number): AbortSignal {
   return ctrl.signal
 }
 
+let nodeFetchSeq = 0
+
 export const fetchNodeFx = createEffect(async (): Promise<IotvexNodesPayload> => {
+  const seq = ++nodeFetchSeq
   const res = await fetch("/api/iotvex/nodes", {
     cache: "no-store",
     credentials: "same-origin",
@@ -344,6 +435,9 @@ export const fetchNodeFx = createEffect(async (): Promise<IotvexNodesPayload> =>
     throw new Error(body.error || `HTTP ${res.status}`)
   }
   const body = (await res.json()) as IotvexNodesPayload
+  if (seq !== nodeFetchSeq) {
+    return { nodes: $nodes.getState() }
+  }
   return { nodes: body.nodes || [] }
 })
 
@@ -381,13 +475,28 @@ export const setStripFx = createEffect(async (payload: StripPatch & { node_id?: 
 
 export const callEntityFx = createEffect(
   async ({ entities, cmd }: { entities: EntityState[]; cmd: EntityCommand }) => {
-    const patch = commandToStripPatch(entities, cmd)
+    // Apply against latest optimistic snapshot so rapid clicks don't reuse stale RGB/bri.
+    const latest = $entities.getState()
+    const patch = commandToStripPatch(latest.length ? latest : entities, cmd)
     if (!patch) {
       throw new Error(`Strip control unavailable for ${cmd.entity_id}`)
     }
-    const entity = entities.find((e) => e.entity_id === cmd.entity_id)
+    const entity =
+      latest.find((e) => e.entity_id === cmd.entity_id) ||
+      entities.find((e) => e.entity_id === cmd.entity_id)
     const nodeId = Number(entity?.attributes.node_id)
     const { index, ...body } = patch
+    const expected: Omit<StripState, "index"> = {
+      on: Boolean(body.on),
+      brightness: Number(body.brightness),
+      r: Number(body.r),
+      g: Number(body.g),
+      b: Number(body.b),
+      effect: Number(body.effect),
+      speed: Number(body.speed),
+    }
+    rememberPending(cmd.entity_id, expected)
+
     const res = await fetch(`/api/iotvex/strips/${index}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -398,6 +507,7 @@ export const callEntityFx = createEffect(
       signal: abortAfter(3000),
     })
     if (!res.ok) {
+      clearPending(cmd.entity_id)
       const txt = await res.text()
       throw new Error(txt || `HTTP ${res.status}`)
     }
@@ -484,98 +594,60 @@ export const $sensors = $entities.map((list) =>
 
 export const callEntityRequested = createEvent<EntityCommand>()
 
+/** Per-entity serial queue — coalesce to the latest command while one is in flight. */
+const stripQueues = new Map<
+  string,
+  { tail: Promise<unknown>; latest: EntityCommand | null; running: boolean }
+>()
+
+async function enqueueStripCommand(cmd: EntityCommand) {
+  const key = cmd.entity_id
+  let q = stripQueues.get(key)
+  if (!q) {
+    q = { tail: Promise.resolve(), latest: null, running: false }
+    stripQueues.set(key, q)
+  }
+  q.latest = cmd
+  // Optimistic UI immediately from the latest command.
+  setEntities(applyEntityCommand($entities.getState(), cmd))
+
+  if (q.running) return
+  q.running = true
+  q.tail = q.tail
+    .catch(() => undefined)
+    .then(async () => {
+      while (q!.latest) {
+        const next = q!.latest
+        q!.latest = null
+        try {
+          await callEntityFx({ entities: $entities.getState(), cmd: next })
+        } catch {
+          // Failure toast is handled by CommandFeedback via callEntityFx.fail
+        }
+      }
+      q!.running = false
+    })
+}
+
 export function callEntity(cmd: EntityCommand) {
-  pauseStripLiveMerge()
-  callEntityRequested(cmd)
+  void enqueueStripCommand(cmd)
 }
 
-const RAMP_STEPS = 10
-const RAMP_MS = 450
-const rampingEntities = new Set<string>()
-
-function sleep(ms: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, ms))
-}
-
-/** Fade brightness toward 0 then off, or on then fade up — preserves RGB/effect/speed. */
+/**
+ * Power toggle — one SET_STRIP only.
+ * (Old multi-step brightness ramp flooded the mesh and caused flicker.)
+ */
 export async function smoothToggleEntity(entityId: string, turnOn: boolean) {
-  if (rampingEntities.has(entityId)) return
   const entity = $entities.getState().find((e) => e.entity_id === entityId)
   if (!entity) return
-
-  const index = Number(entity.attributes.strip_index)
-  const hasStrip = Number.isFinite(index)
-  const canRamp =
-    hasStrip &&
-    (entity.capabilities?.includes("brightness") ||
-      Number.isFinite(Number(entity.attributes.brightness)))
-
-  if (!canRamp) {
-    callEntity({ entity_id: entityId, action: turnOn ? "turn_on" : "turn_off" })
-    return
-  }
-
-  pauseStripLiveMerge()
-
-  const savedBri = Math.max(1, Number(entity.attributes.brightness ?? 128))
-  const stepMs = Math.round(RAMP_MS / RAMP_STEPS)
-  rampingEntities.add(entityId)
-
-  const write = async (fields: { on: boolean; brightness: number }) => {
-    callEntity({
-      entity_id: entityId,
-      action: "set_power",
-      on: fields.on,
-      brightness: fields.brightness,
-    })
-    await sleep(stepMs)
-  }
-
-  try {
-    if (!turnOn) {
-      for (let i = 1; i <= RAMP_STEPS; i++) {
-        const brightness = Math.max(1, Math.round(savedBri * (1 - i / RAMP_STEPS)))
-        await write({ on: true, brightness })
-      }
-      callEntity({
-        entity_id: entityId,
-        action: "set_power",
-        on: false,
-        brightness: savedBri,
-      })
-      return
-    }
-
-    await write({ on: true, brightness: 1 })
-    for (let i = 2; i <= RAMP_STEPS; i++) {
-      const brightness = Math.max(1, Math.round(savedBri * (i / RAMP_STEPS)))
-      await write({ on: true, brightness })
-    }
-    callEntity({
-      entity_id: entityId,
-      action: "set_power",
-      on: true,
-      brightness: savedBri,
-    })
-  } finally {
-    rampingEntities.delete(entityId)
-    scheduleStripLiveMergeResume(1200)
-  }
+  const bri = Math.max(1, Number(entity.attributes.brightness ?? 128))
+  callEntity({
+    entity_id: entityId,
+    action: "set_power",
+    on: turnOn,
+    brightness: bri,
+  })
 }
-
-sample({
-  clock: callEntityRequested,
-  source: $entities,
-  fn: (entities, cmd) => ({ entities, cmd }),
-  target: callEntityFx,
-})
-
-sample({
-  clock: callEntityRequested,
-  source: $entities,
-  fn: (entities, cmd) => applyEntityCommand(entities, cmd),
-  target: setEntities,
-})
 
 sample({
   clock: fetchCatalogFx.doneData,
@@ -629,8 +701,15 @@ sample({
 /** Catalog reload must not drop live-only weather/light rows until discover persists them. */
 sample({
   clock: catalogLoaded,
-  source: $nodes,
-  fn: (nodes, catalog) => mergeLiveOntoCatalog(catalog.entities, nodes),
+  source: combine($nodes, $entities),
+  fn: ([nodes, current], catalog) => {
+    // Prefer current optimistic rows for entities that still have pending writes.
+    const byId = new Map(catalog.entities.map((e) => [e.entity_id, e]))
+    for (const e of current) {
+      if (hasFreshPending(e.entity_id)) byId.set(e.entity_id, e)
+    }
+    return mergeLiveOntoCatalog([...byId.values()], nodes)
+  },
   target: setEntities,
 })
 
@@ -641,19 +720,22 @@ sample({
   target: setDevices,
 })
 
+/**
+ * Always merge live nodes — pending expectations inside mergeLightNode keep
+ * optimistic UI stable and clear as soon as the device matches (no full pause).
+ * Pausing the whole catalog caused 8s of sticky UI and blocked confirmation.
+ */
 sample({
   clock: fetchNodeFx.doneData,
-  source: combine($entities, $stripLiveMergePaused),
-  filter: ([, paused]) => !paused,
-  fn: ([prev], payload) => mergeLiveOntoCatalog(prev, payload.nodes),
+  source: $entities,
+  fn: (prev, payload) => mergeLiveOntoCatalog(prev, payload.nodes),
   target: setEntities,
 })
 
 sample({
   clock: fetchNodeFx.doneData,
-  source: combine($devices, $stripLiveMergePaused),
-  filter: ([, paused]) => !paused,
-  fn: ([prev], payload) => mergeLiveDevicesOntoCatalog(prev, payload.nodes),
+  source: $devices,
+  fn: (prev, payload) => mergeLiveDevicesOntoCatalog(prev, payload.nodes),
   target: setDevices,
 })
 
@@ -687,9 +769,4 @@ sample({
   target: fetchNodeFx,
 })
 
-callEntityFx.finally.watch(() => {
-  scheduleStripLiveMergeResume()
-})
-setStripFx.finally.watch(() => {
-  scheduleStripLiveMergeResume()
-})
+// Pending expectations own the pause lifecycle — do not resume on HTTP finish alone.
