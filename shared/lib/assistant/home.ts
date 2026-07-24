@@ -220,12 +220,23 @@ export async function executeAssistantIntent(intent: ParsedIntent): Promise<{
       const strips = pickStrips(await listStrips(), ent.target, ent.target_index)
       if (!strips.length) return { ok: false, detail: "no_strips", actions: [] }
 
+      // Compound: apply color + brightness + effect + speed in one SET_STRIP when present.
       const actions = await Promise.all(
         strips.map(async (strip) => {
-          if (name === "lights_on") return controlStrip(strip, { on: true })
-          if (name === "lights_off") return controlStrip(strip, { on: false })
-          if (name === "toggle") return controlStrip(strip, { on: !strip.on })
-          if (name === "set_brightness") {
+          if (name === "lights_off") {
+            return controlStrip(strip, { on: false })
+          }
+          if (name === "toggle" && !ent.color_hex && ent.brightness == null && !ent.effect) {
+            return controlStrip(strip, { on: !strip.on })
+          }
+
+          const patch: Partial<ProtoStrip> = { on: true }
+
+          if (name === "lights_on") {
+            patch.on = true
+          }
+
+          if (ent.brightness != null || ent.relative != null) {
             let pct = ent.brightness
             if (pct == null && ent.relative != null) {
               pct = Math.max(
@@ -233,32 +244,45 @@ export async function executeAssistantIntent(intent: ParsedIntent): Promise<{
                 Math.min(100, Math.round((strip.brightness / 255) * 100) + ent.relative),
               )
             }
-            if (pct == null) {
-              return {
-                action: "set_brightness",
-                success: false,
-                detail: "missing_brightness",
-              } satisfies ActionResult
-            }
-            return controlStrip(strip, { on: true, brightness: pctToByte(pct) })
+            if (pct != null) patch.brightness = pctToByte(pct)
+          } else if (name === "set_brightness") {
+            return {
+              action: "set_brightness",
+              success: false,
+              detail: "missing_brightness",
+            } satisfies ActionResult
           }
-          if (name === "set_color") {
-            const hex = (ent.color_hex || "#FFFFFF").replace("#", "")
-            const r = parseInt(hex.slice(0, 2), 16)
-            const g = parseInt(hex.slice(2, 4), 16)
-            const b = parseInt(hex.slice(4, 6), 16)
-            return controlStrip(strip, { on: true, r, g, b, effect: 0 })
+
+          if (ent.color_hex) {
+            const hex = ent.color_hex.replace("#", "")
+            patch.r = parseInt(hex.slice(0, 2), 16)
+            patch.g = parseInt(hex.slice(2, 4), 16)
+            patch.b = parseInt(hex.slice(4, 6), 16)
+            // Color implies solid unless a non-solid effect was also asked
+            if (!ent.effect || ent.effect === "solid") patch.effect = 0
           }
-          if (name === "set_effect") {
-            const effect = ent.effect || "rainbow"
-            const effectId = EFFECT_NAME_TO_ID[effect] ?? 1
-            return controlStrip(strip, { on: true, effect: effectId })
+
+          if (ent.effect) {
+            patch.effect = EFFECT_NAME_TO_ID[ent.effect] ?? 1
           }
-          if (name === "set_speed") {
-            const pct = ent.speed ?? 50
-            return controlStrip(strip, { on: true, speed: pctToByte(pct) })
+
+          if (ent.speed != null) {
+            patch.speed = pctToByte(ent.speed)
           }
-          return { action: name, success: false, detail: "unsupported" } satisfies ActionResult
+
+          // Pure power on with no other fields
+          if (
+            name === "lights_on" &&
+            ent.brightness == null &&
+            ent.relative == null &&
+            !ent.color_hex &&
+            !ent.effect &&
+            ent.speed == null
+          ) {
+            return controlStrip(strip, { on: true })
+          }
+
+          return controlStrip(strip, patch)
         }),
       )
       const ok = actions.some((a) => a.success)
