@@ -226,11 +226,11 @@ function extractTarget(t: string): {
 } {
   // Ordinals / numbers: первая лента, 1-я, лента 2, strip 1
   const ordinalFirst =
-    /перв(?:ой|ую|ая|ое|ый|ом)?|first|1[\-\s]?[яийе]|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?1(?:\D|$)|(?:лент[аыуеию]|strip)\s*#?\s*0(?:\D|$)/iu.test(
+    /перв(?:ой|ую|ая|ое|ый|ом)?|first|(?:^|[^\p{L}\d])1[\-\s]?[яийе]?(?=[^\p{L}\d]|$)|(?:^|[^\p{L}\d])1\s*лент|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?1(?:\D|$)|(?:лент[аыуеию]|strip)\s*#?\s*0(?:\D|$)/iu.test(
       t,
     )
   const ordinalSecond =
-    /втор(?:ой|ую|ая|ое|ый|ом)?|second|2[\-\s]?[яийе]|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?2(?:\D|$)|(?:лент[аыуеию]|strip)\s*#?\s*1(?:\D|$)/iu.test(
+    /втор(?:ой|ую|ая|ое|ый|ом)?|second|(?:^|[^\p{L}\d])2[\-\s]?[яийе]?(?=[^\p{L}\d]|$)|(?:^|[^\p{L}\d])2\s*лент|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?2(?:\D|$)|(?:лент[аыуеию]|strip)\s*#?\s*1(?:\D|$)/iu.test(
       t,
     )
   const ordinalThird =
@@ -257,7 +257,7 @@ function extractTarget(t: string): {
   const named = t.match(
     /(?:лент[аыуеию]|strip|свет|light)\s+([a-zа-яё0-9][\wа-яё\-]{1,24})/iu,
   )
-  if (named?.[1] && !/^(на|до|для|the|a|и)$/i.test(named[1])) {
+  if (named?.[1] && !/^(на|до|для|the|a|и|\d+)$/i.test(named[1])) {
     return { target: named[1].toLowerCase() }
   }
 
