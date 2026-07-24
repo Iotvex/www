@@ -88,18 +88,35 @@ async function listStrips(): Promise<StripRow[]> {
   return strips
 }
 
-function pickStrips(strips: StripRow[], target?: string): StripRow[] {
+function pickStrips(strips: StripRow[], target?: string, targetIndex?: number): StripRow[] {
   if (!strips.length) return []
-  const t = (target || "all").toLowerCase()
-  if (t === "all" || t === "lights") return strips
-  if (t === "left") {
+
+  if (targetIndex != null && Number.isFinite(targetIndex)) {
+    const byIdx = strips.filter((s) => s.index === targetIndex)
+    if (byIdx.length) return byIdx
+    if (targetIndex >= 0 && targetIndex < strips.length) return [strips[targetIndex]]
+  }
+
+  const t = (target || "all").toLowerCase().trim()
+  if (!t || t === "all" || t === "lights") return strips
+
+  const stripMatch = t.match(/^strip:(\d+)$/)
+  if (stripMatch) {
+    const idx = Number(stripMatch[1])
+    const byIdx = strips.filter((s) => s.index === idx)
+    if (byIdx.length) return byIdx
+    if (idx >= 0 && idx < strips.length) return [strips[idx]]
+  }
+
+  if (t === "left" || t === "first" || t === "1") {
     const hit = strips.filter((s) => s.index === 0 || /left|лев/i.test(s.name))
     return hit.length ? hit : strips.slice(0, 1)
   }
-  if (t === "right") {
+  if (t === "right" || t === "second" || t === "2") {
     const hit = strips.filter((s) => s.index === 1 || /right|прав/i.test(s.name))
     return hit.length ? hit : strips.slice(1, 2)
   }
+
   const fuzzy = strips.filter((s) => {
     const blob = `${s.name} ${s.id}`.toLowerCase()
     return blob.includes(t) || t.includes(blob)
@@ -200,7 +217,7 @@ export async function executeAssistantIntent(intent: ParsedIntent): Promise<{
       name === "set_effect" ||
       name === "set_speed"
     ) {
-      const strips = pickStrips(await listStrips(), ent.target)
+      const strips = pickStrips(await listStrips(), ent.target, ent.target_index)
       if (!strips.length) return { ok: false, detail: "no_strips", actions: [] }
 
       const actions = await Promise.all(

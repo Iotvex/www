@@ -263,32 +263,72 @@ _BAGS: tuple[_Bag, ...] = (
 # Entity extractors
 # ─────────────────────────────────────────────
 
-def extract_target(text: str) -> str:
-    if re.search(r"\b(лев(ую|ая|ой|ые)?|left)\b", text, re.IGNORECASE):
-        return "left"
-    if re.search(r"\b(прав(ую|ая|ой|ые)?|right)\b", text, re.IGNORECASE):
-        return "right"
-    if re.search(r"\b(все|всё|все|обе|оба|all|both)\b", text, re.IGNORECASE):
-        return "all"
-    return "all"
+def extract_target(text: str) -> dict[str, Any]:
+    """Return {target, target_index?} for left/right/ordinal/strip N."""
+    if re.search(
+        r"перв(?:ой|ую|ая|ое|ый|ом)?|first|1[\-\s]?[яийе]"
+        r"|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?1(?:\D|$)",
+        text,
+        re.IGNORECASE,
+    ):
+        return {"target": "strip:0", "target_index": 0}
+    if re.search(
+        r"втор(?:ой|ую|ая|ое|ый|ом)?|second|2[\-\s]?[яийе]"
+        r"|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?2(?:\D|$)",
+        text,
+        re.IGNORECASE,
+    ):
+        return {"target": "strip:1", "target_index": 1}
+    if re.search(
+        r"трет(?:ьей|ью|ья|ий|ьем)|third|3[\-\s]?[яийе]"
+        r"|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?3(?:\D|$)",
+        text,
+        re.IGNORECASE,
+    ):
+        return {"target": "strip:2", "target_index": 2}
+
+    if re.search(r"(?<!\w)(?:лев(?:ую|ая|ой|ые|ом|ое)?|left)(?!\w)", text, re.IGNORECASE):
+        return {"target": "left", "target_index": 0}
+    if re.search(r"(?<!\w)(?:прав(?:ую|ая|ой|ые|ом|ое)?|right)(?!\w)", text, re.IGNORECASE):
+        return {"target": "right", "target_index": 1}
+    if re.search(r"(?<!\w)(?:все|всё|обе|оба|all|both)(?!\w)", text, re.IGNORECASE):
+        return {"target": "all"}
+    return {"target": "all"}
 
 
 def extract_brightness(text: str) -> dict[str, int]:
-    # Absolute: require brightness cue or an explicit percent sign
-    m = re.search(
-        r"(?:яркость|brightness|яркост\w*)\s*(?:на\s*|до\s*|to\s*|=\s*)?(\d{1,3})\s*%?",
-        text,
-        re.IGNORECASE,
-    )
-    if not m:
-        m = re.search(r"\b(\d{1,3})\s*%", text)
+    if re.search(r"яркость|brightness|яркост", text, re.IGNORECASE):
+        pct = re.search(r"(\d{1,3})\s*%", text)
+        if pct:
+            n = int(pct.group(1))
+            if 0 <= n <= 100:
+                return {"brightness": n}
+        cleaned = re.sub(
+            r"(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|#\s*|number\s*)?[0-8](?!\d)",
+            " ",
+            text,
+            flags=re.IGNORECASE,
+        )
+        cleaned = re.sub(
+            r"(?:перв|втор|трет|first|second|third)\w*",
+            " ",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
+        parts = re.split(r"яркость|brightness|яркост\w*", cleaned, flags=re.IGNORECASE)
+        after = " ".join(parts[1:]) if len(parts) > 1 else cleaned
+        nums = [int(x) for x in re.findall(r"(\d{1,3})", after)]
+        nums = [n for n in nums if 0 <= n <= 100]
+        if nums:
+            return {"brightness": nums[-1]}
+    m = re.search(r"(?:^|\s)(\d{1,3})\s*%(?:\s|$)", text)
     if m:
         n = int(m.group(1))
         if 0 <= n <= 100:
             return {"brightness": n}
-    if re.search(r"\b(ярче|bright(?:er)?|повыше|увелич)\b", text, re.IGNORECASE):
+    if re.search(r"ярче|bright(?:er)?|повыше|увелич", text, re.IGNORECASE):
         return {"relative": 20}
-    if re.search(r"\b(темнее|dim(?:mer)?|тусклее|пониже|уменьш)\b", text, re.IGNORECASE):
+    if re.search(r"темнее|dim(?:mer)?|тусклее|пониже|уменьш", text, re.IGNORECASE):
         return {"relative": -20}
     return {}
 
@@ -430,7 +470,8 @@ def parse(text: str) -> Intent:
             had_wake=had_wake,
         )
 
-    entities: dict[str, Any] = {"target": extract_target(t)}
+    target_info = extract_target(t)
+    entities: dict[str, Any] = {**target_info}
     entities.update(extract_brightness(t))
     entities.update(extract_color(t))
     eff = extract_effect(t)

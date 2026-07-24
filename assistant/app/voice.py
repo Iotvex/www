@@ -154,21 +154,25 @@ async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
     """
     ent = intent.entities
     strip = ent.get("target", "all")
+    raw_idx = ent.get("target_index")
+    target_index = int(raw_idx) if isinstance(raw_idx, (int, float)) or (
+        isinstance(raw_idx, str) and str(raw_idx).isdigit()
+    ) else None
     results = []
 
     try:
         if intent.name == "lights_on":
-            r = await home.lights_on(strip=strip)
+            r = await home.lights_on(strip=strip, target_index=target_index)
             results.append({"action": "lights_on", "strip": strip, "success": r.success,
                             "backend": r.backend, "detail": r.detail})
 
         elif intent.name == "lights_off":
-            r = await home.lights_off(strip=strip)
+            r = await home.lights_off(strip=strip, target_index=target_index)
             results.append({"action": "lights_off", "strip": strip, "success": r.success,
                             "backend": r.backend, "detail": r.detail})
 
         elif intent.name == "toggle":
-            r = await home.toggle(strip=strip)
+            r = await home.toggle(strip=strip, target_index=target_index)
             results.append({"action": "toggle", "strip": strip, "success": r.success,
                             "backend": r.backend, "detail": r.detail})
 
@@ -176,20 +180,20 @@ async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
             value = ent.get("brightness")
             relative = ent.get("relative")
             if value is not None:
-                r = await home.set_brightness(value, strip=strip)
+                r = await home.set_brightness(value, strip=strip, target_index=target_index)
                 results.append({"action": "set_brightness", "strip": strip, "value": value,
                                  "success": r.success, "backend": r.backend, "detail": r.detail})
             elif relative is not None:
                 # Approximate relative step from current strip brightness (percent).
                 strips = await home.list_strips()
-                picked = home._pick_strips(strips, strip)  # noqa: SLF001
+                picked = home._pick_strips(strips, strip, target_index)  # noqa: SLF001
                 current_pct = 50
                 if picked:
                     bri = int(picked[0].get("brightness") or 128)
                     current_pct = max(0, min(100, round(bri * 100 / 255)))
                 value = max(0, min(100, current_pct + int(relative)))
                 ent["brightness"] = value
-                r = await home.set_brightness(value, strip=strip)
+                r = await home.set_brightness(value, strip=strip, target_index=target_index)
                 results.append({
                     "action": "set_brightness",
                     "strip": strip,
@@ -202,19 +206,19 @@ async def _execute_home_action(intent: nlu.Intent) -> list[dict]:
 
         elif intent.name == "set_color":
             hex_val = ent.get("color_hex", "#FFFFFF")
-            r = await home.set_color(hex_val, strip=strip)
+            r = await home.set_color(hex_val, strip=strip, target_index=target_index)
             results.append({"action": "set_color", "strip": strip, "color": hex_val,
                              "success": r.success, "backend": r.backend, "detail": r.detail})
 
         elif intent.name == "set_effect":
             effect = ent.get("effect", "solid")
-            r = await home.set_effect(effect, strip=strip)
+            r = await home.set_effect(effect, strip=strip, target_index=target_index)
             results.append({"action": "set_effect", "strip": strip, "effect": effect,
                              "success": r.success, "backend": r.backend, "detail": r.detail})
 
         elif intent.name == "set_speed":
             speed = ent.get("speed", 50)
-            r = await home.set_speed(int(speed), strip=strip)
+            r = await home.set_speed(int(speed), strip=strip, target_index=target_index)
             results.append({"action": "set_speed", "strip": strip, "speed": speed,
                              "success": r.success, "backend": r.backend, "detail": r.detail})
 
