@@ -83,7 +83,8 @@
       "settings-services": "Сервисы",
       "settings-users": "Пользователи",
       "settings-backup": "Бэкап",
-      "settings-tools": "Сервис"
+      "settings-tools": "Сервис",
+      "assistant": "Ассистент"
     },
     "mobile": {
       "overview": "Обзор",
@@ -152,6 +153,10 @@
     "settings-tools": {
       "title": "Сервис",
       "subtitle": "Служебные операции"
+    },
+    "assistant": {
+      "title": "Ассистент",
+      "subtitle": "Голос, уровни и разрешения"
     }
   },
   "login": {
@@ -737,5 +742,36 @@
   },
   "sidebar": {
     "panelControlSubtitle": "Панель управления"
+  },
+  "assistant": {
+    "enable": "Включить слух",
+    "disable": "Выключить",
+    "refresh": "Обновить",
+    "unsupported": "Нужен Chrome или Edge с микрофоном.",
+    "permissionsTitle": "Микрофон и динамик",
+    "micGranted": "Микрофон разрешён",
+    "micDenied": "Микрофон запрещён",
+    "micPrompt": "Разрешение ещё не запрашивалось",
+    "micUnknown": "Статус микрофона неизвестен",
+    "speakerReady": "Звук разблокирован",
+    "speakerLocked": "Звук заблокирован — нажмите «Разблокировать»",
+    "speakerUnknown": "Звук ещё не разблокирован",
+    "requestMic": "Разрешить микрофон",
+    "unlockSpeaker": "Разблокировать звук",
+    "permissionsHint": "Разрешения запрашиваются только когда вы включаете слух или нажимаете эти кнопки — не при перезагрузке страницы.",
+    "levelTitle": "Уровень звука",
+    "stateOff": "Выкл",
+    "stateWake": "Жду слово активации",
+    "stateCommand": "Слушаю команду",
+    "stateBusy": "Выполняю…",
+    "stateSpeaking": "Говорю…",
+    "transcriptTitle": "Текст",
+    "heardLabel": "Услышано (вход)",
+    "replyLabel": "Ответ (выход)",
+    "replay": "Повторить озвучку",
+    "commandTitle": "Текстовая команда",
+    "commandPlaceholder": "цвет фиолетовый яркость 30 правая",
+    "send": "Отправить",
+    "wakeHint": "Слова активации: Алекса / Alexa и Света / Sveta. Произносите чётко и чуть громче обычного. Круглая кнопка на любой странице включает слух без этой вкладки."
   }
 }

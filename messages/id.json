@@ -83,7 +83,8 @@
       "settings-services": "Layanan",
       "settings-users": "Pengguna",
       "settings-backup": "Cadangan",
-      "settings-tools": "Alat"
+      "settings-tools": "Alat",
+      "assistant": "Asisten"
     },
     "mobile": {
       "overview": "Ikhtisar",
@@ -152,6 +153,10 @@
     "settings-tools": {
       "title": "Alat",
       "subtitle": "Operasi pemeliharaan"
+    },
+    "assistant": {
+      "title": "Asisten",
+      "subtitle": "Suara dan izin"
     }
   },
   "login": {
@@ -737,5 +742,36 @@
   },
   "sidebar": {
     "panelControlSubtitle": "Panel kontrol"
+  },
+  "assistant": {
+    "enable": "Start listening",
+    "disable": "Stop listening",
+    "refresh": "Refresh",
+    "unsupported": "Voice recognition needs Chrome or Edge with a microphone.",
+    "permissionsTitle": "Microphone & speaker",
+    "micGranted": "Microphone allowed",
+    "micDenied": "Microphone blocked",
+    "micPrompt": "Microphone not asked yet",
+    "micUnknown": "Microphone status unknown",
+    "speakerReady": "Speaker unlocked",
+    "speakerLocked": "Speaker locked — tap Unlock",
+    "speakerUnknown": "Speaker not unlocked yet",
+    "requestMic": "Allow microphone",
+    "unlockSpeaker": "Unlock speaker",
+    "permissionsHint": "Permissions are requested only when you enable listening or tap these buttons — not on page reload.",
+    "levelTitle": "Input level",
+    "stateOff": "Off",
+    "stateWake": "Listening for wake word",
+    "stateCommand": "Listening for command",
+    "stateBusy": "Running…",
+    "stateSpeaking": "Speaking…",
+    "transcriptTitle": "Transcript",
+    "heardLabel": "Heard (in)",
+    "replyLabel": "Reply (out)",
+    "replay": "Replay reply",
+    "commandTitle": "Text command",
+    "commandPlaceholder": "purple color brightness 30 right strip",
+    "send": "Send",
+    "wakeHint": "Wake words: Alexa / Алекса and Sveta / Света. Speak clearly and a bit louder than usual. Use the glass button on any page to start listening without opening this tab."
   }
 }
