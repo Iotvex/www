@@ -1,5 +1,6 @@
 "use client"
 
+import { hasWakeWord, stripWakeWord } from "@/shared/lib/assistant/wake"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Mic, MicOff, Loader2, Send } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
@@ -13,24 +14,6 @@ type AssistantResponse = {
   lang?: string
   error?: string
   actions?: Array<{ success?: boolean; detail?: string }>
-}
-
-/**
- * JS \\b only matches ASCII word chars — broken for Cyrillic («Алекса»).
- * Use unicode letter boundaries instead.
- */
-const WAKE_RE = /(?:^|[^\p{L}\p{N}])(алекс[аеуыой]?|alexa)(?=[^\p{L}\p{N}]|$)/iu
-
-function hasWakeWord(text: string) {
-  return WAKE_RE.test(` ${text} `)
-}
-
-function stripWakeWord(text: string) {
-  return text
-    .replace(/(?:^|[^\p{L}\p{N}])(алекс[аеуыой]?|alexa)(?=[^\p{L}\p{N}]|$)/giu, " ")
-    .replace(/^[,\s.!:;\-—]+/, "")
-    .replace(/\s+/g, " ")
-    .trim()
 }
 
 function SpeechRecognitionCtor(): (new () => SpeechRecognition) | null {
@@ -67,7 +50,7 @@ function speak(text: string, lang: string, onDone?: () => void) {
 export function AlexaListener() {
   const [mode, setMode] = useState<ListenMode>("off")
   const [supported, setSupported] = useState(true)
-  const [hint, setHint] = useState("Нажмите микрофон и скажите «Алекса»")
+  const [hint, setHint] = useState("Нажмите микрофон и скажите «Алекса» или «Света»")
   const [heard, setHeard] = useState("")
   const [draft, setDraft] = useState("")
   const [panelOpen, setPanelOpen] = useState(false)
@@ -140,7 +123,7 @@ export function AlexaListener() {
 
       if (m === "wake") {
         if (!hasWakeWord(text)) return
-        const after = stripWakeWord(text)
+        const { cleaned: after } = stripWakeWord(text)
         // Full phrase in one utterance: «Алекса яркость 100»
         if (after.length >= 2 && (isFinal || after.split(/\s+/).length >= 2)) {
           void runCommand(text)
@@ -154,7 +137,7 @@ export function AlexaListener() {
         commandTimer.current = window.setTimeout(() => {
           if (modeRef.current === "command") {
             setListenMode("wake")
-            setHint("Скажите «Алекса» и команду")
+            setHint("Скажите «Алекса» или «Света» и команду")
           }
         }, 10_000)
         return
@@ -163,7 +146,7 @@ export function AlexaListener() {
       if (m === "command") {
         if (!isFinal) return
         if (commandTimer.current) window.clearTimeout(commandTimer.current)
-        const after = stripWakeWord(text)
+        const { cleaned: after } = stripWakeWord(text)
         if (!after) {
           setHint("Слушаю команду…")
           return
@@ -264,7 +247,7 @@ export function AlexaListener() {
     }
     window.speechSynthesis?.getVoices()
     setListenMode("wake")
-    setHint("Слушаю. Скажите «Алекса» и команду")
+    setHint("Слушаю. Скажите «Алекса» или «Света» и команду")
     setPanelOpen(true)
     startRecognition()
   }, [setListenMode, startRecognition])
@@ -335,7 +318,7 @@ export function AlexaListener() {
           )}
         >
           <p className="text-[12px] font-medium text-foreground/95">
-            {busy ? "Алекса · выполняю" : commanding ? "Алекса · слушаю команду" : "Алекса"}
+            {busy ? "Ассистент · выполняю" : commanding ? "Слушаю команду…" : "Алекса / Света"}
           </p>
           <p className="mt-0.5 text-[12px] leading-snug text-foreground/70">{hint}</p>
           {heard ? (
@@ -369,7 +352,7 @@ export function AlexaListener() {
         type="button"
         onClick={toggle}
         disabled={!supported}
-        title={supported ? "Алекса — постоянное прослушивание" : "Нужен Chrome / Edge"}
+        title={supported ? "Алекса / Света — постоянное прослушивание" : "Нужен Chrome / Edge"}
         className={cn(
           "pointer-events-auto relative flex h-14 w-14 items-center justify-center rounded-full",
           "border border-white/15 shadow-lg transition active:scale-95",

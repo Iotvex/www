@@ -1,7 +1,7 @@
-/**
- * Flexible Alice-like NLU: bag-of-synonyms scoring, not rigid phrases.
- * Understands RU + EN paraphrases for lights, scenes, automations, scripts.
- */
+import {
+  stripWakeWord as _stripWake,
+  type WakeName,
+} from "./wake"
 
 export type AssistantIntentName =
   | "lights_on"
@@ -39,6 +39,7 @@ export type ParsedIntent = {
   cleaned: string
   lang: "ru" | "en"
   hadWake: boolean
+  wakeName: WakeName
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -213,18 +214,8 @@ function normalize(text: string) {
     .trim()
 }
 
-function stripWake(text: string): { cleaned: string; hadWake: boolean } {
-  // Do not use \\b — broken for Cyrillic in JS.
-  const re = /(?:^|[^\p{L}\p{N}])(алекс[аеуыой]?|alexa)(?=[^\p{L}\p{N}]|$)/giu
-  if (!re.test(` ${text} `)) {
-    return { cleaned: text.trim(), hadWake: false }
-  }
-  const cleaned = text
-    .replace(/(?:^|[^\p{L}\p{N}])(алекс[аеуыой]?|alexa)(?=[^\p{L}\p{N}]|$)/giu, " ")
-    .replace(/^[,\s.!:;\-—]+/, "")
-    .replace(/\s+/g, " ")
-    .trim()
-  return { cleaned, hadWake: true }
+function stripWake(text: string): { cleaned: string; hadWake: boolean; wakeName: WakeName } {
+  return _stripWake(text)
 }
 
 function extractTarget(t: string): AssistantEntities["target"] {
@@ -359,7 +350,7 @@ function pickIntent(
 }
 
 export function parseAssistantText(raw: string): ParsedIntent {
-  const { cleaned, hadWake } = stripWake(raw)
+  const { cleaned, hadWake, wakeName } = stripWake(raw)
   const lang = detectLang(cleaned || raw)
   const t = normalize(cleaned || raw)
 
@@ -371,6 +362,7 @@ export function parseAssistantText(raw: string): ParsedIntent {
       cleaned: "",
       lang,
       hadWake,
+      wakeName,
     }
   }
 
@@ -406,16 +398,16 @@ export function parseAssistantText(raw: string): ParsedIntent {
 
   // Brightness without number and without relative → unknown unless "ярче/темнее"
   if (picked.name === "set_brightness" && entities.brightness == null && entities.relative == null) {
-    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake }
+    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake, wakeName }
   }
   if (picked.name === "set_color" && !entities.color_hex) {
-    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake }
+    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake, wakeName }
   }
   if (picked.name === "set_effect" && !entities.effect) {
-    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake }
+    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake, wakeName }
   }
   if (picked.name === "set_speed" && entities.speed == null) {
-    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake }
+    return { name: "unknown", confidence: 0.2, entities, cleaned, lang, hadWake, wakeName }
   }
 
   return {
@@ -425,19 +417,51 @@ export function parseAssistantText(raw: string): ParsedIntent {
     cleaned,
     lang,
     hadWake,
+    wakeName,
   }
 }
 
+const EFFECT_RU: Record<string, string> = {
+  rainbow: "радуга",
+  pulse: "дыхание",
+  chase: "погоня",
+  fire: "огонь",
+  comet: "комета",
+  snow: "снег",
+  wave: "волна",
+  theater: "театр",
+  scanner: "сканер",
+  sparkle: "искры",
+  twinkle: "мерцание",
+  solid: "однотонный",
+  gradient: "градиент",
+  color_loop: "цикл цвета",
+}
+
+/** Spoken confirmation of what was actually done (past tense, feminine). */
 export function formatAssistantReply(
   intent: AssistantIntentName,
   entities: AssistantEntities,
   lang: "ru" | "en",
   ok: boolean,
   detail?: string,
+  wakeName?: WakeName,
 ): string {
+  const who =
+    wakeName === "sveta"
+      ? lang === "ru"
+        ? "Света"
+        : "Sveta"
+      : lang === "ru"
+        ? "Алекса"
+        : "Alexa"
+
   if (!ok && detail) {
-    return lang === "ru" ? `Не получилось: ${detail}` : `Failed: ${detail}`
+    return lang === "ru"
+      ? `Не получилось выполнить: ${detail}.`
+      : `Couldn't do that: ${detail}.`
   }
+
   const tgt =
     entities.target === "left"
       ? lang === "ru"
@@ -447,45 +471,87 @@ export function formatAssistantReply(
         ? lang === "ru"
           ? " на правой ленте"
           : " on the right strip"
-        : ""
+        : lang === "ru"
+          ? " на обеих лентах"
+          : " on both strips"
 
-  const ru: Record<string, string> = {
-    lights_on: `Хорошо, включаю свет${tgt}.`,
-    lights_off: `Выключаю свет${tgt}.`,
-    toggle: `Переключаю свет${tgt}.`,
-    set_brightness:
-      entities.brightness != null
-        ? `Ставлю яркость${tgt} на ${entities.brightness}%.`
-        : `Меняю яркость${tgt}.`,
-    set_color: `Меняю цвет${tgt} на ${entities.color_name || "выбранный"}.`,
-    set_effect: `Включаю эффект «${entities.effect}»${tgt}.`,
-    set_speed: `Скорость${tgt}: ${entities.speed}%.`,
-    activate_scene: `Активирую сцену${detail ? ` «${detail}»` : ""}.`,
-    run_automation: `Запускаю автоматизацию${detail ? ` «${detail}»` : ""}.`,
-    run_script: `Запускаю скрипт${detail ? ` «${detail}»` : ""}.`,
-    greeting: "Слушаю. Чем помочь?",
-    help: "Могу включать и выключать свет, менять яркость, цвет и эффекты, запускать сцены, правила и скрипты. Скажите «Алекса» и команду своими словами.",
-    status: "Я на связи, умный дом отвечает.",
-    unknown: "Не поняла. Попробуйте иначе — например «Алекса, сделай радугу» или «Алекса, яркость 40».",
+  const effectLabel =
+    lang === "ru"
+      ? EFFECT_RU[entities.effect || ""] || entities.effect || "эффект"
+      : entities.effect || "effect"
+
+  if (lang === "ru") {
+    switch (intent) {
+      case "lights_on":
+        return `Готово. Включила свет${tgt}.`
+      case "lights_off":
+        return `Готово. Выключила свет${tgt}.`
+      case "toggle":
+        return `Готово. Переключила свет${tgt}.`
+      case "set_brightness":
+        if (entities.brightness != null) {
+          return `Готово. Поставила яркость${tgt} на ${entities.brightness} процентов.`
+        }
+        if (entities.relative != null && entities.relative > 0) {
+          return `Готово. Сделала ярче${tgt}.`
+        }
+        if (entities.relative != null && entities.relative < 0) {
+          return `Готово. Сделала тусклее${tgt}.`
+        }
+        return `Готово. Изменила яркость${tgt}.`
+      case "set_color":
+        return `Готово. Поставила цвет${tgt}: ${entities.color_name || "выбранный"}.`
+      case "set_effect":
+        return `Готово. Включила эффект «${effectLabel}»${tgt}.`
+      case "set_speed":
+        return `Готово. Поставила скорость${tgt} на ${entities.speed} процентов.`
+      case "activate_scene":
+        return `Готово. Активировала сцену${detail ? ` «${detail}»` : ""}.`
+      case "run_automation":
+        return `Готово. Запустила автоматизацию${detail ? ` «${detail}»` : ""}.`
+      case "run_script":
+        return `Готово. Запустила скрипт${detail ? ` «${detail}»` : ""}.`
+      case "greeting":
+        return `${who} на связи. Чем помочь?`
+      case "help":
+        return `Я ${who}. Могу включать и выключать свет, менять яркость, цвет и эффекты, запускать сцены и правила. Скажите «Алекса» или «Света» и команду.`
+      case "status":
+        return "Я на связи, умный дом отвечает."
+      default:
+        return "Не поняла. Например: «Света, яркость 100» или «Алекса, сделай радугу»."
+    }
   }
-  const en: Record<string, string> = {
-    lights_on: `Turning the lights on${tgt}.`,
-    lights_off: `Turning the lights off${tgt}.`,
-    toggle: `Toggling the lights${tgt}.`,
-    set_brightness:
-      entities.brightness != null
-        ? `Setting brightness${tgt} to ${entities.brightness}%.`
-        : `Adjusting brightness${tgt}.`,
-    set_color: `Setting color${tgt} to ${entities.color_name || "that"}.`,
-    set_effect: `Setting effect to ${entities.effect}${tgt}.`,
-    set_speed: `Speed${tgt}: ${entities.speed}%.`,
-    activate_scene: `Activating scene${detail ? ` ${detail}` : ""}.`,
-    run_automation: `Running automation${detail ? ` ${detail}` : ""}.`,
-    run_script: `Running script${detail ? ` ${detail}` : ""}.`,
-    greeting: "Listening. How can I help?",
-    help: "I can control lights, brightness, color, effects, scenes, automations and scripts. Say Alexa plus a command in your own words.",
-    status: "I'm online and the home is reachable.",
-    unknown: "I didn't catch that. Try rephrasing — e.g. 'Alexa, make it rainbow' or 'Alexa, brightness 40'.",
+
+  switch (intent) {
+    case "lights_on":
+      return `Done. I turned the lights on${tgt}.`
+    case "lights_off":
+      return `Done. I turned the lights off${tgt}.`
+    case "toggle":
+      return `Done. I toggled the lights${tgt}.`
+    case "set_brightness":
+      return entities.brightness != null
+        ? `Done. I set brightness${tgt} to ${entities.brightness} percent.`
+        : `Done. I adjusted brightness${tgt}.`
+    case "set_color":
+      return `Done. I set the color${tgt} to ${entities.color_name || "that"}.`
+    case "set_effect":
+      return `Done. I set the ${effectLabel} effect${tgt}.`
+    case "set_speed":
+      return `Done. I set speed${tgt} to ${entities.speed} percent.`
+    case "activate_scene":
+      return `Done. I activated scene${detail ? ` ${detail}` : ""}.`
+    case "run_automation":
+      return `Done. I ran automation${detail ? ` ${detail}` : ""}.`
+    case "run_script":
+      return `Done. I ran script${detail ? ` ${detail}` : ""}.`
+    case "greeting":
+      return `${who} here. How can I help?`
+    case "help":
+      return `I'm ${who}. I can control lights, brightness, color, effects, scenes and rules. Say Alexa or Sveta plus a command.`
+    case "status":
+      return "I'm online and the home is reachable."
+    default:
+      return "I didn't catch that. Try 'Sveta, brightness 100' or 'Alexa, rainbow'."
   }
-  return (lang === "ru" ? ru : en)[intent] || (lang === "ru" ? ru.unknown : en.unknown)
 }

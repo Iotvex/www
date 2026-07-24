@@ -37,54 +37,52 @@ logger = logging.getLogger(__name__)
 # ─────────────────────────────────────────────
 
 _REPLIES_RU: dict[str, str] = {
-    "lights_on":       "Хорошо, включаю свет{target_suffix}!",
-    "lights_off":      "Выключаю свет{target_suffix}.",
-    "toggle":          "Переключаю свет{target_suffix}.",
-    "set_brightness":  "Устанавливаю яркость{target_suffix} на {brightness}%.",
-    "set_color":       "Меняю цвет{target_suffix} на {color_name}.",
-    "set_effect":      "Включаю эффект «{effect}»{target_suffix}.",
-    "set_speed":       "Скорость{target_suffix}: {speed}%.",
-    "activate_scene":  "Активирую сцену{detail_suffix}.",
-    "run_automation":  "Запускаю автоматизацию{detail_suffix}.",
-    "run_script":      "Запускаю скрипт{detail_suffix}.",
-    "greeting":        "Привет! Я Алекса, ваш умный помощник. Чем могу помочь?",
+    "lights_on":       "Готово. Включила свет{target_suffix}.",
+    "lights_off":      "Готово. Выключила свет{target_suffix}.",
+    "toggle":          "Готово. Переключила свет{target_suffix}.",
+    "set_brightness":  "Готово. Поставила яркость{target_suffix} на {brightness} процентов.",
+    "set_color":       "Готово. Поставила цвет{target_suffix}: {color_name}.",
+    "set_effect":      "Готово. Включила эффект «{effect}»{target_suffix}.",
+    "set_speed":       "Готово. Поставила скорость{target_suffix} на {speed} процентов.",
+    "activate_scene":  "Готово. Активировала сцену{detail_suffix}.",
+    "run_automation":  "Готово. Запустила автоматизацию{detail_suffix}.",
+    "run_script":      "Готово. Запустила скрипт{detail_suffix}.",
+    "greeting":        "На связи. Чем помочь?",
     "help":            (
-        "Я умею: включать, выключать и переключать свет, менять яркость, цвет, эффекты и скорость, "
-        "а также запускать сцены, автоматизации и скрипты. "
-        "Скажите «Алекса» и команду своими словами!"
+        "Могу включать и выключать свет, менять яркость, цвет и эффекты, "
+        "запускать сцены и правила. Скажите «Алекса» или «Света» и команду."
     ),
-    "status":          "Система работает. Все сервисы в норме.",
-    "unknown":         "Извините, я не поняла команду. Скажите «Алекса, помощь», чтобы узнать, что я умею.",
+    "status":          "Я на связи, умный дом отвечает.",
+    "unknown":         "Не поняла. Например: «Света, яркость 100» или «Алекса, сделай радугу».",
 }
 
 _REPLIES_EN: dict[str, str] = {
-    "lights_on":       "Sure, turning on the lights{target_suffix}!",
-    "lights_off":      "Turning off the lights{target_suffix}.",
-    "toggle":          "Toggling the lights{target_suffix}.",
-    "set_brightness":  "Setting brightness{target_suffix} to {brightness}%.",
-    "set_color":       "Changing the color{target_suffix} to {color_name}.",
-    "set_effect":      "Setting effect to {effect}{target_suffix}.",
-    "set_speed":       "Speed{target_suffix}: {speed}%.",
-    "activate_scene":  "Activating scene{detail_suffix}.",
-    "run_automation":  "Running automation{detail_suffix}.",
-    "run_script":      "Running script{detail_suffix}.",
-    "greeting":        "Hi there! I'm Alexa, your smart home assistant. How can I help?",
+    "lights_on":       "Done. I turned the lights on{target_suffix}.",
+    "lights_off":      "Done. I turned the lights off{target_suffix}.",
+    "toggle":          "Done. I toggled the lights{target_suffix}.",
+    "set_brightness":  "Done. I set brightness{target_suffix} to {brightness} percent.",
+    "set_color":       "Done. I set the color{target_suffix} to {color_name}.",
+    "set_effect":      "Done. I set the {effect} effect{target_suffix}.",
+    "set_speed":       "Done. I set speed{target_suffix} to {speed} percent.",
+    "activate_scene":  "Done. I activated scene{detail_suffix}.",
+    "run_automation":  "Done. I ran automation{detail_suffix}.",
+    "run_script":      "Done. I ran script{detail_suffix}.",
+    "greeting":        "Listening. How can I help?",
     "help":            (
-        "I can turn lights on, off or toggle them, set brightness, color, effects and speed, "
-        "and run scenes, automations and scripts. "
-        "Just say 'Alexa' plus a command in your own words!"
+        "I can control lights, brightness, color, effects, scenes and rules. "
+        "Say Alexa or Sveta plus a command."
     ),
-    "status":          "System is running. All services are healthy.",
-    "unknown":         "Sorry, I didn't understand that. Say 'Alexa help' to see what I can do.",
+    "status":          "I'm online and the home is reachable.",
+    "unknown":         "I didn't catch that. Try 'Sveta, brightness 100' or 'Alexa, rainbow'.",
 }
 
 
 def _target_suffix(target: str, lang: str) -> str:
     if target == "all":
-        return ""
+        return " на обеих лентах" if lang == "ru" else " on both strips"
     if lang == "ru":
-        return " (левую ленту)" if target == "left" else " (правую ленту)"
-    return " (left strip)" if target == "left" else " (right strip)"
+        return " на левой ленте" if target == "left" else " на правой ленте"
+    return " on the left strip" if target == "left" else " on the right strip"
 
 
 def _detail_suffix(detail: str, lang: str) -> str:

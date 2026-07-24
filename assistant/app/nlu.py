@@ -34,14 +34,15 @@ class Intent:
 # Wake-word (leading + mid-sentence)
 # ─────────────────────────────────────────────
 
-_RU_WAKE = r"алекс[аеуойы]?"
-_EN_WAKE = r"alexa"
+_RU_WAKE = r"(?:алекс[аеуойы]?|свет(?:а|у|е|ой|ы|ою))"
+_EN_WAKE = r"(?:alexa|sveta)"
 _WAKE_LEAD_RE = re.compile(
     rf"^\s*(?:{_RU_WAKE}|{_EN_WAKE})[,\s!.:]*",
     re.IGNORECASE | re.UNICODE,
 )
+# Avoid ASCII \\b for Cyrillic — use non-letter edges.
 _WAKE_MID_RE = re.compile(
-    rf"\b(?:{_RU_WAKE}|{_EN_WAKE})\b[,\s!.:]*",
+    rf"(?<![\w])(?:{_RU_WAKE}|{_EN_WAKE})(?![\w])[,\s!.:]*",
     re.IGNORECASE | re.UNICODE,
 )
 

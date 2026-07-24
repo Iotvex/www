@@ -65,7 +65,7 @@ class Settings(BaseSettings):
 
     # ── Wake word ─────────────────────────────────────────────────────────
     # Canonical wake word displayed to users
-    wake_word: str = Field(default="Alexa")
+    wake_word: str = Field(default="Alexa / Света")
 
 
 @lru_cache(maxsize=1)

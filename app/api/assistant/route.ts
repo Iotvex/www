@@ -86,6 +86,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     wake_word: "Alexa",
+    wake_words: ["Алекса", "Alexa", "Света", "Sveta"],
     local: true,
     home: probe,
     external: external
