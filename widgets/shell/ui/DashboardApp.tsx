@@ -6,7 +6,10 @@ import { AppSidebar } from "@/widgets/sidebar/ui/AppSidebar"
 import { MobileNav } from "@/widgets/shell/ui/MobileNav"
 import { Topbar } from "@/widgets/topbar/ui/Topbar"
 import { ViewHost } from "@/widgets/shell/ui/ViewHost"
-import { AlexaListener } from "@/features/voice-assistant/ui/AlexaListener"
+import {
+  VoiceAssistantFab,
+  VoiceAssistantProvider,
+} from "@/features/voice-assistant/ui/AlexaListener"
 import { useUnit } from "effector-react"
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
@@ -89,32 +92,34 @@ export function DashboardApp() {
   })
 
   return (
-    <div className="iotvex-shell relative flex overflow-hidden overscroll-none bg-background text-foreground touch-pan-y">
-      <div className="iotvex-atmosphere" aria-hidden>
-        <span className="iotvex-orb iotvex-orb-a" />
-        <span className="iotvex-orb iotvex-orb-b" />
-        <span className="iotvex-orb iotvex-orb-c" />
-        <span className="iotvex-orb iotvex-orb-d" />
-      </div>
-      <div className="relative z-10 flex h-full w-full">
-        <AppSidebar />
-        <div className="flex min-w-0 flex-1 flex-col pl-safe pr-safe">
-          <Topbar
-            title={title}
-            navOpen={navOpen}
-            onNavOpenChange={(open) => {
-              blurActive()
-              setNavOpen(open)
-            }}
-          />
-          {/* No top safe-area: opaque status bar already insets. Bottom: home indicator. */}
-          <main className="iotvex-hide-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-6 md:pb-6">
-            <ViewHost viewId={viewId} />
-          </main>
+    <VoiceAssistantProvider>
+      <div className="iotvex-shell relative flex overflow-hidden overscroll-none bg-background text-foreground touch-pan-y">
+        <div className="iotvex-atmosphere" aria-hidden>
+          <span className="iotvex-orb iotvex-orb-a" />
+          <span className="iotvex-orb iotvex-orb-b" />
+          <span className="iotvex-orb iotvex-orb-c" />
+          <span className="iotvex-orb iotvex-orb-d" />
         </div>
-        <MobileNav />
-        <AlexaListener />
+        <div className="relative z-10 flex h-full w-full">
+          <AppSidebar />
+          <div className="flex min-w-0 flex-1 flex-col pl-safe pr-safe">
+            <Topbar
+              title={title}
+              navOpen={navOpen}
+              onNavOpenChange={(open) => {
+                blurActive()
+                setNavOpen(open)
+              }}
+            />
+            {/* No top safe-area: opaque status bar already insets. Bottom: home indicator. */}
+            <main className="iotvex-hide-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-6 md:pb-6">
+              <ViewHost viewId={viewId} />
+            </main>
+          </div>
+          <MobileNav />
+          <VoiceAssistantFab />
+        </div>
       </div>
-    </div>
+    </VoiceAssistantProvider>
   )
 }

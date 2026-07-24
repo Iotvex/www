@@ -12,6 +12,7 @@ export type AppViewId =
   | "auto-scripts"
   | "activity"
   | "modules"
+  | "assistant"
   | "settings-account"
   | "settings-appearance"
   | "settings-services"
@@ -36,6 +37,7 @@ export const APP_VIEWS: AppViewMeta[] = [
   { id: "auto-scripts", group: "automation" },
   { id: "activity", group: "system" },
   { id: "modules", group: "system" },
+  { id: "assistant", group: "system" },
   { id: "settings-account", group: "settings" },
   { id: "settings-appearance", group: "settings" },
   { id: "settings-services", group: "settings" },

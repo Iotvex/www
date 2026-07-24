@@ -83,7 +83,8 @@
       "settings-services": "服务",
       "settings-users": "用户",
       "settings-backup": "备份",
-      "settings-tools": "工具"
+      "settings-tools": "工具",
+      "assistant": "助手"
     },
     "mobile": {
       "overview": "概览",
@@ -152,6 +153,10 @@
     "settings-tools": {
       "title": "工具",
       "subtitle": "维护操作"
+    },
+    "assistant": {
+      "title": "助手",
+      "subtitle": "语音与权限"
     }
   },
   "login": {
@@ -737,5 +742,36 @@
   },
   "sidebar": {
     "panelControlSubtitle": "控制面板"
+  },
+  "assistant": {
+    "enable": "Start listening",
+    "disable": "Stop listening",
+    "refresh": "Refresh",
+    "unsupported": "Voice recognition needs Chrome or Edge with a microphone.",
+    "permissionsTitle": "Microphone & speaker",
+    "micGranted": "Microphone allowed",
+    "micDenied": "Microphone blocked",
+    "micPrompt": "Microphone not asked yet",
+    "micUnknown": "Microphone status unknown",
+    "speakerReady": "Speaker unlocked",
+    "speakerLocked": "Speaker locked — tap Unlock",
+    "speakerUnknown": "Speaker not unlocked yet",
+    "requestMic": "Allow microphone",
+    "unlockSpeaker": "Unlock speaker",
+    "permissionsHint": "Permissions are requested only when you enable listening or tap these buttons — not on page reload.",
+    "levelTitle": "Input level",
+    "stateOff": "Off",
+    "stateWake": "Listening for wake word",
+    "stateCommand": "Listening for command",
+    "stateBusy": "Running…",
+    "stateSpeaking": "Speaking…",
+    "transcriptTitle": "Transcript",
+    "heardLabel": "Heard (in)",
+    "replyLabel": "Reply (out)",
+    "replay": "Replay reply",
+    "commandTitle": "Text command",
+    "commandPlaceholder": "purple color brightness 30 right strip",
+    "send": "Send",
+    "wakeHint": "Wake words: Alexa / Алекса and Sveta / Света. Speak clearly and a bit louder than usual. Use the glass button on any page to start listening without opening this tab."
   }
 }
