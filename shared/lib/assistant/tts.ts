@@ -1,12 +1,27 @@
-import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts"
+import { MsEdgeTTS, OUTPUT_FORMAT, ProsodyOptions } from "msedge-tts"
 
-const VOICE_RU = "ru-RU-SvetlanaNeural"
-const VOICE_EN = "en-US-JennyNeural"
+/**
+ * Edge online TTS currently exposes only Svetlana/Dmitry for ru-RU.
+ * Emma Multilingual speaks Russian clearly and sounds different from Svetlana.
+ */
+const VOICE_RU = "en-US-EmmaMultilingualNeural"
+const VOICE_RU_FALLBACK = "ru-RU-SvetlanaNeural"
+const VOICE_EN = "en-US-AriaNeural"
 
 let cachedRu: MsEdgeTTS | null = null
+let cachedRuVoice: string | null = null
 let cachedEn: MsEdgeTTS | null = null
 
-async function getTts(lang: "ru" | "en"): Promise<MsEdgeTTS> {
+function ruProsody(): ProsodyOptions {
+  const p = new ProsodyOptions()
+  // Slightly brighter / quicker — less “phone attendant” than stock Svetlana
+  p.pitch = "+4%"
+  p.rate = 1.06
+  p.volume = "+0%"
+  return p
+}
+
+async function getTts(lang: "ru" | "en", voiceOverride?: string): Promise<MsEdgeTTS> {
   if (lang === "en") {
     if (!cachedEn) {
       cachedEn = new MsEdgeTTS()
@@ -14,9 +29,11 @@ async function getTts(lang: "ru" | "en"): Promise<MsEdgeTTS> {
     }
     return cachedEn
   }
-  if (!cachedRu) {
+  const voice = voiceOverride || VOICE_RU
+  if (!cachedRu || cachedRuVoice !== voice) {
     cachedRu = new MsEdgeTTS()
-    await cachedRu.setMetadata(VOICE_RU, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)
+    await cachedRu.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)
+    cachedRuVoice = voice
   }
   return cachedRu
 }
@@ -30,7 +47,20 @@ function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
   })
 }
 
-/** Synthesize MP3 via Microsoft Edge online TTS (no API key). ~1s typical. */
+async function synthesizeWithVoice(
+  text: string,
+  voice: string,
+  withProsody: boolean,
+): Promise<Buffer | null> {
+  const tts = await getTts("ru", voice)
+  const { audioStream } = withProsody
+    ? tts.toStream(text, ruProsody())
+    : tts.toStream(text)
+  const buf = await streamToBuffer(audioStream)
+  return buf.length ? buf : null
+}
+
+/** Synthesize MP3 via Microsoft Edge online TTS (no API key). */
 export async function synthesizeSpeech(
   text: string,
   lang: "ru" | "en" = "ru",
@@ -38,15 +68,27 @@ export async function synthesizeSpeech(
   const trimmed = text.trim().slice(0, 360)
   if (!trimmed) return null
   try {
-    const tts = await getTts(lang)
-    const { audioStream } = tts.toStream(trimmed)
-    const buf = await streamToBuffer(audioStream)
-    return buf.length ? buf : null
+    if (lang === "en") {
+      const tts = await getTts("en")
+      const { audioStream } = tts.toStream(trimmed)
+      const buf = await streamToBuffer(audioStream)
+      return buf.length ? buf : null
+    }
+    try {
+      return await synthesizeWithVoice(trimmed, VOICE_RU, true)
+    } catch (e) {
+      console.warn("Primary RU TTS failed, falling back to Svetlana:", e)
+      cachedRu = null
+      cachedRuVoice = null
+      return await synthesizeWithVoice(trimmed, VOICE_RU_FALLBACK, true)
+    }
   } catch (e) {
     console.error("TTS failed:", e)
-    // Reset cache on failure (stale websocket)
     if (lang === "en") cachedEn = null
-    else cachedRu = null
+    else {
+      cachedRu = null
+      cachedRuVoice = null
+    }
     return null
   }
 }

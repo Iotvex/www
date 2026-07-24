@@ -12,8 +12,9 @@ import {
 } from "react"
 import { hasWakeWord, stripWakeWord } from "@/shared/lib/assistant/wake"
 import {
-  playBase64Mp3,
-  speakFallback,
+  playBase64Mp3Async,
+  prepareSpeakerElement,
+  speakFallbackAsync,
   unlockAudio,
 } from "@/shared/lib/assistant/audio"
 import type {
@@ -70,6 +71,16 @@ async function queryMicPermission(): Promise<MicPermission> {
   }
 }
 
+function commandFingerprint(text: string): string {
+  const { cleaned } = stripWakeWord(text)
+  return cleaned
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
 export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ListenMode>("off")
   const [supported, setSupported] = useState(true)
@@ -84,84 +95,33 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
   const [lastAudioAvailable, setLastAudioAvailable] = useState(false)
 
   const modeRef = useRef<ListenMode>("off")
+  const wantListenRef = useRef(false)
   const recRef = useRef<SpeechRecognition | null>(null)
   const restartTimer = useRef<number | null>(null)
   const commandTimer = useRef<number | null>(null)
   const processingRef = useRef(false)
   const mutedUntilRef = useRef(0)
-  const lastSentRef = useRef("")
+  const lastFpRef = useRef("")
+  const lastFpAtRef = useRef(0)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const lastAudioB64 = useRef<string | null>(null)
   const levelDecayRef = useRef<number | null>(null)
-  const meterStreamRef = useRef<MediaStream | null>(null)
-  const meterCtxRef = useRef<AudioContext | null>(null)
-  const meterRafRef = useRef<number | null>(null)
+  const startRecognitionRef = useRef<() => void>(() => undefined)
 
   const setListenMode = useCallback((m: ListenMode) => {
     modeRef.current = m
     setMode(m)
   }, [])
 
-  const muteMicBriefly = useCallback((ms: number) => {
-    mutedUntilRef.current = Date.now() + ms
+  const muteMicUntil = useCallback((ms: number) => {
+    mutedUntilRef.current = Math.max(mutedUntilRef.current, Date.now() + ms)
   }, [])
 
-  const stopMeter = useCallback(() => {
-    if (meterRafRef.current != null) {
-      cancelAnimationFrame(meterRafRef.current)
-      meterRafRef.current = null
-    }
-    if (levelDecayRef.current != null) {
-      window.clearTimeout(levelDecayRef.current)
-      levelDecayRef.current = null
-    }
-    try {
-      meterStreamRef.current?.getTracks().forEach((t) => t.stop())
-    } catch {
-      /* ignore */
-    }
-    meterStreamRef.current = null
-    try {
-      void meterCtxRef.current?.close()
-    } catch {
-      /* ignore */
-    }
-    meterCtxRef.current = null
-    setLevel(0)
+  const clearMicMute = useCallback(() => {
+    mutedUntilRef.current = 0
   }, [])
-
-  const startMeter = useCallback(async () => {
-    stopMeter()
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true },
-      })
-      meterStreamRef.current = stream
-      const ctx = new AudioContext()
-      meterCtxRef.current = ctx
-      if (ctx.state === "suspended") await ctx.resume()
-      const source = ctx.createMediaStreamSource(stream)
-      const analyser = ctx.createAnalyser()
-      analyser.fftSize = 256
-      analyser.smoothingTimeConstant = 0.65
-      source.connect(analyser)
-      const data = new Uint8Array(analyser.frequencyBinCount)
-      const tick = () => {
-        analyser.getByteFrequencyData(data)
-        let sum = 0
-        for (let i = 0; i < data.length; i++) sum += data[i]
-        setLevel(Math.min(1, (sum / data.length / 255) * 2.4))
-        meterRafRef.current = requestAnimationFrame(tick)
-      }
-      meterRafRef.current = requestAnimationFrame(tick)
-    } catch {
-      /* metering optional — speech pulse still works */
-    }
-  }, [stopMeter])
 
   const pulseLevel = useCallback((strength = 0.55) => {
-    // Prefer live analyser when available
-    if (meterStreamRef.current) return
     setLevel(Math.min(1, strength))
     if (levelDecayRef.current != null) window.clearTimeout(levelDecayRef.current)
     levelDecayRef.current = window.setTimeout(() => setLevel(0), 280)
@@ -169,51 +129,89 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
 
   const unlockSpeaker = useCallback(() => {
     if (!audioRef.current) audioRef.current = new Audio()
+    prepareSpeakerElement(audioRef.current)
     unlockAudio(audioRef.current)
     setSpeakerReady("ready")
   }, [])
 
+  const stopRecognition = useCallback(() => {
+    if (restartTimer.current) {
+      window.clearTimeout(restartTimer.current)
+      restartTimer.current = null
+    }
+    const rec = recRef.current
+    recRef.current = null
+    if (!rec) return
+    try {
+      rec.onresult = null
+      rec.onerror = null
+      rec.onend = null
+      rec.abort()
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
   const playReply = useCallback(
-    (text: string, lang: string, audioB64?: string | null) => {
+    async (text: string, lang: string, audioB64?: string | null) => {
       setSpeaking(true)
       setReply(text)
-      const done = () => {
-        setSpeaking(false)
-        muteMicBriefly(500)
-      }
+      unlockSpeaker()
       const el = audioRef.current
-      if (audioB64 && el) {
-        lastAudioB64.current = audioB64
-        setLastAudioAvailable(true)
-        muteMicBriefly(12_000)
-        el.onended = () => done()
-        el.onerror = () => speakFallback(text, lang, done)
-        el.src = `data:audio/mpeg;base64,${audioB64}`
-        el.volume = 1
-        void el.play().catch(() => {
-          setSpeakerReady("locked")
-          speakFallback(text, lang, done)
-        })
-        return
+      try {
+        if (audioB64 && el) {
+          lastAudioB64.current = audioB64
+          setLastAudioAvailable(true)
+          await playBase64Mp3Async(el, audioB64)
+        } else {
+          await speakFallbackAsync(text, lang)
+        }
+      } catch {
+        await speakFallbackAsync(text, lang)
+      } finally {
+        setSpeaking(false)
       }
-      muteMicBriefly(Math.min(12_000, 900 + text.length * 70))
-      speakFallback(text, lang, done)
     },
-    [muteMicBriefly],
+    [unlockSpeaker],
   )
+
+  const resumeListening = useCallback(() => {
+    if (!wantListenRef.current) return
+    // Clear the long busy mute, then apply a short echo gap
+    clearMicMute()
+    muteMicUntil(700)
+    setListenMode("wake")
+    setHint("Слушаю. Скажите «Алекса» или «Света» и команду")
+    window.setTimeout(() => {
+      if (!wantListenRef.current || modeRef.current === "off") return
+      startRecognitionRef.current()
+    }, 350)
+  }, [clearMicMute, muteMicUntil, setListenMode])
 
   const runCommand = useCallback(
     async (text: string) => {
       const cleaned = text.trim()
       if (!cleaned || processingRef.current) return
-      if (cleaned === lastSentRef.current && Date.now() - mutedUntilRef.current < 1500) return
-      lastSentRef.current = cleaned
+      if (modeRef.current === "off") return
+
+      const fp = commandFingerprint(cleaned)
+      if (!fp) return
+      // Block repeats of the same command (echo / double final)
+      if (fp === lastFpRef.current && Date.now() - lastFpAtRef.current < 5000) {
+        return
+      }
+
+      lastFpRef.current = fp
+      lastFpAtRef.current = Date.now()
       processingRef.current = true
       setListenMode("busy")
       setHint("Выполняю…")
       setHeard(cleaned)
-      muteMicBriefly(15_000)
+      // Stop mic while we work + speak — prevents earpiece mode & self-echo repeats
+      stopRecognition()
+      muteMicUntil(30_000)
       unlockSpeaker()
+
       try {
         const res = await fetch("/api/assistant", {
           method: "POST",
@@ -222,25 +220,42 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ text: cleaned, include_audio: true }),
         })
         const data = (await res.json()) as AssistantResponse
-        const next = data.reply || data.error || "Готово."
+        const next =
+          data.reply ||
+          data.error ||
+          (data.lang === "en" ? "Done." : "Готово.")
         setHint(next)
-        playReply(next, data.lang === "en" ? "en" : "ru", data.audio_b64)
+        await playReply(next, data.lang === "en" ? "en" : "ru", data.audio_b64)
       } catch (e) {
         const msg = `Ошибка: ${String(e)}`
         setHint(msg)
-        playReply("Не удалось выполнить команду", "ru", null)
+        await playReply("Не удалось выполнить команду", "ru", null)
       } finally {
         processingRef.current = false
-        setListenMode("wake")
+        lastFpAtRef.current = Date.now()
+        resumeListening()
       }
     },
-    [muteMicBriefly, playReply, setListenMode, unlockSpeaker],
+    [
+      muteMicUntil,
+      playReply,
+      resumeListening,
+      setListenMode,
+      stopRecognition,
+      unlockSpeaker,
+    ],
   )
 
   const handleTranscript = useCallback(
     (raw: string, isFinal: boolean) => {
       if (Date.now() < mutedUntilRef.current) return
-      if (modeRef.current === "busy" || modeRef.current === "off") return
+      if (
+        modeRef.current === "busy" ||
+        modeRef.current === "off" ||
+        processingRef.current
+      ) {
+        return
+      }
 
       const text = raw.trim()
       if (!text) return
@@ -252,10 +267,16 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
       if (m === "wake") {
         if (!hasWakeWord(text)) return
         const { cleaned: after } = stripWakeWord(text)
-        if (after.length >= 2 && (isFinal || after.split(/\s+/).length >= 2)) {
+        // Only execute on final results — interim often double-fires the same phrase
+        if (after.length >= 2) {
+          if (!isFinal) {
+            setHint("Слушаю…")
+            return
+          }
           void runCommand(text)
           return
         }
+        if (!isFinal) return
         setListenMode("command")
         setHint("Слушаю команду…")
         if (commandTimer.current) window.clearTimeout(commandTimer.current)
@@ -282,24 +303,6 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
     [pulseLevel, runCommand, setListenMode],
   )
 
-  const stopRecognition = useCallback(() => {
-    if (restartTimer.current) {
-      window.clearTimeout(restartTimer.current)
-      restartTimer.current = null
-    }
-    const rec = recRef.current
-    recRef.current = null
-    if (!rec) return
-    try {
-      rec.onresult = null
-      rec.onerror = null
-      rec.onend = null
-      rec.abort()
-    } catch {
-      /* ignore */
-    }
-  }, [])
-
   const startRecognition = useCallback(() => {
     const Ctor = SpeechRecognitionCtor()
     if (!Ctor) {
@@ -307,6 +310,9 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
       setHint("Нужен Chrome / Edge с микрофоном")
       return
     }
+    if (!wantListenRef.current) return
+    if (processingRef.current || modeRef.current === "busy") return
+
     stopRecognition()
     const rec = new Ctor()
     rec.lang = "ru-RU"
@@ -323,7 +329,6 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
         const primary = r[0]?.transcript || ""
         if (r.isFinal) finalText += primary
         else interim += primary
-        // Check alternatives for wake word (ASR often mishears it)
         for (let a = 0; a < r.length; a++) {
           const t = r[a]?.transcript || ""
           if (hasWakeWord(t)) {
@@ -333,35 +338,46 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
         }
       }
       const prefer = altWake && hasWakeWord(altWake) ? altWake : null
-      if (finalText) handleTranscript(prefer && hasWakeWord(prefer) ? prefer : finalText, true)
-      else if (interim) handleTranscript(prefer || interim, false)
+      if (finalText) {
+        handleTranscript(prefer && hasWakeWord(prefer) ? prefer : finalText, true)
+      } else if (interim) {
+        handleTranscript(prefer || interim, false)
+      }
     }
 
     rec.onerror = (ev: SpeechRecognitionErrorEvent) => {
       if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
+        wantListenRef.current = false
         setListenMode("off")
         setMicPermission("denied")
         setHint("Разрешите микрофон в настройках браузера")
-        stopMeter()
         return
       }
-      if (modeRef.current !== "off") {
+      // aborted is expected when we stop for TTS
+      if (ev.error === "aborted") return
+      if (wantListenRef.current && modeRef.current !== "off" && modeRef.current !== "busy") {
         restartTimer.current = window.setTimeout(() => {
-          if (modeRef.current !== "off") startRecognition()
-        }, 350)
+          if (wantListenRef.current && modeRef.current !== "busy") {
+            startRecognitionRef.current()
+          }
+        }, 400)
       }
     }
 
     rec.onend = () => {
-      if (modeRef.current === "off") return
+      if (!wantListenRef.current) return
+      if (modeRef.current === "off" || modeRef.current === "busy" || processingRef.current) {
+        return
+      }
       restartTimer.current = window.setTimeout(() => {
-        if (modeRef.current === "off") return
+        if (!wantListenRef.current) return
+        if (modeRef.current === "off" || modeRef.current === "busy") return
         try {
           rec.start()
         } catch {
-          startRecognition()
+          startRecognitionRef.current()
         }
-      }, 200)
+      }, 220)
     }
 
     recRef.current = rec
@@ -370,7 +386,9 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
     } catch {
       /* already started */
     }
-  }, [handleTranscript, setListenMode, stopMeter, stopRecognition])
+  }, [handleTranscript, setListenMode, stopRecognition])
+
+  startRecognitionRef.current = startRecognition
 
   const refreshPermissions = useCallback(async () => {
     setMicPermission(await queryMicPermission())
@@ -392,39 +410,40 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
     unlockSpeaker()
     const perm = await queryMicPermission()
     setMicPermission(perm)
-    // Only prompt getUserMedia when permission is not already granted —
-    // avoids re-nagging on hard reload / when user re-enables.
     if (perm !== "granted") {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        // Release immediately — keeping the stream open forces phone earpiece / call mode
         stream.getTracks().forEach((t) => t.stop())
         setMicPermission("granted")
       } catch {
         setHint("Разрешите микрофон в браузере")
         setMicPermission("denied")
         setListenMode("off")
+        wantListenRef.current = false
         return
       }
     }
     window.speechSynthesis?.getVoices()
+    wantListenRef.current = true
     setListenMode("wake")
     setHint("Слушаю. Скажите «Алекса» или «Света» и команду")
-    void startMeter()
     startRecognition()
-  }, [setListenMode, startMeter, startRecognition, unlockSpeaker])
+  }, [setListenMode, startRecognition, unlockSpeaker])
 
   const disable = useCallback(() => {
+    wantListenRef.current = false
     setListenMode("off")
     setHint("Микрофон выключен")
+    setLevel(0)
     stopRecognition()
-    stopMeter()
     window.speechSynthesis?.cancel()
     try {
       audioRef.current?.pause()
     } catch {
       /* ignore */
     }
-  }, [setListenMode, stopMeter, stopRecognition])
+  }, [setListenMode, stopRecognition])
 
   const toggle = useCallback(() => {
     if (mode === "off") void enable()
@@ -443,21 +462,21 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
     if (!lastAudioB64.current) return
     if (!audioRef.current) audioRef.current = new Audio()
     unlockSpeaker()
-    playBase64Mp3(audioRef.current, lastAudioB64.current)
+    void playBase64Mp3Async(audioRef.current, lastAudioB64.current)
   }, [unlockSpeaker])
 
   useEffect(() => {
     setSupported(Boolean(SpeechRecognitionCtor()))
     audioRef.current = new Audio()
+    prepareSpeakerElement(audioRef.current)
     void refreshPermissions()
     return () => {
+      wantListenRef.current = false
       stopRecognition()
-      stopMeter()
+      if (levelDecayRef.current != null) window.clearTimeout(levelDecayRef.current)
       if (commandTimer.current) window.clearTimeout(commandTimer.current)
     }
-  }, [refreshPermissions, stopMeter, stopRecognition])
-
-  // Never auto-start listening on reload — user must tap the FAB or enable on the Assistant page.
+  }, [refreshPermissions, stopRecognition])
 
   const api = useMemo<VoiceAssistantApi>(
     () => ({

@@ -39,10 +39,10 @@ class Settings(BaseSettings):
     home_timeout: float = Field(default=5.0)
 
     # ── TTS ───────────────────────────────────────────────────────────────
-    # edge-tts voice for Russian replies
-    tts_voice_ru: str = Field(default="ru-RU-SvetlanaNeural")
+    # edge-tts: Emma Multilingual (female, speaks Russian; different from Svetlana)
+    tts_voice_ru: str = Field(default="en-US-EmmaMultilingualNeural")
     # edge-tts voice for English replies
-    tts_voice_en: str = Field(default="en-US-JennyNeural")
+    tts_voice_en: str = Field(default="en-US-AriaNeural")
     # Include base64 audio in every /v1/text response?
     tts_include_audio: bool = Field(default=True)
     # Audio output format: mp3 | wav

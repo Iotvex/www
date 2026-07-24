@@ -519,10 +519,28 @@ export function formatAssistantReply(
         ? "Алекса"
         : "Alexa"
 
-  if (!ok && detail) {
+  const humanizeFailDetail = (raw: string | undefined, l: "ru" | "en"): string => {
+    const d = (raw || "").toLowerCase()
+    if (!d) return l === "ru" ? "ошибка выполнения" : "execution error"
+    if (d.includes("no_strips")) return l === "ru" ? "ленты не найдены" : "no strips found"
+    if (d.includes("scene_not_found")) return l === "ru" ? "сцена не найдена" : "scene not found"
+    if (d.includes("automation_not_found"))
+      return l === "ru" ? "автоматизация не найдена" : "automation not found"
+    if (d.includes("script_not_found")) return l === "ru" ? "скрипт не найден" : "script not found"
+    if (d.includes("missing_brightness"))
+      return l === "ru" ? "не указана яркость" : "brightness not specified"
+    if (d.includes("command_failed") || d.includes("failed"))
+      return l === "ru" ? "устройство не ответило" : "device did not respond"
+    if (d.startsWith("unsupported:"))
+      return l === "ru" ? "эта команда пока не поддерживается" : "that command is not supported yet"
+    return raw || (l === "ru" ? "ошибка" : "error")
+  }
+
+  if (!ok) {
+    const reason = humanizeFailDetail(detail, lang)
     return lang === "ru"
-      ? `Не получилось выполнить: ${detail}.`
-      : `Couldn't do that: ${detail}.`
+      ? `Не получилось: ${reason}.`
+      : `Couldn't do that: ${reason}.`
   }
 
   const tgt =
