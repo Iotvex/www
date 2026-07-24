@@ -60,7 +60,7 @@ type StripRow = {
 async function listStrips(): Promise<StripRow[]> {
   const listRes = await fetch(`${AGENT}/nodes`, {
     cache: "no-store",
-    signal: AbortSignal.timeout(2500),
+    signal: AbortSignal.timeout(6000),
   })
   if (!listRes.ok) throw new Error(`agent nodes ${listRes.status}`)
   const body = (await listRes.json()) as { nodes?: AgentOpaqueNode[] }
@@ -128,7 +128,7 @@ async function controlStrip(
   const res = await fetch(`${AGENT}/node/${strip.node_id}/command`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    signal: AbortSignal.timeout(2500),
+    signal: AbortSignal.timeout(8000),
     body: JSON.stringify({
       msg_type: MSG.SET_STRIP,
       payload_b64: packSetStripPayload(body),
@@ -203,42 +203,47 @@ export async function executeAssistantIntent(intent: ParsedIntent): Promise<{
       const strips = pickStrips(await listStrips(), ent.target)
       if (!strips.length) return { ok: false, detail: "no_strips", actions: [] }
 
-      const actions: ActionResult[] = []
-      for (const strip of strips) {
-        if (name === "lights_on") {
-          actions.push(await controlStrip(strip, { on: true }))
-        } else if (name === "lights_off") {
-          actions.push(await controlStrip(strip, { on: false }))
-        } else if (name === "toggle") {
-          actions.push(await controlStrip(strip, { on: !strip.on }))
-        } else if (name === "set_brightness") {
-          let pct = ent.brightness
-          if (pct == null && ent.relative != null) {
-            pct = Math.max(
-              0,
-              Math.min(100, Math.round((strip.brightness / 255) * 100) + ent.relative),
-            )
+      const actions = await Promise.all(
+        strips.map(async (strip) => {
+          if (name === "lights_on") return controlStrip(strip, { on: true })
+          if (name === "lights_off") return controlStrip(strip, { on: false })
+          if (name === "toggle") return controlStrip(strip, { on: !strip.on })
+          if (name === "set_brightness") {
+            let pct = ent.brightness
+            if (pct == null && ent.relative != null) {
+              pct = Math.max(
+                0,
+                Math.min(100, Math.round((strip.brightness / 255) * 100) + ent.relative),
+              )
+            }
+            if (pct == null) {
+              return {
+                action: "set_brightness",
+                success: false,
+                detail: "missing_brightness",
+              } satisfies ActionResult
+            }
+            return controlStrip(strip, { on: true, brightness: pctToByte(pct) })
           }
-          if (pct == null) {
-            actions.push({ action: "set_brightness", success: false, detail: "missing_brightness" })
-            continue
+          if (name === "set_color") {
+            const hex = (ent.color_hex || "#FFFFFF").replace("#", "")
+            const r = parseInt(hex.slice(0, 2), 16)
+            const g = parseInt(hex.slice(2, 4), 16)
+            const b = parseInt(hex.slice(4, 6), 16)
+            return controlStrip(strip, { on: true, r, g, b, effect: 0 })
           }
-          actions.push(await controlStrip(strip, { on: true, brightness: pctToByte(pct) }))
-        } else if (name === "set_color") {
-          const hex = (ent.color_hex || "#FFFFFF").replace("#", "")
-          const r = parseInt(hex.slice(0, 2), 16)
-          const g = parseInt(hex.slice(2, 4), 16)
-          const b = parseInt(hex.slice(4, 6), 16)
-          actions.push(await controlStrip(strip, { on: true, r, g, b, effect: 0 }))
-        } else if (name === "set_effect") {
-          const effect = ent.effect || "rainbow"
-          const effectId = EFFECT_NAME_TO_ID[effect] ?? 1
-          actions.push(await controlStrip(strip, { on: true, effect: effectId }))
-        } else if (name === "set_speed") {
-          const pct = ent.speed ?? 50
-          actions.push(await controlStrip(strip, { on: true, speed: pctToByte(pct) }))
-        }
-      }
+          if (name === "set_effect") {
+            const effect = ent.effect || "rainbow"
+            const effectId = EFFECT_NAME_TO_ID[effect] ?? 1
+            return controlStrip(strip, { on: true, effect: effectId })
+          }
+          if (name === "set_speed") {
+            const pct = ent.speed ?? 50
+            return controlStrip(strip, { on: true, speed: pctToByte(pct) })
+          }
+          return { action: name, success: false, detail: "unsupported" } satisfies ActionResult
+        }),
+      )
       const ok = actions.some((a) => a.success)
       return {
         ok,

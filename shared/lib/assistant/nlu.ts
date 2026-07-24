@@ -41,8 +41,6 @@ export type ParsedIntent = {
   hadWake: boolean
 }
 
-const WAKE_RE = /^\s*(?:алекс[аеуойы]?|alexa)[,\s!.:]*/iu
-
 const COLOR_MAP: Record<string, string> = {
   красный: "#FF0000",
   красная: "#FF0000",
@@ -216,18 +214,24 @@ function normalize(text: string) {
 }
 
 function stripWake(text: string): { cleaned: string; hadWake: boolean } {
-  const m = text.match(WAKE_RE)
-  if (m) return { cleaned: text.slice(m[0].length).trim(), hadWake: true }
-  // wake word mid-sentence
-  const mid = text.replace(/\b(?:алекс[аеуойы]?|alexa)\b[,\s!.:]*/giu, " ").trim()
-  if (mid !== text.trim()) return { cleaned: mid, hadWake: true }
-  return { cleaned: text.trim(), hadWake: false }
+  // Do not use \\b — broken for Cyrillic in JS.
+  const re = /(?:^|[^\p{L}\p{N}])(алекс[аеуыой]?|alexa)(?=[^\p{L}\p{N}]|$)/giu
+  if (!re.test(` ${text} `)) {
+    return { cleaned: text.trim(), hadWake: false }
+  }
+  const cleaned = text
+    .replace(/(?:^|[^\p{L}\p{N}])(алекс[аеуыой]?|alexa)(?=[^\p{L}\p{N}]|$)/giu, " ")
+    .replace(/^[,\s.!:;\-—]+/, "")
+    .replace(/\s+/g, " ")
+    .trim()
+  return { cleaned, hadWake: true }
 }
 
 function extractTarget(t: string): AssistantEntities["target"] {
-  if (/лев(?:ую|ая|ой|ые)?|left/i.test(t)) return "left"
-  if (/прав(?:ую|ая|ой|ые)?|right/i.test(t)) return "right"
-  if (/все|всё|обе|оба|all|both/i.test(t)) return "all"
+  // Avoid matching "right" inside "brightness"
+  if (/(?:^|[^\p{L}])(?:лев(?:ую|ая|ой|ые|ом)?|left)(?=[^\p{L}]|$)/iu.test(t)) return "left"
+  if (/(?:^|[^\p{L}])(?:прав(?:ую|ая|ой|ые|ом)?|right)(?=[^\p{L}]|$)/iu.test(t)) return "right"
+  if (/(?:^|[^\p{L}])(?:все|всё|обе|оба|all|both)(?=[^\p{L}]|$)/iu.test(t)) return "all"
   return "all"
 }
 
