@@ -13,6 +13,7 @@ export type AssistantPipelineResult = {
   entities: Record<string, unknown>
   actions: Array<Record<string, unknown>>
   had_wake: boolean
+  wake_name?: string | null
   source: "local"
   error?: string
 }
@@ -49,6 +50,7 @@ export async function runAssistantText(text: string): Promise<AssistantPipelineR
     parsed.lang,
     exec.ok || parsed.name === "unknown" || parsed.name === "help" || parsed.name === "greeting",
     exec.detail,
+    parsed.wakeName,
   )
 
   return {
@@ -59,6 +61,7 @@ export async function runAssistantText(text: string): Promise<AssistantPipelineR
     entities: parsed.entities as Record<string, unknown>,
     actions: exec.actions as unknown as Array<Record<string, unknown>>,
     had_wake: parsed.hadWake,
+    wake_name: parsed.wakeName,
     source: "local",
     error: exec.ok ? undefined : exec.detail,
   }
