@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "iotvex-assistant"
+version = "0.1.0"
+description = "Iotvex voice assistant — Alexa wake word, Russian female TTS, RU/EN NLU, smart home control"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.6",
+    "httpx>=0.25.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "edge-tts>=6.1.9",
+]
+
+[project.optional-dependencies]
+stt-whisper = ["openai-whisper>=20231117"]
+stt-vosk    = ["vosk>=0.3.45"]
+tts-fallback = ["gTTS>=2.3.2"]
+audio       = ["soundfile>=0.12.1", "pydub>=0.25.1"]
+all         = [
+    "openai-whisper>=20231117",
+    "vosk>=0.3.45",
+    "gTTS>=2.3.2",
+    "soundfile>=0.12.1",
+    "pydub>=0.25.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[project.scripts]
+iotvex-assistant = "app.main:start"

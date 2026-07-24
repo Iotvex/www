@@ -1,5 +1,5 @@
-/* Iotvex PWA service worker v19 — assets only; never intercept navigations */
-const CACHE = "iotvex-shell-v19"
+/* Iotvex PWA service worker v21 — assets only; never intercept navigations */
+const CACHE = "iotvex-shell-v21"
 const SHELL = ["/manifest.webmanifest", "/icon-192.png", "/icon-512.png"]
 
 self.addEventListener("install", (event) => {
