@@ -246,7 +246,11 @@ function extractTarget(t: string): {
   if (/(?:^|[^\p{L}])(?:лев(?:ую|ая|ой|ые|ом|ое)?|left)(?=[^\p{L}]|$)/iu.test(t)) {
     return { target: "left", target_index: 0 }
   }
-  if (/(?:^|[^\p{L}])(?:прав(?:ую|ая|ой|ые|ом|ое)?|right)(?=[^\p{L}]|$)/iu.test(t)) {
+  if (
+    /(?:^|[^\p{L}])(?:прав(?:ую|ая|ой|ые|ом|ое)?|right)(?=[^\p{L}]|$)/iu.test(t) ||
+    /(?:right|прав\w*)\s*(?:tape|strip|лент)/iu.test(t) ||
+    /(?:tape|strip|лент)\s*(?:on\s+the\s+)?(?:right|прав)/iu.test(t)
+  ) {
     return { target: "right", target_index: 1 }
   }
   if (/(?:^|[^\p{L}])(?:все|всё|обе|оба|all|both)(?=[^\p{L}]|$)/iu.test(t)) {
@@ -547,10 +551,62 @@ export function formatAssistantReply(
       ? EFFECT_RU[entities.effect || ""] || entities.effect || "эффект"
       : entities.effect || "effect"
 
+  // Compound confirmation: color + brightness + effect in one reply
+  const parts: string[] = []
+  if (lang === "ru") {
+    if (entities.color_name || entities.color_hex) {
+      parts.push(`цвет «${entities.color_name || entities.color_hex}»`)
+    }
+    if (entities.brightness != null) {
+      parts.push(`яркость ${entities.brightness}%`)
+    } else if (entities.relative != null) {
+      parts.push(entities.relative > 0 ? "ярче" : "тусклее")
+    }
+    if (entities.effect && entities.effect !== "solid") {
+      parts.push(`эффект «${effectLabel}»`)
+    }
+    if (entities.speed != null) {
+      parts.push(`скорость ${entities.speed}%`)
+    }
+  } else {
+    if (entities.color_name || entities.color_hex) {
+      parts.push(`color ${entities.color_name || entities.color_hex}`)
+    }
+    if (entities.brightness != null) {
+      parts.push(`brightness ${entities.brightness}%`)
+    } else if (entities.relative != null) {
+      parts.push(entities.relative > 0 ? "brighter" : "dimmer")
+    }
+    if (entities.effect && entities.effect !== "solid") {
+      parts.push(`${effectLabel} effect`)
+    }
+    if (entities.speed != null) {
+      parts.push(`speed ${entities.speed}%`)
+    }
+  }
+
+  const isStripControl = [
+    "lights_on",
+    "lights_off",
+    "toggle",
+    "set_brightness",
+    "set_color",
+    "set_effect",
+    "set_speed",
+  ].includes(intent)
+
+  if (isStripControl && parts.length >= 2) {
+    return lang === "ru"
+      ? `Готово. Поставила ${parts.join(", ")}${tgt}.`
+      : `Done. I set ${parts.join(", ")}${tgt}.`
+  }
+
   if (lang === "ru") {
     switch (intent) {
       case "lights_on":
-        return `Готово. Включила свет${tgt}.`
+        return parts.length
+          ? `Готово. Включила свет${tgt}: ${parts.join(", ")}.`
+          : `Готово. Включила свет${tgt}.`
       case "lights_off":
         return `Готово. Выключила свет${tgt}.`
       case "toggle":
@@ -581,17 +637,19 @@ export function formatAssistantReply(
       case "greeting":
         return `${who} на связи. Чем помочь?`
       case "help":
-        return `Я ${who}. Могу включать и выключать свет, менять яркость, цвет и эффекты, запускать сцены и правила. Скажите «Алекса» или «Света» и команду.`
+        return `Я ${who}. Могу включать и выключать свет, менять яркость, цвет и эффекты сразу в одной команде, запускать сцены и правила. Скажите «Алекса» или «Света» и команду.`
       case "status":
         return "Я на связи, умный дом отвечает."
       default:
-        return "Не поняла. Например: «Света, яркость 100» или «Алекса, сделай радугу»."
+        return "Не поняла. Например: «Света, фиолетовый цвет яркость 30 на правой ленте»."
     }
   }
 
   switch (intent) {
     case "lights_on":
-      return `Done. I turned the lights on${tgt}.`
+      return parts.length
+        ? `Done. I turned the lights on${tgt}: ${parts.join(", ")}.`
+        : `Done. I turned the lights on${tgt}.`
     case "lights_off":
       return `Done. I turned the lights off${tgt}.`
     case "toggle":
@@ -615,10 +673,10 @@ export function formatAssistantReply(
     case "greeting":
       return `${who} here. How can I help?`
     case "help":
-      return `I'm ${who}. I can control lights, brightness, color, effects, scenes and rules. Say Alexa or Sveta plus a command.`
+      return `I'm ${who}. I can set color, brightness and effects in one command. Say Alexa or Sveta plus a command.`
     case "status":
       return "I'm online and the home is reachable."
     default:
-      return "I didn't catch that. Try 'Sveta, brightness 100' or 'Alexa, rainbow'."
+      return "I didn't catch that. Try 'Alexa, purple color, 30% brightness for the right strip'."
   }
 }
