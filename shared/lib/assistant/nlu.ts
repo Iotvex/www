@@ -20,7 +20,9 @@ export type AssistantIntentName =
   | "unknown"
 
 export type AssistantEntities = {
+  /** all | left | right | strip:0 | strip:1 | free-text device name */
   target?: "all" | "left" | "right" | string
+  target_index?: number
   brightness?: number
   relative?: number
   color_name?: string
@@ -218,19 +220,71 @@ function stripWake(text: string): { cleaned: string; hadWake: boolean; wakeName:
   return _stripWake(text)
 }
 
-function extractTarget(t: string): AssistantEntities["target"] {
+function extractTarget(t: string): {
+  target: AssistantEntities["target"]
+  target_index?: number
+} {
+  // Ordinals / numbers: первая лента, 1-я, лента 2, strip 1
+  const ordinalFirst =
+    /перв(?:ой|ую|ая|ое|ый|ом)?|first|1[\-\s]?[яийе]|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?1(?:\D|$)|(?:лент[аыуеию]|strip)\s*#?\s*0(?:\D|$)/iu.test(
+      t,
+    )
+  const ordinalSecond =
+    /втор(?:ой|ую|ая|ое|ый|ом)?|second|2[\-\s]?[яийе]|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?2(?:\D|$)|(?:лент[аыуеию]|strip)\s*#?\s*1(?:\D|$)/iu.test(
+      t,
+    )
+  const ordinalThird =
+    /трет(?:ьей|ью|ья|ий|ьем)|third|3[\-\s]?[яийе]|(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|number\s*)?3(?:\D|$)/iu.test(
+      t,
+    )
+
+  if (ordinalFirst) return { target: "strip:0", target_index: 0 }
+  if (ordinalSecond) return { target: "strip:1", target_index: 1 }
+  if (ordinalThird) return { target: "strip:2", target_index: 2 }
+
   // Avoid matching "right" inside "brightness"
-  if (/(?:^|[^\p{L}])(?:лев(?:ую|ая|ой|ые|ом)?|left)(?=[^\p{L}]|$)/iu.test(t)) return "left"
-  if (/(?:^|[^\p{L}])(?:прав(?:ую|ая|ой|ые|ом)?|right)(?=[^\p{L}]|$)/iu.test(t)) return "right"
-  if (/(?:^|[^\p{L}])(?:все|всё|обе|оба|all|both)(?=[^\p{L}]|$)/iu.test(t)) return "all"
-  return "all"
+  if (/(?:^|[^\p{L}])(?:лев(?:ую|ая|ой|ые|ом|ое)?|left)(?=[^\p{L}]|$)/iu.test(t)) {
+    return { target: "left", target_index: 0 }
+  }
+  if (/(?:^|[^\p{L}])(?:прав(?:ую|ая|ой|ые|ом|ое)?|right)(?=[^\p{L}]|$)/iu.test(t)) {
+    return { target: "right", target_index: 1 }
+  }
+  if (/(?:^|[^\p{L}])(?:все|всё|обе|оба|all|both)(?=[^\p{L}]|$)/iu.test(t)) {
+    return { target: "all" }
+  }
+
+  // Named device hints: "лента кухни", "kitchen strip"
+  const named = t.match(
+    /(?:лент[аыуеию]|strip|свет|light)\s+([a-zа-яё0-9][\wа-яё\-]{1,24})/iu,
+  )
+  if (named?.[1] && !/^(на|до|для|the|a|и)$/i.test(named[1])) {
+    return { target: named[1].toLowerCase() }
+  }
+
+  return { target: "all" }
 }
 
 function extractBrightness(t: string): { brightness?: number; relative?: number } {
-  const m = t.match(/(?:яркость|brightness)\s*(?:на\s*|до\s*|to\s*|=?\s*)?(\d{1,3})\s*%?/)
-  if (m) {
-    const n = Number(m[1])
-    if (n >= 0 && n <= 100) return { brightness: n }
+  if (/яркость|brightness|яркост/i.test(t)) {
+    // Prefer explicit percent anywhere in the phrase
+    const pct = t.match(/(\d{1,3})\s*%/)
+    if (pct) {
+      const n = Number(pct[1])
+      if (n >= 0 && n <= 100) return { brightness: n }
+    }
+    // Drop strip ordinals / "лента 1" so their digits are not taken as brightness
+    const cleaned = t
+      .replace(
+        /(?:лент[аыуеию]|strip|канал)\s*(?:номер\s*|№\s*|#\s*|number\s*)?[0-8](?!\d)/giu,
+        " ",
+      )
+      .replace(/(?:перв|втор|трет|first|second|third)\w*/giu, " ")
+      .replace(/\b[12][\-\s]?[яийе]\b/giu, " ")
+    const after =
+      cleaned.split(/яркость|brightness|яркост\w*/i).slice(1).join(" ") || cleaned
+    const nums = [...after.matchAll(/(\d{1,3})/g)].map((m) => Number(m[1]))
+    const last = nums.filter((n) => n >= 0 && n <= 100).pop()
+    if (last != null) return { brightness: last }
   }
   const lone = t.match(/(?:^|\s)(\d{1,3})\s*%(?:\s|$)/)
   if (lone) {
@@ -259,10 +313,13 @@ function extractEffect(t: string): string | undefined {
 }
 
 function extractSpeed(t: string): number | undefined {
-  const m = t.match(/(?:скорость|speed)\s*(?:на\s*|до\s*|to\s*)?(\d{1,3})/i)
-  if (m) return Math.max(1, Math.min(100, Number(m[1])))
-  if (/\b(быстрее|faster)\b/i.test(t)) return 80
-  if (/\b(медленнее|slower)\b/i.test(t)) return 30
+  if (/скорость|speed/i.test(t)) {
+    const after = t.split(/скорость|speed/i).slice(1).join(" ") || t
+    const m = after.match(/(\d{1,3})\s*%?/)
+    if (m) return Math.max(1, Math.min(100, Number(m[1])))
+  }
+  if (/быстрее|faster/i.test(t)) return 80
+  if (/медленнее|slower/i.test(t)) return 30
   return undefined
 }
 
@@ -366,8 +423,10 @@ export function parseAssistantText(raw: string): ParsedIntent {
     }
   }
 
+  const targetInfo = extractTarget(t)
   const entities: AssistantEntities = {
-    target: extractTarget(t),
+    target: targetInfo.target,
+    ...(targetInfo.target_index != null ? { target_index: targetInfo.target_index } : {}),
     ...extractBrightness(t),
     ...extractColor(t),
     effect: extractEffect(t),
@@ -463,17 +522,25 @@ export function formatAssistantReply(
   }
 
   const tgt =
-    entities.target === "left"
+    entities.target_index === 0 || entities.target === "left" || entities.target === "strip:0"
       ? lang === "ru"
-        ? " на левой ленте"
-        : " on the left strip"
-      : entities.target === "right"
+        ? " на первой (левой) ленте"
+        : " on the first (left) strip"
+      : entities.target_index === 1 || entities.target === "right" || entities.target === "strip:1"
         ? lang === "ru"
-          ? " на правой ленте"
-          : " on the right strip"
-        : lang === "ru"
-          ? " на обеих лентах"
-          : " on both strips"
+          ? " на второй (правой) ленте"
+          : " on the second (right) strip"
+        : entities.target_index != null
+          ? lang === "ru"
+            ? ` на ленте ${entities.target_index + 1}`
+            : ` on strip ${entities.target_index + 1}`
+          : entities.target && entities.target !== "all"
+            ? lang === "ru"
+              ? ` на «${entities.target}»`
+              : ` on ${entities.target}`
+            : lang === "ru"
+              ? " на обеих лентах"
+              : " on both strips"
 
   const effectLabel =
     lang === "ru"

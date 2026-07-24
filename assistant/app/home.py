@@ -171,21 +171,47 @@ async def list_strips() -> list[dict[str, Any]]:
     return out
 
 
-def _pick_strips(strips: list[dict[str, Any]], target: str) -> list[dict[str, Any]]:
+def _pick_strips(
+    strips: list[dict[str, Any]],
+    target: str,
+    target_index: int | None = None,
+) -> list[dict[str, Any]]:
     if not strips:
         return []
+
+    if target_index is not None:
+        try:
+            idx = int(target_index)
+        except (TypeError, ValueError):
+            idx = -1
+        if idx >= 0:
+            hit = [s for s in strips if int(s.get("index", -1)) == idx]
+            if hit:
+                return hit
+            if idx < len(strips):
+                return [strips[idx]]
+
     t = (target or "all").lower().strip()
     if t in {"all", "lights", "свет", "огни", "ленты", ""}:
         return strips
+
+    m = re.match(r"^strip:(\d+)$", t)
+    if m:
+        idx = int(m.group(1))
+        hit = [s for s in strips if int(s.get("index", -1)) == idx]
+        if hit:
+            return hit
+        if 0 <= idx < len(strips):
+            return [strips[idx]]
 
     def match(s: dict[str, Any], keys: tuple[str, ...]) -> bool:
         blob = f"{s.get('name', '')} {s.get('id', '')} {s.get('index', '')}".lower()
         return any(k in blob for k in keys)
 
-    if t in {"left", "левая", "левую", "левой"}:
+    if t in {"left", "левая", "левую", "левой", "first", "1"}:
         hit = [s for s in strips if match(s, ("left", "лев", "0")) or int(s.get("index", -1)) == 0]
         return hit or strips[:1]
-    if t in {"right", "правая", "правую", "правой"}:
+    if t in {"right", "правая", "правую", "правой", "second", "2"}:
         hit = [s for s in strips if match(s, ("right", "прав", "1")) or int(s.get("index", -1)) == 1]
         return hit or strips[1:2] or strips[:1]
 
@@ -264,11 +290,12 @@ async def apply_strip(
 
 async def _run_on_targets(
     target: str,
+    target_index: int | None = None,
     **kwargs: Any,
 ) -> ActionResult:
     try:
         strips = await list_strips()
-        picked = _pick_strips(strips, target)
+        picked = _pick_strips(strips, target, target_index)
         if not picked:
             return ActionResult(success=False, detail="no_strips")
         last: dict[str, Any] | None = None
@@ -292,19 +319,19 @@ async def _run_on_targets(
         return ActionResult(success=False, detail=str(exc))
 
 
-async def lights_on(strip: str = "all") -> ActionResult:
-    return await _run_on_targets(strip, on=True)
+async def lights_on(strip: str = "all", target_index: int | None = None) -> ActionResult:
+    return await _run_on_targets(strip, target_index=target_index, on=True)
 
 
-async def lights_off(strip: str = "all") -> ActionResult:
-    return await _run_on_targets(strip, on=False)
+async def lights_off(strip: str = "all", target_index: int | None = None) -> ActionResult:
+    return await _run_on_targets(strip, target_index=target_index, on=False)
 
 
-async def toggle(strip: str = "all") -> ActionResult:
+async def toggle(strip: str = "all", target_index: int | None = None) -> ActionResult:
     """Flip on/off for each matched strip based on current state."""
     try:
         strips = await list_strips()
-        picked = _pick_strips(strips, strip)
+        picked = _pick_strips(strips, strip, target_index)
         if not picked:
             return ActionResult(success=False, detail="no_strips")
         last: dict[str, Any] | None = None
@@ -315,27 +342,49 @@ async def toggle(strip: str = "all") -> ActionResult:
         names = ", ".join(str(s.get("name") or s.get("id") or s.get("index")) for s in picked)
         return ActionResult(success=True, detail=names, data=last if isinstance(last, dict) else None)
     except Exception as exc:  # noqa: BLE001
-        logger.exception("toggle failed strip=%s", strip)
+        logger.exception("toggle failed target=%s", strip)
         return ActionResult(success=False, detail=str(exc))
 
 
-async def set_brightness(value: int, strip: str = "all") -> ActionResult:
+async def set_brightness(
+    value: int,
+    strip: str = "all",
+    target_index: int | None = None,
+) -> ActionResult:
     """value is 0–100 percent from NLU."""
-    return await _run_on_targets(strip, on=True, brightness=_pct_to_bri(value))
+    return await _run_on_targets(
+        strip, target_index=target_index, on=True, brightness=_pct_to_bri(value),
+    )
 
 
-async def set_color(hex_color: str, strip: str = "all") -> ActionResult:
+async def set_color(
+    hex_color: str,
+    strip: str = "all",
+    target_index: int | None = None,
+) -> ActionResult:
     r, g, b = _hex_to_rgb(hex_color)
-    return await _run_on_targets(strip, on=True, r=r, g=g, b=b, effect="solid")
+    return await _run_on_targets(
+        strip, target_index=target_index, on=True, r=r, g=g, b=b, effect="solid",
+    )
 
 
-async def set_effect(effect: str, strip: str = "all") -> ActionResult:
-    return await _run_on_targets(strip, on=True, effect=effect)
+async def set_effect(
+    effect: str,
+    strip: str = "all",
+    target_index: int | None = None,
+) -> ActionResult:
+    return await _run_on_targets(strip, target_index=target_index, on=True, effect=effect)
 
 
-async def set_speed(value: int, strip: str = "all") -> ActionResult:
+async def set_speed(
+    value: int,
+    strip: str = "all",
+    target_index: int | None = None,
+) -> ActionResult:
     """value is 0–100 percent from NLU → firmware 1–255."""
-    return await _run_on_targets(strip, on=True, speed=_pct_to_bri(value) or 1)
+    return await _run_on_targets(
+        strip, target_index=target_index, on=True, speed=_pct_to_bri(value) or 1,
+    )
 
 
 # ── Scenes / automations / scripts ───────────────────────────────────────
