@@ -40,11 +40,17 @@ export async function runAssistantText(
           ? `Online. Strips: ${probe.strips}.`
           : "Smart home agent is unreachable."
   } else {
+    const truthfulOk =
+      parsed.name === "unknown" ||
+      parsed.name === "help" ||
+      parsed.name === "greeting"
+        ? true
+        : exec.ok
     reply = formatAssistantReply(
       parsed.name,
       parsed.entities,
       parsed.lang,
-      exec.ok || parsed.name === "unknown" || parsed.name === "help" || parsed.name === "greeting",
+      truthfulOk,
       exec.detail,
       parsed.wakeName,
     )

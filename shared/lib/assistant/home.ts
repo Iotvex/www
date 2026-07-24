@@ -285,10 +285,13 @@ export async function executeAssistantIntent(intent: ParsedIntent): Promise<{
           return controlStrip(strip, patch)
         }),
       )
-      const ok = actions.some((a) => a.success)
+      const ok = actions.length > 0 && actions.every((a) => a.success)
+      const failed = actions.filter((a) => !a.success)
       return {
         ok,
-        detail: actions.map((a) => a.detail).filter(Boolean).join(", "),
+        detail: ok
+          ? actions.map((a) => a.detail).filter(Boolean).join(", ")
+          : failed.map((a) => a.detail || "failed").join(", ") || "command_failed",
         actions,
       }
     }

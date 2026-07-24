@@ -2,8 +2,8 @@
 Text-to-Speech module.
 
 Primary backend  : edge-tts (Microsoft Neural TTS, online)
-                   Russian female: ru-RU-SvetlanaNeural (default)
-                   English female: en-US-JennyNeural (default)
+                   Russian: en-US-EmmaMultilingualNeural (female, multilingual)
+                   English: en-US-AriaNeural
 Fallback backend : gTTS (Google TTS, online, lower quality)
 Final fallback   : returns None (silent mode)
 
@@ -29,13 +29,14 @@ logger = logging.getLogger(__name__)
 # ─────────────────────────────────────────────
 
 VOICES_RU: list[dict] = [
-    {"name": "ru-RU-SvetlanaNeural", "gender": "Female", "lang": "ru", "quality": "neural", "default": True},
+    {"name": "en-US-EmmaMultilingualNeural", "gender": "Female", "lang": "ru", "quality": "neural", "default": True},
+    {"name": "ru-RU-SvetlanaNeural", "gender": "Female", "lang": "ru", "quality": "neural"},
     {"name": "ru-RU-DmitryNeural",   "gender": "Male",   "lang": "ru", "quality": "neural"},
 ]
 
 VOICES_EN: list[dict] = [
-    {"name": "en-US-JennyNeural",    "gender": "Female", "lang": "en", "quality": "neural", "default": True},
-    {"name": "en-US-AriaNeural",     "gender": "Female", "lang": "en", "quality": "neural"},
+    {"name": "en-US-AriaNeural",     "gender": "Female", "lang": "en", "quality": "neural", "default": True},
+    {"name": "en-US-JennyNeural",    "gender": "Female", "lang": "en", "quality": "neural"},
     {"name": "en-US-GuyNeural",      "gender": "Male",   "lang": "en", "quality": "neural"},
 ]
 
