@@ -85,6 +85,7 @@ function triggerMatches(
   trigger: Record<string, unknown>,
   now: { hhmm: string; weekday: string },
   states: Map<string, { state: string; attributes: Record<string, unknown>; last_changed: string }>,
+  recentEvents: Array<{ kind?: string; entity_id?: string | null; created_at?: string }>,
 ): boolean {
   const kind = String(trigger.trigger || trigger.platform || trigger.type || "")
 
@@ -104,8 +105,10 @@ function triggerMatches(
     const st = states.get(entityId)
     if (!st) return false
     if (!changedRecently(st.last_changed)) return false
-    if (trigger.from != null && String(trigger.from) !== "" && String(st.state) === String(trigger.from)) {
-      // from is previous — we only have current; require to match and recent change
+    // `from` = previous value (stored as attributes.previous_state on sync)
+    if (trigger.from != null && String(trigger.from) !== "") {
+      const prev = String(st.attributes?.previous_state ?? "")
+      if (prev !== String(trigger.from)) return false
     }
     if (trigger.to != null && String(trigger.to) !== "" && String(st.state) !== String(trigger.to)) {
       return false
@@ -118,6 +121,24 @@ function triggerMatches(
     return true
   }
 
+  if (kind === "event") {
+    // Event-bus: match recent home events by kind / event_type (logEvent table).
+    const wantKind = String(
+      trigger.event_type || trigger.event || trigger.kind || "",
+    ).trim()
+    if (!wantKind) return false
+    const wantEntity = String(trigger.entity_id || "").trim()
+    const windowMs = Number(trigger.window_ms || 70_000)
+    const cutoff = Date.now() - (Number.isFinite(windowMs) ? windowMs : 70_000)
+    return recentEvents.some((ev) => {
+      const ek = String(ev.kind || "")
+      if (ek !== wantKind && !ek.startsWith(wantKind)) return false
+      if (wantEntity && String(ev.entity_id || "") !== wantEntity) return false
+      const t = ev.created_at ? new Date(ev.created_at).getTime() : 0
+      return Number.isFinite(t) && t >= cutoff
+    })
+  }
+
   if (kind === "numeric_state") {
     const entityId = String(trigger.entity_id || "")
     const st = states.get(entityId)
@@ -128,11 +149,6 @@ function triggerMatches(
     if (trigger.above != null && !(n > Number(trigger.above))) return false
     if (trigger.below != null && !(n < Number(trigger.below))) return false
     return true
-  }
-
-  if (kind === "event") {
-    // Reserved for future event-bus modules
-    return false
   }
 
   return false
@@ -244,12 +260,24 @@ export async function tickAutomations() {
   const now = tzNowParts()
   const stateRows = await loadStates()
   const states = new Map(stateRows.map((s) => [s.entity_id, s]))
+  let recentEvents: Array<{ kind?: string; entity_id?: string | null; created_at?: string }> = []
+  try {
+    const sb = createAdminClient()
+    const { data } = await sb
+      .from("events")
+      .select("kind, entity_id, created_at")
+      .order("created_at", { ascending: false })
+      .limit(80)
+    recentEvents = (data || []) as typeof recentEvents
+  } catch {
+    recentEvents = []
+  }
   const fired = []
 
   for (const auto of autos) {
     if (!auto.enabled) continue
     const trigger = (auto.trigger || {}) as Record<string, unknown>
-    if (!triggerMatches(trigger, now, states)) continue
+    if (!triggerMatches(trigger, now, states, recentEvents)) continue
     if (!conditionsPass((auto.conditions || []) as unknown[], now, states)) continue
 
     if (auto.last_triggered) {

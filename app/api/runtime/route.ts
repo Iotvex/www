@@ -7,15 +7,13 @@ import {
   saveRuntimeFile,
   saveSecretsFile,
 } from "@/shared/config/runtime.server"
+import { agentFetch } from "@/shared/lib/agent-fetch"
 
 export const dynamic = "force-dynamic"
 
-async function probeAgent(agentUrl: string) {
+async function probeAgent() {
   try {
-    const res = await fetch(`${agentUrl.replace(/\/$/, "")}/health`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(2500),
-    })
+    const res = await agentFetch("/health", { signal: AbortSignal.timeout(2500) })
     if (!res.ok) return { ok: false as const, status: res.status }
     const body = (await res.json().catch(() => ({}))) as { ok?: boolean }
     return { ok: Boolean(body.ok ?? true), status: res.status }
@@ -24,16 +22,14 @@ async function probeAgent(agentUrl: string) {
   }
 }
 
+/** Non-secret runtime snapshot. Anon/service keys never returned. */
 export async function GET() {
   const runtime = getRuntimeConfig()
-  const agent = await probeAgent(runtime.agentUrl)
+  const agent = await probeAgent()
   const view = publicRuntimeView(runtime)
   return NextResponse.json({
     ok: true,
-    runtime: {
-      ...view,
-      supabaseAnonKey: runtime.supabaseAnonKey,
-    },
+    runtime: view,
     agent,
     file: {
       wwwMode: loadRuntimeFile().wwwMode,

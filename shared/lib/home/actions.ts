@@ -6,8 +6,7 @@ import {
   type AgentOpaqueNode,
   type ProtoStrip,
 } from "@/shared/lib/iotvex-proto"
-
-const AGENT = process.env.IOTVEX_AGENT_URL || "http://127.0.0.1:7421"
+import { agentFetch } from "@/shared/lib/agent-fetch"
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -161,10 +160,7 @@ async function controlIotvexStrip(
 
   if (nodeId == null) {
     try {
-      const listRes = await fetch(`${AGENT}/nodes`, {
-        cache: "no-store",
-        signal: AbortSignal.timeout(1500),
-      })
+      const listRes = await agentFetch("/nodes", { signal: AbortSignal.timeout(1500) })
       if (!listRes.ok) {
         return { ok: false, status: listRes.status, platform: "iotvex", index, body: strip }
       }
@@ -179,9 +175,8 @@ async function controlIotvexStrip(
     }
   }
 
-  const res = await fetch(`${AGENT}/node/${nodeId}/command`, {
+  const res = await agentFetch(`/node/${nodeId}/command`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     signal: AbortSignal.timeout(2500),
     body: JSON.stringify({
       msg_type: MSG.SET_STRIP,
@@ -321,9 +316,8 @@ export async function runHomeAction(action: Record<string, unknown>): Promise<Re
 
   // Future modules: POST to agent generic entity endpoint if available
   try {
-    const res = await fetch(`${AGENT}/entities/${encodeURIComponent(entityId)}/action`, {
+    const res = await agentFetch(`/entities/${encodeURIComponent(entityId)}/action`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: serviceName(domain, verb), data }),
     })
     if (res.status !== 404) {

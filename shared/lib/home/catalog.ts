@@ -180,11 +180,17 @@ export async function upsertEntityState(
     .select("state,attributes,last_changed")
     .eq("entity_id", entityId)
     .maybeSingle()
-  const unchanged = stateSnapshotEqual(prev, state, attributes)
+  const nextAttrs: Record<string, unknown> = { ...attributes }
+  if (prev && prev.state !== state) {
+    nextAttrs.previous_state = prev.state
+  } else if (prev?.attributes && "previous_state" in (prev.attributes as object)) {
+    nextAttrs.previous_state = (prev.attributes as Record<string, unknown>).previous_state
+  }
+  const unchanged = stateSnapshotEqual(prev, state, nextAttrs)
   const { error } = await sb.from("entity_states").upsert({
     entity_id: entityId,
     state,
-    attributes,
+    attributes: nextAttrs,
     available,
     last_changed: unchanged && prev?.last_changed
       ? prev.last_changed
@@ -300,18 +306,23 @@ async function upsertLightNode(
     })
     await assertOk(entErr, `entities upsert ${id}`)
     const nextState = s.on ? "on" : "off"
-    const nextAttrs = {
+    const { data: prevState } = await sb
+      .from("entity_states")
+      .select("state,attributes,last_changed")
+      .eq("entity_id", id)
+      .maybeSingle()
+    const nextAttrs: Record<string, unknown> = {
       brightness: s.brightness,
       rgb_color: [s.r, s.g, s.b],
       effect: s.effect ?? 0,
       speed: s.speed ?? 128,
       effect_list: EFFECT_LIST,
     }
-    const { data: prevState } = await sb
-      .from("entity_states")
-      .select("state,attributes,last_changed")
-      .eq("entity_id", id)
-      .maybeSingle()
+    if (prevState && prevState.state !== nextState) {
+      nextAttrs.previous_state = prevState.state
+    } else if (prevState?.attributes?.previous_state != null) {
+      nextAttrs.previous_state = prevState.attributes.previous_state
+    }
     const unchanged = stateSnapshotEqual(prevState, nextState, nextAttrs)
     const { error: stateErr } = await sb.from("entity_states").upsert({
       entity_id: id,
@@ -381,15 +392,20 @@ async function upsertWeatherNode(
     })
     await assertOk(entErr, `entities upsert ${id}`)
     const nextState = formatSensorValue(sensor.value, sensor.digits)
-    const nextAttrs = {
-      unit_of_measurement: sensor.unit,
-      device_class: sensor.device_class,
-    }
     const { data: prevState } = await sb
       .from("entity_states")
       .select("state,attributes,last_changed")
       .eq("entity_id", id)
       .maybeSingle()
+    const nextAttrs: Record<string, unknown> = {
+      unit_of_measurement: sensor.unit,
+      device_class: sensor.device_class,
+    }
+    if (prevState && prevState.state !== nextState) {
+      nextAttrs.previous_state = prevState.state
+    } else if (prevState?.attributes?.previous_state != null) {
+      nextAttrs.previous_state = prevState.attributes.previous_state
+    }
     const unchanged = stateSnapshotEqual(prevState, nextState, nextAttrs)
     const { error: stateErr } = await sb.from("entity_states").upsert({
       entity_id: id,
@@ -403,9 +419,10 @@ async function upsertWeatherNode(
 }
 
 /** Discover all online agent nodes into catalog (lights + opaque weather sensors). */
-export async function discoverFromAgent(agentUrl: string) {
+export async function discoverFromAgent(_agentUrl?: string) {
+  const { agentFetch } = await import("@/shared/lib/agent-fetch")
   const sb = createAdminClient()
-  const res = await fetch(`${agentUrl.replace(/\/$/, "")}/nodes`, { cache: "no-store" })
+  const res = await agentFetch("/nodes")
   if (!res.ok) throw new Error(`agent ${res.status}`)
   const body = (await res.json()) as { nodes?: AgentOpaqueNode[] }
   const nodes = decodeAgentNodes(body.nodes || [])

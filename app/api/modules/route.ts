@@ -4,6 +4,41 @@ import { logEvent } from "@/shared/lib/home/events"
 
 export const dynamic = "force-dynamic"
 
+/** Block SSRF via source_url — only https public hosts, no private/link-local. */
+function assertSafeModuleUrl(raw: string): URL {
+  let u: URL
+  try {
+    u = new URL(raw)
+  } catch {
+    throw new Error("invalid source_url")
+  }
+  if (u.protocol !== "https:") {
+    throw new Error("source_url must be https")
+  }
+  const host = u.hostname.toLowerCase()
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "::1" ||
+    host === "0.0.0.0" ||
+    host.endsWith(".local") ||
+    host.endsWith(".internal") ||
+    host === "metadata.google.internal" ||
+    /^10\.\d+\.\d+\.\d+$/.test(host) ||
+    /^192\.168\.\d+\.\d+$/.test(host) ||
+    /^169\.254\.\d+\.\d+$/.test(host) ||
+    /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d+\.\d+$/.test(host)
+  ) {
+    throw new Error("source_url host not allowed")
+  }
+  const m = host.match(/^172\.(\d+)\./)
+  if (m) {
+    const n = Number(m[1])
+    if (n >= 16 && n <= 31) throw new Error("source_url host not allowed")
+  }
+  return u
+}
+
 export async function GET() {
   const sb = createAdminClient()
   const { data, error } = await sb.from("modules").select("*").order("name")
@@ -18,8 +53,16 @@ export async function POST(request: Request) {
     let manifest = body.manifest || {}
     const source_url = body.source_url ? String(body.source_url) : null
     if (source_url && !body.manifest) {
-      const res = await fetch(source_url, { cache: "no-store" })
+      const safe = assertSafeModuleUrl(source_url)
+      const res = await fetch(safe.toString(), {
+        cache: "no-store",
+        redirect: "error",
+        signal: AbortSignal.timeout(8000),
+        headers: { Accept: "application/json" },
+      })
       if (!res.ok) throw new Error(`module fetch ${res.status}`)
+      const ct = (res.headers.get("content-type") || "").toLowerCase()
+      if (!ct.includes("json")) throw new Error("source_url must return JSON")
       manifest = await res.json()
     }
     const id = String(body.id || manifest.id || `mod_${Date.now()}`)

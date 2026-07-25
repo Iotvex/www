@@ -6,18 +6,15 @@ import {
   type AgentOpaqueNode,
   type ProtoStrip,
 } from "@/shared/lib/iotvex-proto"
+import { agentFetch } from "@/shared/lib/agent-fetch"
 
 export const dynamic = "force-dynamic"
-const AGENT = process.env.IOTVEX_AGENT_URL || "http://127.0.0.1:7421"
 
 async function resolveLightNodeId(preferred?: number): Promise<number | null> {
   if (preferred != null && Number.isFinite(preferred) && preferred > 0) {
     return preferred
   }
-  const listRes = await fetch(`${AGENT}/nodes`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(1500),
-  })
+  const listRes = await agentFetch("/nodes", { signal: AbortSignal.timeout(1500) })
   if (!listRes.ok) return null
   const listBody = (await listRes.json()) as { nodes?: AgentOpaqueNode[] }
   const light = pickLightOpaqueNode(listBody.nodes || [])
@@ -65,9 +62,8 @@ export async function POST(
       return NextResponse.json({ error: "no light node online" }, { status: 503 })
     }
 
-    const res = await fetch(`${AGENT}/node/${nodeId}/command`, {
+    const res = await agentFetch(`/node/${nodeId}/command`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       signal: AbortSignal.timeout(2500),
       body: JSON.stringify({
         msg_type: MSG.SET_STRIP,

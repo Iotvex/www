@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { authorizeApiRequest, isPublicApiPath } from "@/shared/lib/api-auth"
 import { updateSession } from "@/shared/lib/supabase/middleware"
 
 export async function middleware(request: NextRequest) {
@@ -21,6 +22,14 @@ export async function middleware(request: NextRequest) {
     url.search = ""
     url.hash = ""
     return NextResponse.redirect(url)
+  }
+
+  // Gate /api/* — session cookie or service token (except login/logout/cron)
+  if (path.startsWith("/api/") && !isPublicApiPath(path)) {
+    const ok = await authorizeApiRequest(request)
+    if (!ok) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 })
+    }
   }
 
   return updateSession(request)

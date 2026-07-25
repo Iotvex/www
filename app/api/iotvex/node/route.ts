@@ -4,13 +4,12 @@ import {
   pickLightNodeView,
   type AgentOpaqueNode,
 } from "@/shared/lib/iotvex-proto"
+import { agentFetch } from "@/shared/lib/agent-fetch"
 
 export const dynamic = "force-dynamic"
 
-const AGENT = process.env.IOTVEX_AGENT_URL || "http://127.0.0.1:7421"
-
 async function fetchOpaqueNodes(): Promise<AgentOpaqueNode[]> {
-  const listRes = await fetch(`${AGENT}/nodes`, { cache: "no-store" })
+  const listRes = await agentFetch("/nodes")
   if (!listRes.ok) {
     const text = await listRes.text().catch(() => "")
     throw Object.assign(new Error(text || `agent ${listRes.status}`), {
