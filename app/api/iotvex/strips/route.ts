@@ -5,10 +5,9 @@ import {
   type AgentOpaqueNode,
 } from "@/shared/lib/iotvex-proto"
 import { defaultStripName } from "@/shared/lib/home/action-options"
+import { agentFetch } from "@/shared/lib/agent-fetch"
 
 export const dynamic = "force-dynamic"
-
-const AGENT = process.env.IOTVEX_AGENT_URL || "http://127.0.0.1:7421"
 
 /**
  * Flat list of online light strips for voice assistant / external control.
@@ -16,7 +15,7 @@ const AGENT = process.env.IOTVEX_AGENT_URL || "http://127.0.0.1:7421"
  */
 export async function GET() {
   try {
-    const listRes = await fetch(`${AGENT}/nodes`, { cache: "no-store" })
+    const listRes = await agentFetch("/nodes")
     if (!listRes.ok) {
       const text = await listRes.text().catch(() => "")
       return NextResponse.json(

@@ -373,7 +373,7 @@ const $catalogDeviceIds = createStore<Set<string>>(new Set()).on(
 )
 
 export const fetchCatalogFx = createEffect(async () => {
-  const res = await fetch("/api/home", { cache: "no-store" })
+  const res = await fetch("/api/home", { cache: "no-store", credentials: "same-origin" })
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error(body.error || `HTTP ${res.status}`)
@@ -461,6 +461,7 @@ export const setStripFx = createEffect(async (payload: StripPatch & { node_id?: 
   const { index, node_id, ...body } = payload
   const res = await fetch(`/api/iotvex/strips/${index}`, {
     method: "POST",
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...body, ...(node_id != null ? { node_id } : {}) }),
     signal: abortAfter(3000),
@@ -499,6 +500,7 @@ export const callEntityFx = createEffect(
 
     const res = await fetch(`/api/iotvex/strips/${index}`, {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...body,

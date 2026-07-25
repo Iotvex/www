@@ -21,8 +21,7 @@ services:
       - .env.local
     environment:
       IOTVEX_AGENT_URL: http://host.docker.internal:7421
-      IOTVEX_AGENT_TOKEN: ${IOTVEX_AGENT_TOKEN:-}
-      IOTVEX_SERVICE_TOKEN: ${IOTVEX_SERVICE_TOKEN:-}
+      # Tokens come from env_file (.env.local) — do not override with empty ${VAR:-}
       IOTVEX_CONFIG_DIR: /app/config
       IOTVEX_WWW_MODE: ${IOTVEX_WWW_MODE:-local_published}
       IOTVEX_DB_MODE: ${IOTVEX_DB_MODE:-local}

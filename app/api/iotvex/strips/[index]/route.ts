@@ -10,15 +10,15 @@ import { agentFetch } from "@/shared/lib/agent-fetch"
 
 export const dynamic = "force-dynamic"
 
-async function resolveLightNodeId(preferred?: number): Promise<number | null> {
+async function resolveLightNodeId(preferred?: number): Promise<{ nodeId: number | null; agentStatus?: number }> {
   if (preferred != null && Number.isFinite(preferred) && preferred > 0) {
-    return preferred
+    return { nodeId: preferred }
   }
   const listRes = await agentFetch("/nodes", { signal: AbortSignal.timeout(1500) })
-  if (!listRes.ok) return null
+  if (!listRes.ok) return { nodeId: null, agentStatus: listRes.status }
   const listBody = (await listRes.json()) as { nodes?: AgentOpaqueNode[] }
   const light = pickLightOpaqueNode(listBody.nodes || [])
-  return light ? Number(light.node_id) : null
+  return { nodeId: light ? Number(light.node_id) : null }
 }
 
 /**
@@ -55,10 +55,17 @@ export async function POST(
 
   const preferredNodeId = Number(b.node_id)
   try {
-    const nodeId = await resolveLightNodeId(
+    const resolved = await resolveLightNodeId(
       Number.isFinite(preferredNodeId) ? preferredNodeId : undefined,
     )
+    const nodeId = resolved.nodeId
     if (nodeId == null) {
+      if (resolved.agentStatus === 401 || resolved.agentStatus === 403) {
+        return NextResponse.json(
+          { error: "agent unauthorized — check IOTVEX_AGENT_TOKEN" },
+          { status: 502 },
+        )
+      }
       return NextResponse.json({ error: "no light node online" }, { status: 503 })
     }
 

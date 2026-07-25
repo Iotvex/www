@@ -15,9 +15,8 @@ import {
   type ProtoStrip,
 } from "@/shared/lib/iotvex-proto"
 import { defaultStripName } from "@/shared/lib/home/action-options"
+import { agentFetch } from "@/shared/lib/agent-fetch"
 import type { AssistantEntities, AssistantIntentName, ParsedIntent } from "./nlu"
-
-const AGENT = process.env.IOTVEX_AGENT_URL || "http://127.0.0.1:7421"
 
 const EFFECT_NAME_TO_ID: Record<string, number> = {
   solid: 0,
@@ -58,8 +57,7 @@ type StripRow = {
 }
 
 async function listStrips(): Promise<StripRow[]> {
-  const listRes = await fetch(`${AGENT}/nodes`, {
-    cache: "no-store",
+  const listRes = await agentFetch("/nodes", {
     signal: AbortSignal.timeout(6000),
   })
   if (!listRes.ok) throw new Error(`agent nodes ${listRes.status}`)
@@ -142,9 +140,8 @@ async function controlStrip(
     effect: patch.effect ?? strip.effect,
     speed: patch.speed ?? strip.speed,
   }
-  const res = await fetch(`${AGENT}/node/${strip.node_id}/command`, {
+  const res = await agentFetch(`/node/${strip.node_id}/command`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     signal: AbortSignal.timeout(8000),
     body: JSON.stringify({
       msg_type: MSG.SET_STRIP,
@@ -377,7 +374,7 @@ export async function assistantStatusProbe(): Promise<{
     return { agent: true, strips: strips.length }
   } catch {
     try {
-      const res = await fetch(`${AGENT}/health`, { signal: AbortSignal.timeout(1500) })
+      const res = await agentFetch("/health", { signal: AbortSignal.timeout(1500) })
       return { agent: res.ok, strips: 0 }
     } catch {
       return { agent: false, strips: 0 }

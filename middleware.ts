@@ -24,6 +24,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Refresh session cookies first so the API gate sees a valid access token.
+  const sessionResponse = await updateSession(request)
+
   // Gate /api/* — session cookie or service token (except login/logout/cron)
   if (path.startsWith("/api/") && !isPublicApiPath(path)) {
     const ok = await authorizeApiRequest(request)
@@ -32,7 +35,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return updateSession(request)
+  return sessionResponse
 }
 
 export const config = {
