@@ -453,13 +453,36 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> 
 
     # Server-side env applies after a new production deployment.
     try:
+        # Prefer rebuilding the current production deployment with fresh env.
         proc = subprocess.run(
-            [vercel, "redeploy", "--yes", "--target", "production"],
+            [vercel, "ls", "--prod"],
             cwd=str(www_root),
             check=False,
             capture_output=True,
             text=True,
-            timeout=180,
+            timeout=60,
+        )
+        deploy_url = None
+        if proc.returncode == 0:
+            for line in (proc.stdout or "").splitlines():
+                if "https://" in line and "iotvex-" in line:
+                    # columns: Age Project Deployment Status ...
+                    for part in line.split():
+                        if part.startswith("https://") and "vercel.app" in part:
+                            deploy_url = part
+                            break
+                    if deploy_url:
+                        break
+        cmd = [vercel, "redeploy", "--target", "production"]
+        if deploy_url:
+            cmd.append(deploy_url)
+        proc = subprocess.run(
+            cmd,
+            cwd=str(www_root),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=300,
         )
         if proc.returncode != 0:
             print(
@@ -467,6 +490,8 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> 
                 f"{(proc.stderr or proc.stdout or '')[:240]}",
                 flush=True,
             )
+        else:
+            print(f"vercel redeploy ok: {(proc.stdout or '')[-200:]}", flush=True)
     except Exception as e:
         print(f"vercel redeploy: {e}", flush=True)
 
