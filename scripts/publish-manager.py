@@ -5,7 +5,7 @@ Reads config/runtime.json (+ secrets) and ensures tunnels match the WWW×DB matr
   - local_published → expose WWW (:httpPort)
   - cloud + local DB → expose local Supabase (:54321)
   - cloud → expose agent (:7421)
-  - cloud → expose Alexa assistant (:8777)
+  - cloud → expose Alexa assistant (:18927)
 
 Providers: cloudflare_tunnel (quick or token), pinggy (ssh), ngrok, tailscale_funnel.
 State: config/publish-state.json; URLs written back into runtime.json bridge.*.
@@ -106,9 +106,9 @@ def effective_desired(rt: dict) -> dict[str, dict]:
         desired["agent"] = {"port": 7421, "provider": provider if provider != "caddy_local" else "cloudflare_tunnel", "target": "http://127.0.0.1:7421"}
     if expose_assistant:
         desired["assistant"] = {
-            "port": 8777,
+            "port": 18927,
             "provider": provider if provider != "caddy_local" else "cloudflare_tunnel",
-            "target": "http://127.0.0.1:8777",
+            "target": "http://127.0.0.1:18927",
         }
     return desired
 
@@ -276,7 +276,15 @@ def start_tailscale(name: str, port: int, provider_cfg: dict) -> dict:
 def ensure_tunnel(name: str, spec: dict, rt: dict, secrets: dict, state: dict) -> dict:
     provider = spec["provider"]
     existing = (state.get("tunnels") or {}).get(name)
-    if existing and existing.get("provider") == provider and existing.get("pid") and pid_alive(int(existing["pid"])):
+    # Restart when provider OR target (port/URL) changed — e.g. Alexa 8777→18927
+    same_endpoint = (
+        existing
+        and existing.get("provider") == provider
+        and existing.get("target") == spec.get("target")
+        and existing.get("pid")
+        and pid_alive(int(existing["pid"]))
+    )
+    if same_endpoint:
         if existing.get("url") or provider == "caddy_local":
             return existing
         # still starting — try read log again
@@ -423,14 +431,21 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> 
 
     for key, val in pairs:
         try:
-            subprocess.run(
+            # Vars may exist in "all Environments" — rm without env first, then per-env.
+            for rm_args in (
+                [vercel, "env", "rm", key, "-y"],
                 [vercel, "env", "rm", key, "production", "-y"],
-                cwd=str(www_root),
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
+                [vercel, "env", "rm", key, "preview", "-y"],
+                [vercel, "env", "rm", key, "development", "-y"],
+            ):
+                subprocess.run(
+                    rm_args,
+                    cwd=str(www_root),
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
             proc = subprocess.run(
                 [vercel, "env", "add", key, "production"],
                 cwd=str(www_root),
@@ -445,6 +460,8 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> 
                     f"vercel env add {key} failed: {(proc.stderr or proc.stdout or '')[:200]}",
                     flush=True,
                 )
+            else:
+                print(f"vercel env add {key} ok", flush=True)
         except Exception as e:
             print(f"vercel sync {key}: {e}", flush=True)
 

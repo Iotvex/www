@@ -5,9 +5,9 @@ import { assistantStatusProbe } from "@/shared/lib/assistant/home"
 export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
-/** Host Alexa; docker-compose sets host.docker.internal:8777 (127.0.0.1 is wrong inside the container). */
+/** Host Alexa; docker-compose sets host.docker.internal:18927 (127.0.0.1 is wrong inside the container). */
 const EXTERNAL =
-  process.env.IOTVEX_ASSISTANT_URL?.trim() || "http://127.0.0.1:8777"
+  process.env.IOTVEX_ASSISTANT_URL?.trim() || "http://127.0.0.1:18927"
 
 /** Inbound auth for tunneled Alexa — same secret as home service token when possible. */
 function assistantAuthHeaders(extra?: HeadersInit): Headers {
