@@ -772,6 +772,6 @@
     "commandTitle": "Text command",
     "commandPlaceholder": "purple color brightness 30 right strip",
     "send": "Send",
-    "wakeHint": "Wake words: Alexa / Алекса and Sveta / Света. Speak clearly and a bit louder than usual. Use the glass button on any page to start listening without opening this tab."
+    "wakeHint": "Wake word: Alexa / Алекса. Speak clearly and a bit louder than usual. The glass button on any page starts listening without opening this tab. The host also runs continuous wake on the weather-station mic."
   }
 }

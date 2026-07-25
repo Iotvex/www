@@ -511,13 +511,7 @@ export function formatAssistantReply(
   wakeName?: WakeName,
 ): string {
   const who =
-    wakeName === "sveta"
-      ? lang === "ru"
-        ? "Света"
-        : "Sveta"
-      : lang === "ru"
-        ? "Алекса"
-        : "Alexa"
+    lang === "ru" ? "Алекса" : "Alexa"
 
   const humanizeFailDetail = (raw: string | undefined, l: "ru" | "en"): string => {
     const d = (raw || "").toLowerCase()
@@ -655,11 +649,11 @@ export function formatAssistantReply(
       case "greeting":
         return `${who} на связи. Чем помочь?`
       case "help":
-        return `Я ${who}. Могу включать и выключать свет, менять яркость, цвет и эффекты сразу в одной команде, запускать сцены и правила. Скажите «Алекса» или «Света» и команду.`
+        return `Я ${who}. Могу включать и выключать свет, менять яркость, цвет и эффекты сразу в одной команде, запускать сцены и правила. Скажите «Алекса» и команду.`
       case "status":
         return "Я на связи, умный дом отвечает."
       default:
-        return "Не поняла. Например: «Света, фиолетовый цвет яркость 30 на правой ленте»."
+        return "Не поняла. Например: «Алекса, фиолетовый цвет яркость 30 на правой ленте»."
     }
   }
 
@@ -691,7 +685,7 @@ export function formatAssistantReply(
     case "greeting":
       return `${who} here. How can I help?`
     case "help":
-      return `I'm ${who}. I can set color, brightness and effects in one command. Say Alexa or Sveta plus a command.`
+      return `I'm ${who}. I can set color, brightness and effects in one command. Say Alexa plus a command.`
     case "status":
       return "I'm online and the home is reachable."
     default:

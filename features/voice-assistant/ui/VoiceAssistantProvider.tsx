@@ -84,7 +84,7 @@ function commandFingerprint(text: string): string {
 export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ListenMode>("off")
   const [supported, setSupported] = useState(true)
-  const [hint, setHint] = useState("Нажмите кнопку и скажите «Алекса» или «Света»")
+  const [hint, setHint] = useState("Нажмите кнопку и скажите «Алекса»")
   const [heard, setHeard] = useState("")
   const [reply, setReply] = useState("")
   const [draft, setDraft] = useState("")
@@ -181,7 +181,7 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
     clearMicMute()
     muteMicUntil(700)
     setListenMode("wake")
-    setHint("Слушаю. Скажите «Алекса» или «Света» и команду")
+    setHint("Слушаю. Скажите «Алекса» и команду")
     window.setTimeout(() => {
       if (!wantListenRef.current || modeRef.current === "off") return
       startRecognitionRef.current()
@@ -283,7 +283,7 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
         commandTimer.current = window.setTimeout(() => {
           if (modeRef.current === "command") {
             setListenMode("wake")
-            setHint("Скажите «Алекса» или «Света» и команду")
+            setHint("Скажите «Алекса» и команду")
           }
         }, 10_000)
         return
@@ -427,7 +427,7 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
     window.speechSynthesis?.getVoices()
     wantListenRef.current = true
     setListenMode("wake")
-    setHint("Слушаю. Скажите «Алекса» или «Света» и команду")
+    setHint("Слушаю. Скажите «Алекса» и команду")
     startRecognition()
   }, [setListenMode, startRecognition, unlockSpeaker])
 
