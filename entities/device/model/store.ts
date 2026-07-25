@@ -321,9 +321,22 @@ function mergeWeatherNode(byId: Map<string, EntityState>, node: IotvexNode) {
 /** Merge live agent nodes onto catalog entities (DB is metadata SoT). */
 function mergeLiveOntoCatalog(prev: EntityState[], nodes: IotvexNode[]): EntityState[] {
   const byId = new Map(prev.map((e) => [e.entity_id, e]))
+  const liveNodeIds = new Set(nodes.map((n) => n.node_id >>> 0))
   for (const node of nodes) {
     if (node.strips?.length) mergeLightNode(byId, node)
     if (node.sensors?.length) mergeWeatherNode(byId, node)
+  }
+  // Weather (and other opaque) sensors go stale when the node drops off /nodes.
+  // Prevents a frozen catalog snapshot from looking like live readings.
+  for (const [id, e] of byId) {
+    if (e.domain !== "sensor" && e.domain !== "binary_sensor") continue
+    if (e.attributes?.platform !== "iotvex") continue
+    const nid = Number(e.attributes.node_id)
+    if (!Number.isFinite(nid)) continue
+    const online = liveNodeIds.has(nid >>> 0)
+    if (e.available !== online) {
+      byId.set(id, { ...e, available: online })
+    }
   }
   return [...byId.values()]
 }
