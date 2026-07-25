@@ -27,7 +27,8 @@ services:
       IOTVEX_DB_MODE: ${IOTVEX_DB_MODE:-local}
       IOTVEX_MDNS_NAME: ${IOTVEX_MDNS_NAME:-iotvex.local}
       REDIS_URL: redis://redis:6379
-      SUPABASE_URL: ${SUPABASE_URL:-http://host.docker.internal:54321}
+      # Always reach host Supabase from the container — never inherit 127.0.0.1 from .env
+      SUPABASE_URL: http://host.docker.internal:54321
       SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
