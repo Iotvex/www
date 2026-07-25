@@ -359,7 +359,72 @@ def reconcile() -> dict:
     if bridge.get("wwwPublicUrl"):
         env_lines.append(f"# home www public: {bridge['wwwPublicUrl']}")
     (CONFIG_DIR / "cloud-client.env").write_text("\n".join(env_lines) + "\n")
+    sync_vercel_cloud_env(bridge, rt)
     return state
+
+
+def _vercel_bin() -> str | None:
+    from shutil import which
+
+    return which("vercel")
+
+
+def sync_vercel_cloud_env(bridge: dict, rt: dict) -> None:
+    """Best-effort: push tunnel URLs into Vercel project `iotvex` production env.
+
+    Quick Cloudflare tunnels rotate URLs; without this, cloud WWW keeps an old
+    IOTVEX_AGENT_URL / Supabase tunnel and strip calls fail or hang.
+    Requires `vercel` CLI logged in on the home machine.
+    """
+    vercel = _vercel_bin()
+    if not vercel:
+        return
+    project = (bridge.get("vercelProject") or os.environ.get("IOTVEX_VERCEL_PROJECT") or "iotvex")
+    pairs: list[tuple[str, str]] = []
+    if bridge.get("agentPublicUrl"):
+        pairs.append(("IOTVEX_AGENT_URL", bridge["agentPublicUrl"]))
+    if bridge.get("localDbPublicUrl"):
+        db = bridge["localDbPublicUrl"]
+        pairs.extend(
+            [
+                ("SUPABASE_URL", db),
+                ("NEXT_PUBLIC_SUPABASE_URL", db),
+                ("IOTVEX_LOCAL_SUPABASE_URL", db),
+            ]
+        )
+    pairs.append(("IOTVEX_WWW_MODE", "cloud"))
+    db_mode = str((rt.get("db") or {}).get("mode") or "local")
+    pairs.append(("IOTVEX_DB_MODE", db_mode))
+    if not pairs:
+        return
+
+    www_root = ROOT
+    for key, val in pairs:
+        try:
+            subprocess.run(
+                [vercel, "env", "rm", key, "production", "-y"],
+                cwd=str(www_root),
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            proc = subprocess.run(
+                [vercel, "env", "add", key, "production"],
+                cwd=str(www_root),
+                input=val,
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            if proc.returncode != 0:
+                print(
+                    f"vercel env add {key} failed: {(proc.stderr or proc.stdout or '')[:200]}",
+                    flush=True,
+                )
+        except Exception as e:
+            print(f"vercel sync {key}: {e}", flush=True)
 
 
 def consume_request() -> str | None:
