@@ -60,17 +60,20 @@ type RuntimePayload = {
       needsWwwPublish?: boolean
       needsLocalDbBridge?: boolean
       needsAgentBridge?: boolean
+      needsAssistantBridge?: boolean
       summary?: string
     }
     bridge?: {
       wwwPublicUrl?: string
       localDbPublicUrl?: string
       agentPublicUrl?: string
+      assistantPublicUrl?: string
       autoFromMatrix?: boolean
       preferredProvider?: string
     }
     supabasePublicUrl?: string | null
     agentPublicUrl?: string | null
+    assistantPublicUrl?: string | null
   }
   agent?: { ok?: boolean }
 }
@@ -517,8 +520,10 @@ export function DeploymentPanel() {
             <div>needsWwwPublish: {String(payload?.runtime?.matrix?.needsWwwPublish)}</div>
             <div>needsLocalDbBridge: {String(payload?.runtime?.matrix?.needsLocalDbBridge)}</div>
             <div>needsAgentBridge: {String(payload?.runtime?.matrix?.needsAgentBridge)}</div>
+            <div>needsAssistantBridge: {String(payload?.runtime?.matrix?.needsAssistantBridge)}</div>
             <div>supabasePublicUrl: {payload?.runtime?.supabasePublicUrl || "—"}</div>
             <div>agentPublicUrl: {payload?.runtime?.agentPublicUrl || "—"}</div>
+            <div>assistantPublicUrl: {payload?.runtime?.assistantPublicUrl || "—"}</div>
             <div>wwwPublicUrl: {payload?.runtime?.bridge?.wwwPublicUrl || "—"}</div>
           </div>
           <div className="flex flex-wrap gap-2">

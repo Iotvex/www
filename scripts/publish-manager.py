@@ -5,6 +5,7 @@ Reads config/runtime.json (+ secrets) and ensures tunnels match the WWW×DB matr
   - local_published → expose WWW (:httpPort)
   - cloud + local DB → expose local Supabase (:54321)
   - cloud → expose agent (:7421)
+  - cloud → expose Alexa assistant (:8777)
 
 Providers: cloudflare_tunnel (quick or token), pinggy (ssh), ngrok, tailscale_funnel.
 State: config/publish-state.json; URLs written back into runtime.json bridge.*.
@@ -53,6 +54,7 @@ def matrix_needs(www: str, db: str) -> dict[str, bool]:
         "www": www == "local_published",
         "db": cloud and db == "local",
         "agent": cloud,
+        "assistant": cloud,
     }
 
 
@@ -67,9 +69,11 @@ def effective_desired(rt: dict) -> dict[str, dict]:
     if auto:
         expose_db = needs["db"] or bool(bridge.get("exposeLocalDb"))
         expose_agent = needs["agent"] or bool(bridge.get("exposeAgent"))
+        expose_assistant = needs["assistant"] or bool(bridge.get("exposeAssistant"))
     else:
         expose_db = bool(bridge.get("exposeLocalDb"))
         expose_agent = bool(bridge.get("exposeAgent"))
+        expose_assistant = bool(bridge.get("exposeAssistant"))
 
     pub = rt.get("publish") or {}
     http_port = int(pub.get("httpPort") or 3100)
@@ -100,6 +104,12 @@ def effective_desired(rt: dict) -> dict[str, dict]:
         desired["db"] = {"port": 54321, "provider": provider if provider != "caddy_local" else "cloudflare_tunnel", "target": "http://127.0.0.1:54321"}
     if expose_agent:
         desired["agent"] = {"port": 7421, "provider": provider if provider != "caddy_local" else "cloudflare_tunnel", "target": "http://127.0.0.1:7421"}
+    if expose_assistant:
+        desired["assistant"] = {
+            "port": 8777,
+            "provider": provider if provider != "caddy_local" else "cloudflare_tunnel",
+            "target": "http://127.0.0.1:8777",
+        }
     return desired
 
 
@@ -306,6 +316,8 @@ def write_bridge_urls(rt: dict, state: dict) -> dict:
         rt.setdefault("db", {}).setdefault("local", {})["publicUrl"] = tunnels["db"]["url"]
     if "agent" in tunnels and tunnels["agent"].get("url"):
         bridge["agentPublicUrl"] = tunnels["agent"]["url"]
+    if "assistant" in tunnels and tunnels["assistant"].get("url"):
+        bridge["assistantPublicUrl"] = tunnels["assistant"]["url"]
     return rt
 
 
@@ -356,10 +368,13 @@ def reconcile() -> dict:
         ]
     if bridge.get("agentPublicUrl"):
         env_lines.append(f"IOTVEX_AGENT_URL={bridge['agentPublicUrl']}")
+    if bridge.get("assistantPublicUrl"):
+        env_lines.append(f"IOTVEX_ASSISTANT_URL={bridge['assistantPublicUrl']}")
     if bridge.get("wwwPublicUrl"):
         env_lines.append(f"# home www public: {bridge['wwwPublicUrl']}")
     (CONFIG_DIR / "cloud-client.env").write_text("\n".join(env_lines) + "\n")
-    sync_vercel_cloud_env(bridge, rt)
+    sync_vercel_cloud_env(bridge, rt, state)
+    save_json(STATE, state)
     return state
 
 
@@ -369,20 +384,22 @@ def _vercel_bin() -> str | None:
     return which("vercel")
 
 
-def sync_vercel_cloud_env(bridge: dict, rt: dict) -> None:
+def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> None:
     """Best-effort: push tunnel URLs into Vercel project `iotvex` production env.
 
     Quick Cloudflare tunnels rotate URLs; without this, cloud WWW keeps an old
-    IOTVEX_AGENT_URL / Supabase tunnel and strip calls fail or hang.
+    IOTVEX_AGENT_URL / IOTVEX_ASSISTANT_URL / Supabase tunnel and strip/assistant
+    calls fail or hang.
     Requires `vercel` CLI logged in on the home machine.
     """
     vercel = _vercel_bin()
     if not vercel:
         return
-    project = (bridge.get("vercelProject") or os.environ.get("IOTVEX_VERCEL_PROJECT") or "iotvex")
     pairs: list[tuple[str, str]] = []
     if bridge.get("agentPublicUrl"):
         pairs.append(("IOTVEX_AGENT_URL", bridge["agentPublicUrl"]))
+    if bridge.get("assistantPublicUrl"):
+        pairs.append(("IOTVEX_ASSISTANT_URL", bridge["assistantPublicUrl"]))
     if bridge.get("localDbPublicUrl"):
         db = bridge["localDbPublicUrl"]
         pairs.extend(
@@ -399,6 +416,11 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict) -> None:
         return
 
     www_root = ROOT
+    last = ((state or {}).get("vercelSynced") or {}) if state is not None else {}
+    fingerprint = {k: v for k, v in pairs}
+    if last == fingerprint:
+        return
+
     for key, val in pairs:
         try:
             subprocess.run(
@@ -425,6 +447,28 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict) -> None:
                 )
         except Exception as e:
             print(f"vercel sync {key}: {e}", flush=True)
+
+    if state is not None:
+        state["vercelSynced"] = fingerprint
+
+    # Server-side env applies after a new production deployment.
+    try:
+        proc = subprocess.run(
+            [vercel, "redeploy", "--yes", "--target", "production"],
+            cwd=str(www_root),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+        if proc.returncode != 0:
+            print(
+                f"vercel redeploy failed (env updated; push/redeploy www to apply): "
+                f"{(proc.stderr or proc.stdout or '')[:240]}",
+                flush=True,
+            )
+    except Exception as e:
+        print(f"vercel redeploy: {e}", flush=True)
 
 
 def consume_request() -> str | None:

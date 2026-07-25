@@ -57,9 +57,11 @@
   "bridge": {
     "exposeLocalDb": true,
     "exposeAgent": true,
+    "exposeAssistant": true,
     "autoFromMatrix": false,
     "localDbPublicUrl": "https://live-fare-aqua-reproductive.trycloudflare.com",
     "agentPublicUrl": "https://trackback-corporations-inherited-identical.trycloudflare.com",
+    "assistantPublicUrl": "https://portland-bringing-theater-javascript.trycloudflare.com",
     "wwwPublicUrl": "https://<lan-or-wan-ip>:8443",
     "preferredProvider": "cloudflare_tunnel"
   }

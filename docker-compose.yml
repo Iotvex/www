@@ -21,6 +21,8 @@ services:
       - .env.local
     environment:
       IOTVEX_AGENT_URL: http://host.docker.internal:7421
+      # Python Alexa on the host (:8777) — never use 127.0.0.1 from inside the container
+      IOTVEX_ASSISTANT_URL: http://host.docker.internal:8777
       # Tokens come from env_file (.env.local) — do not override with empty ${VAR:-}
       IOTVEX_CONFIG_DIR: /app/config
       IOTVEX_WWW_MODE: ${IOTVEX_WWW_MODE:-local_published}

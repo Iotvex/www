@@ -63,8 +63,10 @@ export type RuntimeFile = {
     autoFromMatrix: boolean
     exposeLocalDb: boolean
     exposeAgent: boolean
+    exposeAssistant: boolean
     localDbPublicUrl: string
     agentPublicUrl: string
+    assistantPublicUrl: string
     wwwPublicUrl: string
     preferredProvider: string
   }
@@ -117,12 +119,15 @@ export type ResolvedRuntime = {
     needsWwwPublish: boolean
     needsLocalDbBridge: boolean
     needsAgentBridge: boolean
+    needsAssistantBridge: boolean
     summary: string
   }
   /** URL cloud/remote WWW should use for catalog when DB is local (tunneled). */
   supabasePublicUrl: string | null
   /** URL cloud/remote WWW should use for agent commands. */
   agentPublicUrl: string | null
+  /** URL cloud/remote WWW should use for Python Alexa (:8777). */
+  assistantPublicUrl: string | null
   configPath: string
   secretsPath: string
 }
@@ -205,8 +210,10 @@ export function defaultRuntimeFile(): RuntimeFile {
       autoFromMatrix: true,
       exposeLocalDb: false,
       exposeAgent: false,
+      exposeAssistant: false,
       localDbPublicUrl: "",
       agentPublicUrl: "",
+      assistantPublicUrl: "",
       wwwPublicUrl: "",
       preferredProvider: process.env.IOTVEX_PUBLISH_PROVIDER || "cloudflare_tunnel",
     },
@@ -481,6 +488,7 @@ export function getRuntimeConfig(): ResolvedRuntime {
         needsWwwPublish: m.needsWwwPublish,
         needsLocalDbBridge: m.needsLocalDbBridge,
         needsAgentBridge: m.needsAgentBridge,
+        needsAssistantBridge: m.needsAssistantBridge,
         summary: m.summary,
       }
     })(),
@@ -491,6 +499,7 @@ export function getRuntimeConfig(): ResolvedRuntime {
           null
         : db.url || null,
     agentPublicUrl: file.bridge.agentPublicUrl || null,
+    assistantPublicUrl: file.bridge.assistantPublicUrl || null,
     configPath,
     secretsPath,
   }
@@ -504,8 +513,11 @@ export function effectiveBridge(file: RuntimeFile = loadRuntimeFile()) {
     autoFromMatrix: auto,
     exposeLocalDb: auto ? m.needsLocalDbBridge || file.bridge.exposeLocalDb : file.bridge.exposeLocalDb,
     exposeAgent: auto ? m.needsAgentBridge || file.bridge.exposeAgent : file.bridge.exposeAgent,
+    exposeAssistant:
+      auto ? m.needsAssistantBridge || file.bridge.exposeAssistant : file.bridge.exposeAssistant,
     localDbPublicUrl: file.bridge.localDbPublicUrl || file.db.local.publicUrl || "",
     agentPublicUrl: file.bridge.agentPublicUrl || "",
+    assistantPublicUrl: file.bridge.assistantPublicUrl || "",
     wwwPublicUrl: file.bridge.wwwPublicUrl || "",
     preferredProvider: file.bridge.preferredProvider || "cloudflare_tunnel",
   }
@@ -566,6 +578,7 @@ export function publicRuntimeView(runtime = getRuntimeConfig()) {
     matrix: runtime.matrix,
     supabasePublicUrl: runtime.supabasePublicUrl,
     agentPublicUrl: runtime.agentPublicUrl,
+    assistantPublicUrl: runtime.assistantPublicUrl,
   }
 }
 

@@ -5,13 +5,32 @@ import { assistantStatusProbe } from "@/shared/lib/assistant/home"
 export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
+/** Host Alexa; docker-compose sets host.docker.internal:8777 (127.0.0.1 is wrong inside the container). */
 const EXTERNAL =
-  process.env.IOTVEX_ASSISTANT_URL || "http://127.0.0.1:8777"
+  process.env.IOTVEX_ASSISTANT_URL?.trim() || "http://127.0.0.1:8777"
+
+/** Inbound auth for tunneled Alexa — same secret as home service token when possible. */
+function assistantAuthHeaders(extra?: HeadersInit): Headers {
+  const h = new Headers(extra)
+  const token = (
+    process.env.IOTVEX_ASSISTANT_TOKEN ||
+    process.env.IOTVEX_SERVICE_TOKEN ||
+    process.env.CRON_SECRET ||
+    ""
+  ).trim()
+  if (token) {
+    h.set("Authorization", `Bearer ${token}`)
+    h.set("X-Iotvex-Token", token)
+    h.set("X-Iotvex-Assistant-Token", token)
+  }
+  return h
+}
 
 async function pythonHealthy(): Promise<boolean> {
   try {
     const res = await fetch(`${EXTERNAL}/health`, {
       cache: "no-store",
+      headers: assistantAuthHeaders(),
       signal: AbortSignal.timeout(2500),
     })
     if (!res.ok) return false
@@ -44,6 +63,7 @@ export async function POST(request: Request) {
         if (include != null) upstream.append("include_audio", String(include))
         const res = await fetch(`${EXTERNAL}/v1/audio`, {
           method: "POST",
+          headers: assistantAuthHeaders(),
           body: upstream,
           signal: AbortSignal.timeout(60_000),
         })
@@ -79,7 +99,7 @@ export async function POST(request: Request) {
       try {
         const res = await fetch(`${EXTERNAL}/v1/text`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: assistantAuthHeaders({ "Content-Type": "application/json" }),
           body: JSON.stringify({ text, include_audio: includeAudio }),
           signal: AbortSignal.timeout(45_000),
         })
@@ -105,6 +125,7 @@ export async function GET() {
   try {
     const res = await fetch(`${EXTERNAL}/health`, {
       cache: "no-store",
+      headers: assistantAuthHeaders(),
       signal: AbortSignal.timeout(2500),
     })
     if (res.ok) python = (await res.json()) as Record<string, unknown>
@@ -119,5 +140,6 @@ export async function GET() {
     tts: true,
     python,
     home: probe,
+    assistant_url_configured: Boolean(process.env.IOTVEX_ASSISTANT_URL?.trim()),
   })
 }
