@@ -19,8 +19,21 @@ export function agentHeaders(extra?: HeadersInit): Headers {
   return h
 }
 
+function defaultSignal(init?: RequestInit): AbortSignal | undefined {
+  if (init?.signal) return init.signal
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+    return AbortSignal.timeout(2500)
+  }
+  return undefined
+}
+
 export async function agentFetch(path: string, init?: RequestInit): Promise<Response> {
   const url = `${agentBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`
   const headers = agentHeaders(init?.headers)
-  return fetch(url, { ...init, headers, cache: "no-store" })
+  return fetch(url, {
+    ...init,
+    headers,
+    cache: "no-store",
+    signal: defaultSignal(init),
+  })
 }
