@@ -5,7 +5,8 @@ Reads config/runtime.json (+ secrets) and ensures tunnels match the WWW×DB matr
   - local_published → expose WWW (:httpPort)
   - cloud + local DB → expose local Supabase (:54321)
   - cloud → expose agent (:7421)
-  - cloud → expose Alexa assistant (:18927)
+  - exposeSmartHome → public HTTPS for Yandex Smart Home (/v1.0, /oauth) via WWW port
+  - Alexa assistant tunnel is disabled (product off; code remains under assistant/)
 
 Providers: cloudflare_tunnel (quick or token), pinggy (ssh), ngrok, tailscale_funnel.
 State: config/publish-state.json; URLs written back into runtime.json bridge.*.
@@ -54,7 +55,8 @@ def matrix_needs(www: str, db: str) -> dict[str, bool]:
         "www": www == "local_published",
         "db": cloud and db == "local",
         "agent": cloud,
-        "assistant": cloud,
+        # Local Alexa product is off — never auto-tunnel :18927
+        "assistant": False,
     }
 
 
@@ -69,11 +71,18 @@ def effective_desired(rt: dict) -> dict[str, dict]:
     if auto:
         expose_db = needs["db"] or bool(bridge.get("exposeLocalDb"))
         expose_agent = needs["agent"] or bool(bridge.get("exposeAgent"))
-        expose_assistant = needs["assistant"] or bool(bridge.get("exposeAssistant"))
+        # Assistant tunnel forced off unless IOTVEX_EXPOSE_ASSISTANT=1
+        expose_assistant = False
+        if os.environ.get("IOTVEX_EXPOSE_ASSISTANT", "").strip() in ("1", "true", "yes"):
+            expose_assistant = bool(bridge.get("exposeAssistant"))
     else:
         expose_db = bool(bridge.get("exposeLocalDb"))
         expose_agent = bool(bridge.get("exposeAgent"))
-        expose_assistant = bool(bridge.get("exposeAssistant"))
+        expose_assistant = False
+        if os.environ.get("IOTVEX_EXPOSE_ASSISTANT", "").strip() in ("1", "true", "yes"):
+            expose_assistant = bool(bridge.get("exposeAssistant"))
+
+    expose_smarthome = bool(bridge.get("exposeSmartHome"))
 
     pub = rt.get("publish") or {}
     http_port = int(pub.get("httpPort") or 3100)
@@ -86,7 +95,6 @@ def effective_desired(rt: dict) -> dict[str, dict]:
     if preferred in enabled:
         provider = preferred
     elif enabled:
-        # prefer cloudflare if enabled
         for cand in ("cloudflare_tunnel", "pinggy", "ngrok", "tailscale_funnel", "caddy_local"):
             if cand in enabled:
                 provider = cand
@@ -94,16 +102,33 @@ def effective_desired(rt: dict) -> dict[str, dict]:
     else:
         provider = preferred
 
+    # Smart Home needs a public HTTPS URL pointing at WWW.
+    if expose_smarthome and not expose_www:
+        expose_www = True
+    if expose_smarthome and provider == "caddy_local":
+        provider = "cloudflare_tunnel"
+
     desired: dict[str, dict] = {}
     if expose_www and provider != "caddy_local":
         desired["www"] = {"port": http_port, "provider": provider, "target": f"http://127.0.0.1:{http_port}"}
     elif expose_www and provider == "caddy_local":
-        # caddy is host systemd — record LAN/WAN hint only
-        desired["www"] = {"port": http_port, "provider": "caddy_local", "target": f"https://127.0.0.1:{pub.get('httpsPort', 8443)}"}
+        desired["www"] = {
+            "port": http_port,
+            "provider": "caddy_local",
+            "target": f"https://127.0.0.1:{pub.get('httpsPort', 8443)}",
+        }
     if expose_db:
-        desired["db"] = {"port": 54321, "provider": provider if provider != "caddy_local" else "cloudflare_tunnel", "target": "http://127.0.0.1:54321"}
+        desired["db"] = {
+            "port": 54321,
+            "provider": provider if provider != "caddy_local" else "cloudflare_tunnel",
+            "target": "http://127.0.0.1:54321",
+        }
     if expose_agent:
-        desired["agent"] = {"port": 7421, "provider": provider if provider != "caddy_local" else "cloudflare_tunnel", "target": "http://127.0.0.1:7421"}
+        desired["agent"] = {
+            "port": 7421,
+            "provider": provider if provider != "caddy_local" else "cloudflare_tunnel",
+            "target": "http://127.0.0.1:7421",
+        }
     if expose_assistant:
         desired["assistant"] = {
             "port": 18927,
@@ -319,12 +344,17 @@ def write_bridge_urls(rt: dict, state: dict) -> dict:
     tunnels = state.get("tunnels") or {}
     if "www" in tunnels and tunnels["www"].get("url"):
         bridge["wwwPublicUrl"] = tunnels["www"]["url"]
+        if bridge.get("exposeSmartHome"):
+            bridge["smartHomePublicUrl"] = tunnels["www"]["url"]
     if "db" in tunnels and tunnels["db"].get("url"):
         bridge["localDbPublicUrl"] = tunnels["db"]["url"]
         rt.setdefault("db", {}).setdefault("local", {})["publicUrl"] = tunnels["db"]["url"]
     if "agent" in tunnels and tunnels["agent"].get("url"):
         bridge["agentPublicUrl"] = tunnels["agent"]["url"]
-    if "assistant" in tunnels and tunnels["assistant"].get("url"):
+    if "assistant" not in tunnels:
+        bridge["assistantPublicUrl"] = ""
+        bridge["exposeAssistant"] = False
+    elif tunnels["assistant"].get("url"):
         bridge["assistantPublicUrl"] = tunnels["assistant"]["url"]
     return rt
 
@@ -376,8 +406,10 @@ def reconcile() -> dict:
         ]
     if bridge.get("agentPublicUrl"):
         env_lines.append(f"IOTVEX_AGENT_URL={bridge['agentPublicUrl']}")
-    if bridge.get("assistantPublicUrl"):
-        env_lines.append(f"IOTVEX_ASSISTANT_URL={bridge['assistantPublicUrl']}")
+    if bridge.get("smartHomePublicUrl") or bridge.get("wwwPublicUrl"):
+        sh = bridge.get("smartHomePublicUrl") or bridge.get("wwwPublicUrl")
+        env_lines.append(f"# Yandex Smart Home endpoint (Dialogs Endpoint URL, no /v1.0): {sh}")
+    # Do not export IOTVEX_ASSISTANT_URL while Alexa product is off
     if bridge.get("wwwPublicUrl"):
         env_lines.append(f"# home www public: {bridge['wwwPublicUrl']}")
     (CONFIG_DIR / "cloud-client.env").write_text("\n".join(env_lines) + "\n")
@@ -396,8 +428,7 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> 
     """Best-effort: push tunnel URLs into Vercel project `iotvex` production env.
 
     Quick Cloudflare tunnels rotate URLs; without this, cloud WWW keeps an old
-    IOTVEX_AGENT_URL / IOTVEX_ASSISTANT_URL / Supabase tunnel and strip/assistant
-    calls fail or hang.
+    IOTVEX_AGENT_URL / Supabase tunnel and strip calls fail or hang.
     Requires `vercel` CLI logged in on the home machine.
     """
     vercel = _vercel_bin()
@@ -406,9 +437,7 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> 
     pairs: list[tuple[str, str]] = []
     if bridge.get("agentPublicUrl"):
         pairs.append(("IOTVEX_AGENT_URL", bridge["agentPublicUrl"]))
-    if bridge.get("assistantPublicUrl"):
-        pairs.append(("IOTVEX_ASSISTANT_URL", bridge["assistantPublicUrl"]))
-    if bridge.get("localDbPublicUrl"):
+    # Alexa assistant URL intentionally not synced (product off)    if bridge.get("localDbPublicUrl"):
         db = bridge["localDbPublicUrl"]
         pairs.extend(
             [

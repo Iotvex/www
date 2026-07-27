@@ -13,7 +13,7 @@ Next.js dashboard for the DIY home hub.
 |------|---------|
 | **local** | Self-hosted UI. Always: `http(s)://<ip>:<port>` + mDNS (`iotvex.local`, editable). |
 | **local_published** | Same as local **plus** public HTTPS (port-forward, custom domain, Pinggy, Cloudflare Tunnel, ngrok, Tailscale Funnel…). |
-| **cloud** | UI hosted in Iotvex cloud; home machine keeps agent/OTBR. |
+| **cloud** | UI hosted in Iotvex cloud; home machine keeps hub (agent + OTBR). |
 
 ### Database (`IOTVEX_DB_MODE` / Settings)
 
@@ -38,6 +38,11 @@ config/runtime.secrets.json.example
 `GET/PATCH /api/runtime`  
 `POST /api/runtime/db/probe`  
 `POST /api/runtime/db/switch`
+
+## Яндекс Умный дом (Алиса)
+
+Провайдер REST `/v1.0` + OAuth `/oauth` — см. [docs/YANDEX_SMART_HOME.md](docs/YANDEX_SMART_HOME.md).
+Локальная Alexa (`assistant/`) выключена; FAB скрыт без `NEXT_PUBLIC_IOTVEX_VOICE_ASSISTANT_UI=1`.
 
 ## Run
 

@@ -17,7 +17,7 @@ export const MSG = {
 export const STRIP_SIZE = 8
 export const MAX_STRIPS = 8
 
-/** Packed WeatherStateV1 from living-room-weather-station firmware (30 bytes). */
+/** Packed WeatherStateV1 from libs/sensors Types::WeatherStateV1 (30 bytes). */
 export const WEATHER_STATE_V1_SIZE = 30
 export const WEATHER_FLAG_SCD = 1 << 0
 export const WEATHER_FLAG_BH1750 = 1 << 1

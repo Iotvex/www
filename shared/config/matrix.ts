@@ -13,6 +13,7 @@ export type MatrixCell = {
   needsLocalDbBridge: boolean
   needsAgentBridge: boolean
   needsAssistantBridge: boolean
+  needsSmartHomePublish: boolean
   summary: string
 }
 
@@ -28,11 +29,13 @@ export function matrixCell(www: WwwMode, db: DbMode): MatrixCell {
     needsWwwPublish: published,
     needsLocalDbBridge: cloudWww && localDb,
     needsAgentBridge: cloudWww,
-    needsAssistantBridge: cloudWww,
+    // Local Alexa product is off — never require assistant tunnel
+    needsAssistantBridge: false,
+    needsSmartHomePublish: true,
     summary: cloudWww
       ? localDb
-        ? "Cloud UI + local DB: tunnel Supabase + agent + Alexa from home."
-        : "Cloud UI + cloud DB: tunnel agent + Alexa from home; DB is remote."
+        ? "Cloud UI + local DB: tunnel Supabase + agent from home."
+        : "Cloud UI + cloud DB: tunnel agent from home; DB is remote."
       : published
         ? "Self-hosted UI with public HTTPS; DB may be local or cloud."
         : "Self-hosted LAN/mDNS UI; DB may be local or cloud.",

@@ -112,12 +112,16 @@ export function DashboardApp() {
               }}
             />
             {/* No top safe-area: opaque status bar already insets. Bottom: home indicator. */}
-            <main className="iotvex-hide-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-6 md:pb-6">
-              <ViewHost viewId={viewId} />
+            <main className="iotvex-hide-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-5 md:pb-6 lg:px-8 xl:px-10 xl:pt-6">
+              <div className="mx-auto w-full max-w-[1600px]">
+                <ViewHost viewId={viewId} />
+              </div>
             </main>
           </div>
           <MobileNav />
-          <VoiceAssistantFab />
+          {process.env.NEXT_PUBLIC_IOTVEX_VOICE_ASSISTANT_UI === "1" ? (
+            <VoiceAssistantFab />
+          ) : null}
         </div>
       </div>
     </VoiceAssistantProvider>

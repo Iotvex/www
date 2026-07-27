@@ -57,6 +57,31 @@ export async function loadHomeCatalog(): Promise<HomeCatalog & {
   }
 }
 
+/** Lean snapshot for Yandex Smart Home (discovery/query/action) — keep under Dialogs' ~3s budget. */
+export async function loadYandexCatalog(): Promise<{
+  areas: HomeCatalog["areas"]
+  devices: HomeCatalog["devices"]
+  entities: DbEntity[]
+  states: HomeCatalog["states"]
+}> {
+  const sb = createAdminClient()
+  const [areas, devices, entities, states] = await Promise.all([
+    sb.from("areas").select("*").order("sort_order"),
+    sb.from("devices").select("*").order("name"),
+    sb.from("entities").select("*").order("name"),
+    sb.from("entity_states").select("*"),
+  ])
+  for (const r of [areas, devices, entities, states]) {
+    if (r.error) throw new Error(r.error.message)
+  }
+  return {
+    areas: areas.data || [],
+    devices: devices.data || [],
+    entities: (entities.data || []) as DbEntity[],
+    states: states.data || [],
+  }
+}
+
 export async function listAutomations() {
   const sb = createAdminClient()
   const { data, error } = await sb.from("automations").select("*").order("name")

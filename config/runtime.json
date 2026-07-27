@@ -36,7 +36,7 @@
   },
   "cloudWww": {
     "baseUrl": "",
-    "note": "When wwwMode=cloud, UI is hosted externally; home keeps agent/OTBR."
+    "note": "When wwwMode=cloud, UI is hosted externally; home keeps hub (agent + OTBR)."
   },
   "db": {
     "mode": "local",
@@ -57,12 +57,14 @@
   "bridge": {
     "exposeLocalDb": true,
     "exposeAgent": true,
-    "exposeAssistant": true,
+    "exposeAssistant": false,
     "autoFromMatrix": false,
     "localDbPublicUrl": "https://live-fare-aqua-reproductive.trycloudflare.com",
     "agentPublicUrl": "https://trackback-corporations-inherited-identical.trycloudflare.com",
-    "assistantPublicUrl": "https://direct-kate-stress-dvds.trycloudflare.com",
-    "wwwPublicUrl": "https://<lan-or-wan-ip>:8443",
-    "preferredProvider": "cloudflare_tunnel"
+    "assistantPublicUrl": "",
+    "wwwPublicUrl": "https://smtp-path-hon-pacific.trycloudflare.com",
+    "preferredProvider": "cloudflare_tunnel",
+    "exposeSmartHome": true,
+    "smartHomePublicUrl": "https://smtp-path-hon-pacific.trycloudflare.com"
   }
 }

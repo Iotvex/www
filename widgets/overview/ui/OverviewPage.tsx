@@ -388,7 +388,7 @@ export function OverviewPage() {
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={orderedWidgets.map((widget) => widget.id)} strategy={rectSortingStrategy}>
-              <div className="grid min-w-0 gap-2 sm:gap-2.5 lg:grid-cols-2">
+              <div className="grid min-w-0 items-start gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3">
                 {orderedWidgets.map((widget, index) => (
                   <SortableWidgetCard
                     key={widget.id}
@@ -596,8 +596,14 @@ function SortableWidgetCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "iotvex-card-in relative min-w-0 overflow-hidden touch-manipulation",
+        "iotvex-card-in relative min-w-0 self-start overflow-hidden touch-manipulation",
         isDragging && "opacity-90 shadow-lg ring-1 ring-primary/30",
+        widget.kind === "status" && "h-fit",
+        (widget.kind === "entities" ||
+          widget.kind === "lights" ||
+          widget.kind === "area" ||
+          widget.kind === "activity") &&
+          "xl:col-span-2",
       )}
     >
       <CardHeader

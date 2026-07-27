@@ -130,7 +130,7 @@ function DevicesTab() {
           }
         />
       ) : (
-        <div className="flex flex-col md:grid md:grid-cols-2 md:gap-2.5">
+        <div className="flex flex-col md:grid md:grid-cols-2 md:gap-3 xl:grid-cols-3 2xl:grid-cols-4">
           {devices.map((d, i) => {
             const linked = entities.filter((e) => e.device_id === d.id)
             const onCount = linked.filter(isEntityActive).length
@@ -680,7 +680,7 @@ function AreasTab() {
           }
         />
       ) : (
-        <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-2.5 xl:grid-cols-3">
+        <div className="flex flex-col sm:grid sm:grid-cols-2 sm:gap-3 xl:grid-cols-3 2xl:grid-cols-4">
           {areas.map((a, i) => {
             const ents = entities.filter((e) => e.area === a.id)
             const entityDeviceIds = new Set(

@@ -86,6 +86,10 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => null)) as {
       text?: string
       include_audio?: boolean
+      client_id?: string
+      playback?: string
+      rms?: number
+      vad?: boolean
     } | null
     const text = String(body?.text || "").trim()
     if (!text) {
@@ -93,6 +97,8 @@ export async function POST(request: Request) {
     }
 
     const includeAudio = body?.include_audio !== false
+    const clientId = String(body?.client_id || "").trim()
+    const playback = body?.playback === "server" ? "server" : "client"
 
     // Prefer Python Alexa (skills: calendar, music, weather, search, …)
     if (await pythonHealthy()) {
@@ -100,12 +106,17 @@ export async function POST(request: Request) {
         const res = await fetch(`${EXTERNAL}/v1/text`, {
           method: "POST",
           headers: assistantAuthHeaders({ "Content-Type": "application/json" }),
-          body: JSON.stringify({ text, include_audio: includeAudio }),
+          body: JSON.stringify({
+            text,
+            include_audio: includeAudio,
+            client_id: clientId || undefined,
+            playback,
+          }),
           signal: AbortSignal.timeout(45_000),
         })
         if (res.ok) {
           const data = await res.json()
-          return NextResponse.json({ ...data, source: "python" })
+          return NextResponse.json({ ...data, source: "python", playback })
         }
       } catch {
         /* fall through to local */

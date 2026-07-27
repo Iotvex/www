@@ -5,7 +5,7 @@ import "server-only"
  * WWW modes:
  * - local            — self-hosted UI on the home machine (HTTP + mDNS)
  * - local_published  — same, plus public HTTPS reachability (port-forward / tunnels / domain)
- * - cloud            — UI hosted in Iotvex cloud; home keeps agent/OTBR only
+ * - cloud            — UI hosted in Iotvex cloud; home keeps hub (agent + OTBR) only
  *
  * DB modes:
  * - local          — bundled Supabase on the home machine
@@ -64,10 +64,13 @@ export type RuntimeFile = {
     exposeLocalDb: boolean
     exposeAgent: boolean
     exposeAssistant: boolean
+    /** Public HTTPS for Yandex Smart Home (/v1.0 + /oauth) via WWW tunnel. */
+    exposeSmartHome?: boolean
     localDbPublicUrl: string
     agentPublicUrl: string
     assistantPublicUrl: string
     wwwPublicUrl: string
+    smartHomePublicUrl?: string
     preferredProvider: string
   }
   db: {
@@ -211,10 +214,12 @@ export function defaultRuntimeFile(): RuntimeFile {
       exposeLocalDb: false,
       exposeAgent: false,
       exposeAssistant: false,
+      exposeSmartHome: false,
       localDbPublicUrl: "",
       agentPublicUrl: "",
       assistantPublicUrl: "",
       wwwPublicUrl: "",
+      smartHomePublicUrl: "",
       preferredProvider: process.env.IOTVEX_PUBLISH_PROVIDER || "cloudflare_tunnel",
     },
     db: {
@@ -513,12 +518,14 @@ export function effectiveBridge(file: RuntimeFile = loadRuntimeFile()) {
     autoFromMatrix: auto,
     exposeLocalDb: auto ? m.needsLocalDbBridge || file.bridge.exposeLocalDb : file.bridge.exposeLocalDb,
     exposeAgent: auto ? m.needsAgentBridge || file.bridge.exposeAgent : file.bridge.exposeAgent,
-    exposeAssistant:
-      auto ? m.needsAssistantBridge || file.bridge.exposeAssistant : file.bridge.exposeAssistant,
+    // Alexa product off — never auto-expose
+    exposeAssistant: false,
+    exposeSmartHome: Boolean(file.bridge.exposeSmartHome),
     localDbPublicUrl: file.bridge.localDbPublicUrl || file.db.local.publicUrl || "",
     agentPublicUrl: file.bridge.agentPublicUrl || "",
-    assistantPublicUrl: file.bridge.assistantPublicUrl || "",
+    assistantPublicUrl: "",
     wwwPublicUrl: file.bridge.wwwPublicUrl || "",
+    smartHomePublicUrl: file.bridge.smartHomePublicUrl || file.bridge.wwwPublicUrl || "",
     preferredProvider: file.bridge.preferredProvider || "cloudflare_tunnel",
   }
 }

@@ -33,6 +33,7 @@ export function hasValidServiceToken(request: Request | NextRequest): boolean {
 export function isPublicApiPath(pathname: string): boolean {
   if (pathname === "/api/auth/login" || pathname === "/api/auth/logout") return true
   if (pathname.startsWith("/api/cron/")) return true
+  if (pathname === "/api/yandex/oauth-info") return true
   return false
 }
 

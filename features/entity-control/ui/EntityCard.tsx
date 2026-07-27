@@ -34,7 +34,7 @@ import {
   pctToByte,
 } from "@/shared/lib/home/action-options"
 import { cn } from "@/shared/lib/utils"
-import { stackItemOffsetClass, stackItemOffsetStyle, stackRadiusClass, stackRadiusStyle } from "@/shared/lib/stack-radius"
+import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
 import {
   Atom,
   Binary,
@@ -612,11 +612,13 @@ function DeviceEntityCard({
 
   return (
     <div
-      style={{ ...style, ...stackItemOffsetStyle(stackIndex), ...stackRadiusStyle(stackIndex, stackTotal, "xl") }}
+      style={style}
       className={cn(
         "iotvex-card-in iotvex-surface relative min-w-0 overflow-hidden border transition-[background-color,box-shadow] duration-300",
         "hover:z-[1] hover:bg-white/[0.04]",
         stackItemOffsetClass(stackIndex),
+        stackRadiusClass(stackIndex, stackTotal, "xl"),
+        "md:mt-0 md:rounded-xl",
       )}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -631,13 +633,16 @@ function DeviceEntityCard({
         {menu ? <div className="shrink-0">{menu}</div> : null}
       </div>
 
-      <div className="flex flex-col">
+      <div className="h-px w-full bg-white/[0.08]" aria-hidden />
+      <div
+        className={cn(
+          "flex flex-col divide-y divide-white/[0.08]",
+          group.entities.length > 1 && "md:grid md:grid-cols-2 md:divide-x md:divide-y-0",
+        )}
+      >
         {group.entities.map((entity) => (
-          <div key={entity.entity_id} className="min-w-0">
-            <div className="h-px w-full bg-white/[0.08]" aria-hidden />
-            <div className="px-2.5 sm:px-3">
-              <EntityControls entity={entity} onEdit={onEdit} compact />
-            </div>
+          <div key={entity.entity_id} className="min-w-0 px-2.5 sm:px-3">
+            <EntityControls entity={entity} onEdit={onEdit} compact />
           </div>
         ))}
       </div>
@@ -675,7 +680,7 @@ export function EntityGrid({
 
   if (!groupByDevice) {
     return (
-      <div className={cn("flex flex-col md:grid md:grid-cols-2 md:gap-2.5", className)}>
+      <div className={cn("flex flex-col gap-0 md:grid md:grid-cols-2 md:gap-3 xl:grid-cols-3", className)}>
         {entities.map((e, i) => (
           <EntityCard
             key={e.entity_id}
@@ -695,7 +700,12 @@ export function EntityGrid({
   }
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div
+      className={cn(
+        "flex flex-col md:grid md:grid-cols-2 md:gap-3 xl:grid-cols-2 2xl:grid-cols-3",
+        className,
+      )}
+    >
       {groups.map((group, gi) => (
         <DeviceEntityCard
           key={group.key}

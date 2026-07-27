@@ -9,6 +9,7 @@ import {
   ListOrdered,
   Activity,
   Puzzle,
+  Box,
   Mic,
   UserRound,
   Palette,
@@ -60,6 +61,7 @@ export const NAV_SECTIONS: NavSection[] = [
     sectionKey: "system",
     items: [
       { id: "activity", icon: Activity },
+      { id: "spatial", icon: Box },
       { id: "modules", icon: Puzzle },
       { id: "assistant", icon: Mic },
     ],

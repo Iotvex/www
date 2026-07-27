@@ -1,0 +1,19 @@
+[Unit]
+Description=Iotvex Alice Linux wake companion (hotword → Yandex Browser)
+Documentation=file:///home/xlebpushek/iotvex/www/docs/YANDEX_SMART_HOME.md
+After=pipewire.service pipewire-pulse.service graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+Environment=XDG_RUNTIME_DIR=%t
+Environment=IOTVEX_ASSISTANT_VENV=/home/xlebpushek/iotvex/assistant/.venv
+Environment=WHISPER_MODEL=tiny
+Environment=SPEECH_RMS=0.038
+ExecStart=/home/xlebpushek/iotvex/assistant/.venv/bin/python /home/xlebpushek/iotvex/www/scripts/alice-linux-wake/alice_wake.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,15 +1,14 @@
-/** Wake words: Алекса / Alexa only (unicode-safe, no JS \\b). */
+/** Wake words: Алекса / Alexa only (unicode-safe, no JS \\b).
+ *
+ * Command text is ALWAYS the substring AFTER the first wake token.
+ * Pre-wake context is discarded (never treated as the command).
+ */
 
 export const WAKE_TOKEN = "алекс[аеуыой]?|alexa"
 
 export const WAKE_RE = new RegExp(
   `(?:^|[^\\p{L}\\p{N}])(${WAKE_TOKEN})(?=[^\\p{L}\\p{N}]|$)`,
   "iu",
-)
-
-export const WAKE_RE_GLOBAL = new RegExp(
-  `(?:^|[^\\p{L}\\p{N}])(${WAKE_TOKEN})(?=[^\\p{L}\\p{N}]|$)`,
-  "giu",
 )
 
 /** Looser ASR variants — common mishears / truncated forms. */
@@ -26,11 +25,18 @@ function normalizeWakeText(text: string): string {
   return collapseRepeats(text.toLowerCase().replace(/ё/g, "е").replace(/[’'`]/g, ""))
 }
 
+function firstWakeMatch(text: string): RegExpExecArray | null {
+  const padded = ` ${text} `
+  const exact = new RegExp(WAKE_RE.source, "iu")
+  const m1 = exact.exec(padded)
+  if (m1) return m1
+  const fuzzy = new RegExp(FUZZY_ALEXA.source, "iu")
+  return fuzzy.exec(padded)
+}
+
 export function detectWakeName(text: string): WakeName {
   const padded = ` ${normalizeWakeText(text)} `
-  const m = padded.match(WAKE_RE)
-  if (m) return "alexa"
-  if (FUZZY_ALEXA.test(padded)) return "alexa"
+  if (WAKE_RE.test(padded) || FUZZY_ALEXA.test(padded)) return "alexa"
   return null
 }
 
@@ -38,6 +44,10 @@ export function hasWakeWord(text: string): boolean {
   return detectWakeName(text) != null
 }
 
+/**
+ * Keep ONLY words after the first wake token.
+ * «…что такое Alexa пицца…» → cleaned «пицца»
+ */
 export function stripWakeWord(text: string): {
   cleaned: string
   hadWake: boolean
@@ -45,12 +55,16 @@ export function stripWakeWord(text: string): {
 } {
   const wakeName = detectWakeName(text)
   if (!wakeName) return { cleaned: text.trim(), hadWake: false, wakeName: null }
-  const cleaned = text
-    .replace(new RegExp(WAKE_RE_GLOBAL.source, "giu"), " ")
-    .replace(new RegExp(FUZZY_ALEXA.source, "giu"), " ")
-    .replace(/^[,\s.!:;\-—]+/, "")
-    .replace(/\s+/g, " ")
-    .trim()
+
+  const m = firstWakeMatch(text)
+  if (!m || m.index == null) {
+    return { cleaned: text.trim(), hadWake: true, wakeName }
+  }
+  // Match was against ` ${text} ` — index 0 is the leading space
+  const endInPadded = m.index + m[0].length
+  const endInText = Math.max(0, endInPadded - 1)
+  let cleaned = text.slice(endInText).replace(/^[,.\s!:;\-—–]+/u, "").trim()
+  cleaned = cleaned.replace(/\s+/g, " ")
   return { cleaned, hadWake: true, wakeName }
 }
 

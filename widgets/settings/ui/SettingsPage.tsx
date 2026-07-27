@@ -106,7 +106,7 @@ function SectionIntro(_props: { title: string; description?: string }) {
 
 export function SettingsPage({ tab = "account" }: { tab?: SettingsTab }) {
   return (
-    <div className="iotvex-page mx-auto w-full max-w-3xl space-y-5">
+    <div className="iotvex-page mx-auto w-full max-w-5xl space-y-5">
       <div className="min-w-0">
         {tab === "account" ? <AccountPanel /> : null}
         {tab === "appearance" ? <AppearanceSection /> : null}

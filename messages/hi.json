@@ -84,7 +84,8 @@
       "settings-users": "उपयोगकर्ता",
       "settings-backup": "बैकअप",
       "settings-tools": "टूल",
-      "assistant": "सहायक"
+      "assistant": "सहायक",
+      "spatial": "Spatial"
     },
     "mobile": {
       "overview": "अवलोकन",
@@ -157,6 +158,13 @@
     "assistant": {
       "title": "सहायक",
       "subtitle": "आवाज़ और अनुमतियाँ"
+    },
+    "spatial": {
+      "title": "Spatial",
+      "subtitle": "Universal 2D/3D scene engine",
+      "loading": "Starting spatial engine…",
+      "hint": "Alt+drag orbit · scroll zoom · click select · Ctrl+Z undo",
+      "selected": "{count} selected"
     }
   },
   "login": {
@@ -557,7 +565,7 @@
     },
     "deployment": {
       "title": "Deployment",
-      "description": "WWW reachability and database backend. Device plane (agent/OTBR) stays local.",
+      "description": "WWW reachability and database backend. Device plane (hub (agent+OTBR)) stays local.",
       "loadError": "Failed to load runtime config",
       "saveError": "Failed to save",
       "saved": "Saved. mDNS/publish providers updated in config/runtime.json.",
@@ -572,7 +580,7 @@
       "wwwModeHelp": {
         "local": "Self-hosted on this machine. HTTP + HTTPS on LAN/mDNS.",
         "local_published": "Same as local, plus public HTTPS (port-forward, domain, Pinggy, Cloudflare, ngrok, Tailscale…).",
-        "cloud": "UI in the cloud; home keeps agent/OTBR. With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
+        "cloud": "UI in the cloud; home keeps hub (agent+OTBR). With local DB, tunnel Supabase+agent. With cloud DB, tunnel agent."
       },
       "mdnsLabel": "mDNS name",
       "customDomainLabel": "Custom domain",

@@ -68,7 +68,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppSidebar() {
   return (
-    <aside className="iotvex-sidebar-enter hidden h-full w-52 shrink-0 flex-col border-r border-white/[0.08] bg-black/80 text-sidebar-foreground backdrop-blur-2xl md:flex">
+    <aside className="iotvex-sidebar-enter hidden h-full w-56 shrink-0 flex-col border-r border-white/[0.08] bg-black/80 text-sidebar-foreground backdrop-blur-2xl md:flex xl:w-60">
       <SidebarNav />
     </aside>
   )

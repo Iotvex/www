@@ -17,3 +17,5 @@ config/runtime.json.bak
 .vercel
 tsconfig.tsbuildinfo
 docker-compose.yml.bak.port
+
+config/yandex-smart-home.json

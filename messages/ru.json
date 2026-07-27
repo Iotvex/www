@@ -78,6 +78,7 @@
       "auto-scripts": "Последовательности",
       "activity": "Журнал",
       "modules": "Расширения",
+      "spatial": "Пространство",
       "settings-account": "Аккаунт",
       "settings-appearance": "Оформление",
       "settings-services": "Сервисы",
@@ -129,6 +130,13 @@
     "modules": {
       "title": "Расширения",
       "subtitle": "Подключаемые модули"
+    },
+    "spatial": {
+      "title": "Пространство",
+      "subtitle": "Универсальный 2D/3D движок сцен",
+      "loading": "Запуск spatial engine…",
+      "hint": "Alt+drag орбита · колесо зум · клик выбор · Ctrl+Z отмена",
+      "selected": "Выбрано: {count}"
     },
     "settings-account": {
       "title": "Аккаунт",
@@ -557,7 +565,7 @@
     },
     "deployment": {
       "title": "Развёртывание",
-      "description": "Доступ к панели и бэкенд БД. Плоскость устройств (agent/OTBR) всегда локальная.",
+      "description": "Доступ к панели и бэкенд БД. Плоскость устройств (hub (agent+OTBR)) всегда локальная.",
       "loadError": "Не удалось загрузить runtime-конфиг",
       "saveError": "Не удалось сохранить",
       "saved": "Сохранено в config/runtime.json.",
@@ -572,7 +580,7 @@
       "wwwModeHelp": {
         "local": "Хостинг на этой машине. HTTP + HTTPS в LAN/mDNS.",
         "local_published": "То же + публичный HTTPS (проброс, домен, Pinggy, Cloudflare, ngrok, Tailscale…).",
-        "cloud": "UI в облаке; дом держит agent/OTBR. С local БД — туннель Supabase+agent. С cloud БД — туннель agent."
+        "cloud": "UI в облаке; дом держит hub (agent+OTBR). С local БД — туннель Supabase+agent. С cloud БД — туннель agent."
       },
       "mdnsLabel": "Имя mDNS",
       "customDomainLabel": "Свой домен",

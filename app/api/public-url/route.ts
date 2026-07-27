@@ -1,29 +1,18 @@
 import { NextResponse } from "next/server"
+import { publicRequestOrigin } from "@/shared/lib/public-origin"
 
 export const dynamic = "force-dynamic"
 
 /** Public origin of this request (works for any LAN/WAN IP:port). */
 export function requestOrigin(request: Request): string | null {
-  // Prefer Host (includes non-default port). X-Forwarded-Host is fallback.
-  const hostHeader = request.headers.get("host")?.trim()
-  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim()
-  const host = hostHeader || forwardedHost
-  if (!host) return null
-
-  const forwardedProto = request.headers
-    .get("x-forwarded-proto")
-    ?.split(",")[0]
-    ?.trim()
-    ?.toLowerCase()
-
-  let proto = forwardedProto
-  if (!proto) {
-    if (host.endsWith(":8443") || host.endsWith(":443")) proto = "https"
-    else if (host.endsWith(":3100") || host.endsWith(":80")) proto = "http"
-    else proto = new URL(request.url).protocol.replace(":", "") || "https"
+  const origin = publicRequestOrigin(request)
+  try {
+    const host = new URL(origin).hostname
+    if (host === "0.0.0.0" || host === "127.0.0.1" || host === "localhost") return null
+  } catch {
+    return null
   }
-
-  return `${proto}://${host}`
+  return origin
 }
 
 export async function GET(request: Request) {

@@ -107,14 +107,23 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
   const lastAudioB64 = useRef<string | null>(null)
   const levelDecayRef = useRef<number | null>(null)
   const startRecognitionRef = useRef<() => void>(() => undefined)
+  const clientIdRef = useRef(
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? `web-${crypto.randomUUID()}`
+      : `web-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  )
+  const levelRef = useRef(0)
 
   const setListenMode = useCallback((m: ListenMode) => {
     modeRef.current = m
     setMode(m)
   }, [])
 
-  const muteMicUntil = useCallback((ms: number) => {
-    mutedUntilRef.current = Math.max(mutedUntilRef.current, Date.now() + ms)
+  const muteMicUntil = useCallback((ms: number, extend = true) => {
+    const until = Date.now() + ms
+    mutedUntilRef.current = extend
+      ? Math.max(mutedUntilRef.current, until)
+      : until
   }, [])
 
   const clearMicMute = useCallback(() => {
@@ -122,9 +131,14 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const pulseLevel = useCallback((strength = 0.55) => {
-    setLevel(Math.min(1, strength))
+    const v = Math.min(1, strength)
+    levelRef.current = v
+    setLevel(v)
     if (levelDecayRef.current != null) window.clearTimeout(levelDecayRef.current)
-    levelDecayRef.current = window.setTimeout(() => setLevel(0), 280)
+    levelDecayRef.current = window.setTimeout(() => {
+      levelRef.current = 0
+      setLevel(0)
+    }, 280)
   }, [])
 
   const unlockSpeaker = useCallback(() => {
@@ -177,24 +191,42 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
 
   const resumeListening = useCallback(() => {
     if (!wantListenRef.current) return
-    // Clear the long busy mute, then apply a short echo gap
+    // End busy mute immediately; short echo gap only
     clearMicMute()
-    muteMicUntil(700)
-    setListenMode("wake")
-    setHint("Слушаю. Скажите «Алекса» и команду")
-    window.setTimeout(() => {
-      if (!wantListenRef.current || modeRef.current === "off") return
-      startRecognitionRef.current()
-    }, 350)
+    muteMicUntil(450, false)
+    // Follow-up turn: accept next command without repeating «Алекса»
+    setListenMode("command")
+    setHint("Слушаю… Можно следующую команду")
+    if (commandTimer.current) window.clearTimeout(commandTimer.current)
+    commandTimer.current = window.setTimeout(() => {
+      if (modeRef.current === "command" && wantListenRef.current) {
+        setListenMode("wake")
+        setHint("Скажите «Алекса» и команду")
+      }
+    }, 12_000)
+    const kick = (delay: number) => {
+      window.setTimeout(() => {
+        if (!wantListenRef.current || modeRef.current === "off") return
+        if (processingRef.current) return
+        startRecognitionRef.current()
+      }, delay)
+    }
+    kick(300)
+    kick(900) // mobile browsers often drop the first restart
   }, [clearMicMute, muteMicUntil, setListenMode])
 
   const runCommand = useCallback(
     async (text: string) => {
-      const cleaned = text.trim()
-      if (!cleaned || processingRef.current) return
+      const raw = text.trim()
+      if (!raw || processingRef.current) return
       if (modeRef.current === "off") return
 
-      const fp = commandFingerprint(cleaned)
+      // Command = only words AFTER wake; pre-wake context discarded
+      const { cleaned: afterWake, hadWake } = stripWakeWord(raw)
+      const command = (hadWake ? afterWake : raw).trim()
+      if (!command) return
+
+      const fp = commandFingerprint(command)
       if (!fp) return
       // Block repeats of the same command (echo / double final)
       if (fp === lastFpRef.current && Date.now() - lastFpAtRef.current < 5000) {
@@ -206,10 +238,11 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
       processingRef.current = true
       setListenMode("busy")
       setHint("Выполняю…")
-      setHeard(cleaned)
+      setHeard(command)
       // Stop mic while we work + speak — prevents earpiece mode & self-echo repeats
       stopRecognition()
-      muteMicUntil(30_000)
+      // Absolute mute window (not extend) — finally() clears and resumes
+      muteMicUntil(120_000, false)
       unlockSpeaker()
 
       try {
@@ -217,7 +250,13 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
           method: "POST",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: cleaned, include_audio: true }),
+          body: JSON.stringify({
+            // Prefix wake so server NLU sets had_wake; command body is after-wake only
+            text: `Алекса ${command}`,
+            include_audio: true,
+            client_id: clientIdRef.current,
+            playback: "client",
+          }),
         })
         const data = (await res.json()) as AssistantResponse
         const next =
@@ -225,6 +264,7 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
           data.error ||
           (data.lang === "en" ? "Done." : "Готово.")
         setHint(next)
+        // Playback follows capture: phone/web → local speaker only (never TV)
         await playReply(next, data.lang === "en" ? "en" : "ru", data.audio_b64)
       } catch (e) {
         const msg = `Ошибка: ${String(e)}`
@@ -273,6 +313,7 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
             setHint("Слушаю…")
             return
           }
+          // Pass full transcript; runCommand keeps only after-wake
           void runCommand(text)
           return
         }
@@ -293,11 +334,12 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
         if (!isFinal) return
         if (commandTimer.current) window.clearTimeout(commandTimer.current)
         const { cleaned: after } = stripWakeWord(text)
-        if (!after) {
+        const cmd = after || text.trim()
+        if (!cmd) {
           setHint("Слушаю команду…")
           return
         }
-        void runCommand(hasWakeWord(text) ? text : after)
+        void runCommand(hasWakeWord(text) ? text : cmd)
       }
     },
     [pulseLevel, runCommand, setListenMode],
@@ -477,6 +519,40 @@ export function VoiceAssistantProvider({ children }: { children: ReactNode }) {
       if (commandTimer.current) window.clearTimeout(commandTimer.current)
     }
   }, [refreshPermissions, stopRecognition])
+
+  // RMS heartbeat → server arbitration (louder stream owns listen)
+  useEffect(() => {
+    if (mode === "off") return
+    const id = window.setInterval(() => {
+      if (!wantListenRef.current || modeRef.current === "off") return
+      const rms = Math.max(levelRef.current, speaking ? 0.05 : 0)
+      void fetch("/api/assistant/audio-route", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          client_id: clientIdRef.current,
+          rms,
+          vad: rms >= 0.2 || modeRef.current === "command" || modeRef.current === "busy",
+          active: true,
+        }),
+      }).catch(() => undefined)
+    }, 400)
+    return () => {
+      window.clearInterval(id)
+      void fetch("/api/assistant/audio-route", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          client_id: clientIdRef.current,
+          rms: 0,
+          vad: false,
+          active: false,
+        }),
+      }).catch(() => undefined)
+    }
+  }, [mode, speaking])
 
   const api = useMemo<VoiceAssistantApi>(
     () => ({

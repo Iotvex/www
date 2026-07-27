@@ -4,7 +4,15 @@ import { updateSession } from "@/shared/lib/supabase/middleware"
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
+
+  // Dialogs may send /v1.0/v1.0/* when Endpoint URL still includes /v1.0.
+  // next.config rewrites handle this; keep path public here too.
+  const isYandexSmartHome =
+    path === "/v1.0" ||
+    path.startsWith("/v1.0/") ||
+    path.startsWith("/oauth/")
   const isAssetOrApi =
+    isYandexSmartHome ||
     path.startsWith("/api/") ||
     path.startsWith("/supabase") ||
     path.startsWith("/_next") ||
@@ -22,6 +30,12 @@ export async function middleware(request: NextRequest) {
     url.search = ""
     url.hash = ""
     return NextResponse.redirect(url)
+  }
+
+  // Yandex Smart Home + OAuth: Bearer handled in route handlers (no session gate).
+  // Do not touch Node fs here — middleware runs on Edge.
+  if (isYandexSmartHome) {
+    return NextResponse.next()
   }
 
   // Refresh session cookies first so the API gate sees a valid access token.
