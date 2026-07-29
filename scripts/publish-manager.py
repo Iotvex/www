@@ -146,6 +146,24 @@ def pid_alive(pid: int) -> bool:
         return False
 
 
+def tunnel_url_healthy(url: str | None, timeout: float = 4.0) -> bool:
+    if not url or not str(url).startswith("https://"):
+        return False
+    try:
+        import urllib.error
+        import urllib.request
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            # 530 = CF tunnel offline; anything else means edge reached our origin path
+            return int(getattr(r, "status", 200) or 200) != 530
+    except urllib.error.HTTPError as e:
+        return int(e.code) != 530
+    except Exception:
+        return False
+
+
+
+
 def stop_tunnel(name: str, state: dict) -> None:
     info = (state.get("tunnels") or {}).get(name) or {}
     pid = info.get("pid")
@@ -310,9 +328,23 @@ def ensure_tunnel(name: str, spec: dict, rt: dict, secrets: dict, state: dict) -
         and pid_alive(int(existing["pid"]))
     )
     if same_endpoint:
-        if existing.get("url") or provider == "caddy_local":
+        if provider == "caddy_local":
             return existing
-        # still starting — try read log again
+        url = existing.get("url")
+        if url and tunnel_url_healthy(url):
+            return existing
+        # URL missing/unhealthy: try re-read log before killing
+        log_path = Path(existing.get("log") or (RUN_DIR / f"{name}.log"))
+        if log_path.exists():
+            text = log_path.read_text(errors="ignore")
+            m = CF_URL_RE.search(text)
+            if m:
+                existing["url"] = m.group(0)
+                if tunnel_url_healthy(existing["url"]):
+                    state.setdefault("tunnels", {})[name] = existing
+                    return existing
+        # still starting with no healthy URL yet — keep process if young
+        # else fall through to restart
     if existing:
         stop_tunnel(name, state)
 
@@ -437,7 +469,8 @@ def sync_vercel_cloud_env(bridge: dict, rt: dict, state: dict | None = None) -> 
     pairs: list[tuple[str, str]] = []
     if bridge.get("agentPublicUrl"):
         pairs.append(("IOTVEX_AGENT_URL", bridge["agentPublicUrl"]))
-    # Alexa assistant URL intentionally not synced (product off)    if bridge.get("localDbPublicUrl"):
+    # Alexa assistant URL intentionally not synced (product off)
+    if bridge.get("localDbPublicUrl"):
         db = bridge["localDbPublicUrl"]
         pairs.extend(
             [
