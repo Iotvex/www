@@ -465,7 +465,9 @@
     "selectAllTargets": "Select all",
     "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
     "targetsRequired": "Select at least one target",
-    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions."
+    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions.",
+    "completeToEndLabel": "إكمال حتى النهاية",
+    "completeToEndHint": "بعد الانقطاع أو التأخير أو الفشل، أعد المحاولة حتى النجاح (أو انتهاء نافذة اللحاق)."
   },
   "settings": {
     "account": {

@@ -465,7 +465,9 @@
     "selectAllTargets": "Select all",
     "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
     "targetsRequired": "Select at least one target",
-    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions."
+    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions.",
+    "completeToEndLabel": "Complete to the end",
+    "completeToEndHint": "After outages, lag, or failed actions, keep retrying this automation until it succeeds (or the catch-up window expires)."
   },
   "settings": {
     "account": {

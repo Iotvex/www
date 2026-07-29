@@ -70,6 +70,8 @@ automationEditor.brightnessLabel
 automationEditor.capabilitiesLine
 automationEditor.colorLabel
 automationEditor.commandLabel
+automationEditor.completeToEndHint
+automationEditor.completeToEndLabel
 automationEditor.conditionKinds.numeric_state
 automationEditor.conditionKinds.state
 automationEditor.conditionKinds.time
@@ -308,6 +310,7 @@ nav.items.settings-backup
 nav.items.settings-services
 nav.items.settings-tools
 nav.items.settings-users
+nav.items.spatial
 nav.mobile.auto
 nav.mobile.home
 nav.mobile.more
@@ -629,3 +632,8 @@ views.settings-tools.subtitle
 views.settings-tools.title
 views.settings-users.subtitle
 views.settings-users.title
+views.spatial.hint
+views.spatial.loading
+views.spatial.selected
+views.spatial.subtitle
+views.spatial.title

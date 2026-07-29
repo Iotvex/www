@@ -465,7 +465,9 @@
     "selectAllTargets": "Select all",
     "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
     "targetsRequired": "Select at least one target",
-    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions."
+    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions.",
+    "completeToEndLabel": "अंत तक पूरा करें",
+    "completeToEndHint": "आउटेज, लैग या विफलता के बाद सफल होने तक (या कैच-अप विंडो खत्म होने तक) फिर से प्रयास करें।"
   },
   "settings": {
     "account": {

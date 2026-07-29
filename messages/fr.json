@@ -465,7 +465,9 @@
     "selectAllTargets": "Select all",
     "targetsHint": "{count, plural, one {# device selected} other {# devices selected}}",
     "targetsRequired": "Select at least one target",
-    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions."
+    "noControllableTargets": "No controllable devices available. Sensors can only be used in triggers and conditions.",
+    "completeToEndLabel": "Mener jusqu’au bout",
+    "completeToEndHint": "Après pannes, lags ou échecs, réessayer jusqu’à réussite (ou expiration de la fenêtre de rattrapage)."
   },
   "settings": {
     "account": {

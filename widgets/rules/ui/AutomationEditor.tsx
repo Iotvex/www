@@ -16,6 +16,7 @@ import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
 import { FieldSelect, SegmentedTabs } from "@/shared/ui/page-toolbar"
 import { Slider } from "@/shared/ui/slider"
+import { Switch } from "@/shared/ui/switch"
 import { ColorPicker, type Rgb } from "@/shared/ui/color-picker"
 import { cn } from "@/shared/lib/utils"
 import {
@@ -58,6 +59,7 @@ export type AutomationItem = {
   id: string
   name: string
   enabled?: boolean
+  complete_to_end?: boolean
   description?: string
   trigger?: Record<string, unknown>
   conditions?: Array<Record<string, unknown>>
@@ -274,6 +276,7 @@ export function AutomationEditor({
   const [effect, setEffect] = useState(0)
   const [speedPct, setSpeedPct] = useState(50)
   const [effects, setEffects] = useState<EffectOpt[]>([])
+  const [completeToEnd, setCompleteToEnd] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -327,6 +330,7 @@ export function AutomationEditor({
     const trigger = (item?.trigger || {}) as Record<string, unknown>
     const kind = String(trigger.trigger || trigger.platform || trigger.type || "time") as TriggerKind
     setName(item?.name ?? "")
+    setCompleteToEnd(item?.complete_to_end !== false)
     setTriggerKind(kind === "state" || kind === "numeric_state" ? kind : "time")
     setTime(String(trigger.at || trigger.time || "08:00").slice(0, 5))
     setWeekdays(Array.isArray(trigger.weekday) ? trigger.weekday.map(String) : [])
@@ -498,6 +502,7 @@ export function AutomationEditor({
       const domain = primaryEntity?.domain || selectedEntities[0]?.split(".")[0] || "home"
       const payload = {
         name: name.trim(),
+        complete_to_end: completeToEnd,
         trigger: buildTrigger(),
         conditions: buildConditions(),
         actions: [
@@ -562,6 +567,19 @@ export function AutomationEditor({
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder={t("namePlaceholder")}
+            />
+          </div>
+
+          <div className="mb-4 flex items-start justify-between gap-3 rounded-lg border border-border/60 bg-muted/30 px-3 py-2.5">
+            <div className="min-w-0 space-y-0.5">
+              <Label htmlFor="automation-complete-to-end">{t("completeToEndLabel")}</Label>
+              <p className="text-xs text-muted-foreground">{t("completeToEndHint")}</p>
+            </div>
+            <Switch
+              id="automation-complete-to-end"
+              checked={completeToEnd}
+              onCheckedChange={setCompleteToEnd}
+              aria-label={t("completeToEndLabel")}
             />
           </div>
 

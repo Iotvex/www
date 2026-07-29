@@ -41,12 +41,27 @@ export type DbAutomation = {
   name: string
   description: string
   enabled: boolean
+  /** When true (default), missed/failed runs are retried until success or grace expires. */
+  complete_to_end: boolean
   trigger: Record<string, unknown>
   conditions: unknown[]
   actions: unknown[]
   mode: string
   ha_entity_id: string | null
   last_triggered: string | null
+}
+
+export type DbAutomationRun = {
+  id: string
+  automation_id: string
+  scheduled_for: string
+  status: "pending" | "running" | "succeeded" | "failed" | "abandoned"
+  attempts: number
+  last_error: string | null
+  last_attempt_at: string | null
+  completed_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 export type DbScript = {

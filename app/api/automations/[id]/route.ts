@@ -31,6 +31,10 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       name: body.name != null ? String(body.name) : existing.name,
       description: body.description != null ? String(body.description) : existing.description,
       enabled: typeof body.enabled === "boolean" ? body.enabled : existing.enabled,
+      complete_to_end:
+        typeof body.complete_to_end === "boolean"
+          ? body.complete_to_end
+          : existing.complete_to_end !== false,
       trigger: body.trigger || existing.trigger,
       conditions: body.conditions != null ? body.conditions : existing.conditions,
       actions: body.actions != null ? body.actions : existing.actions,
