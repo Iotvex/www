@@ -38,6 +38,7 @@ export async function POST(request: Request) {
       name,
       description: body.description || "",
       enabled: body.enabled !== false,
+      complete_to_end: body.complete_to_end !== false,
       trigger: body.trigger || { trigger: "time", at: "17:00:00" },
       conditions: body.conditions || [],
       actions: body.actions || [],

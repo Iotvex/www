@@ -14,6 +14,7 @@ import {
 } from "@/shared/lib/iotvex-proto"
 import type {
   DbAutomation,
+  DbAutomationRun,
   DbEntity,
   DbScene,
   DbScript,
@@ -119,6 +120,81 @@ export async function deleteAutomation(id: string) {
 export async function markAutomationTriggered(id: string) {
   const sb = createAdminClient()
   await sb.from("automations").update({ last_triggered: new Date().toISOString() }).eq("id", id)
+}
+
+export async function ensureAutomationRun(automationId: string, scheduledFor: Date) {
+  const sb = createAdminClient()
+  const scheduled_for = scheduledFor.toISOString()
+  const id = `run_${automationId}_${scheduledFor.getTime()}`
+  const { data: existing } = await sb
+    .from("automation_runs")
+    .select("*")
+    .eq("automation_id", automationId)
+    .eq("scheduled_for", scheduled_for)
+    .maybeSingle()
+  if (existing) return existing as DbAutomationRun
+  const row = {
+    id,
+    automation_id: automationId,
+    scheduled_for,
+    status: "pending",
+    attempts: 0,
+    last_error: null,
+    last_attempt_at: null,
+    completed_at: null,
+  }
+  const { data, error } = await sb
+    .from("automation_runs")
+    .upsert(row, { onConflict: "automation_id,scheduled_for", ignoreDuplicates: true })
+    .select("*")
+    .maybeSingle()
+  if (error) {
+    // Race: another tick inserted the same slot
+    const { data: again } = await sb
+      .from("automation_runs")
+      .select("*")
+      .eq("automation_id", automationId)
+      .eq("scheduled_for", scheduled_for)
+      .maybeSingle()
+    if (again) return again as DbAutomationRun
+    throw new Error(error.message)
+  }
+  if (data) return data as DbAutomationRun
+  const { data: again } = await sb
+    .from("automation_runs")
+    .select("*")
+    .eq("automation_id", automationId)
+    .eq("scheduled_for", scheduled_for)
+    .single()
+  return again as DbAutomationRun
+}
+
+export async function listOpenAutomationRuns() {
+  const sb = createAdminClient()
+  const { data, error } = await sb
+    .from("automation_runs")
+    .select("*")
+    .in("status", ["pending", "failed", "running"])
+    .order("scheduled_for", { ascending: true })
+    .limit(200)
+  if (error) throw new Error(error.message)
+  return (data || []) as DbAutomationRun[]
+}
+
+export async function updateAutomationRun(
+  id: string,
+  patch: Partial<{
+    status: DbAutomationRun["status"]
+    attempts: number
+    last_error: string | null
+    last_attempt_at: string | null
+    completed_at: string | null
+  }>,
+) {
+  const sb = createAdminClient()
+  const { data, error } = await sb.from("automation_runs").update(patch).eq("id", id).select("*").single()
+  if (error) throw new Error(error.message)
+  return data as DbAutomationRun
 }
 
 export async function getScript(id: string) {
