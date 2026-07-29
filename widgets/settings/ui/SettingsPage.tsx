@@ -1,107 +1,73 @@
-"use client";
+"use client"
 
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { useUnit } from "effector-react";
-import { useTranslations } from "next-intl";
+import { ChangeEvent, useCallback, useEffect, useState } from "react"
+import { useUnit } from "effector-react"
+import { useTranslations } from "next-intl"
 
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge"
+import { Button } from "@/shared/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/shared/ui/card";
-import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
-import {
-  EmptyState,
-  StatusDot,
-} from "@/shared/ui/page-toolbar";
-import { AppearancePanel } from "@/features/theme/ui/ThemeSwitcher";
-import { $agentConnection, $agentOnline, $node, $nodeError, fetchCatalogFx } from "@/entities/device/model/store";
-import { $user } from "@/entities/auth/model/store";
-import { DeploymentPanel } from "@/widgets/settings/ui/DeploymentPanel";
-import { cn } from "@/shared/lib/utils";
-import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius";
+} from "@/shared/ui/card"
+import { Input } from "@/shared/ui/input"
+import { Label } from "@/shared/ui/label"
+import { EmptyState } from "@/shared/ui/page-toolbar"
+import { AppearancePanel } from "@/features/theme/ui/ThemeSwitcher"
+import { fetchCatalogFx } from "@/entities/device/model/store"
+import { $user } from "@/entities/auth/model/store"
+import { cn } from "@/shared/lib/utils"
+import { stackItemOffsetClass, stackRadiusClass } from "@/shared/lib/stack-radius"
 
-type SettingsTab = "account" | "appearance" | "services" | "users" | "backup" | "tools";
+type SettingsTab = "account" | "appearance" | "users" | "backup" | "tools"
 
 type User = {
-  id: string;
-  email: string;
-  role?: string;
-  created_at?: string;
-};
-
-type CurrentUser = {
-  id?: string;
-  email?: string;
-};
-
-type NodeStatus = {
-  id?: string;
-  name?: string;
-  online?: boolean;
-  status?: string;
-  version?: string;
-};
-
-type PublicUrlResponse = {
-  url?: string;
-  public_url?: string;
-};
-
-type ApiList<T> = {
-  items: T[];
-};
-
-type ApiOptions = {
-  requestError?: (status: number) => string;
-};
-
-type RuntimeResponse = {
-  ok?: boolean;
-  runtime?: {
-    devicePlane?: string;
-    wwwMode?: string;
-    dbMode?: string;
-    agentUrl?: string;
-    agentIsLocal?: boolean;
-    supabaseUrlHost?: string;
-    timezone?: string;
-    automationsScheduler?: string;
-    mdnsName?: string;
-  };
-  agent?: { ok?: boolean; status?: number; error?: string };
-  notes?: Record<string, string>;
-};
-
-async function api<T>(url: string, init?: RequestInit, options?: ApiOptions): Promise<T> {
-  const isFormData = init?.body instanceof FormData;
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...init?.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || options?.requestError?.(response.status) || `Request error ${response.status}`);
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
+  id: string
+  email: string
+  role?: string
+  created_at?: string
 }
 
-function SectionIntro(_props: { title: string; description?: string }) {
-  return null
+type CurrentUser = {
+  id?: string
+  email?: string
+}
+
+type ApiList<T> = {
+  items: T[]
+}
+
+type ApiOptions = {
+  requestError?: (status: number) => string
+}
+
+async function api<T>(
+  path: string,
+  init?: RequestInit,
+  options?: ApiOptions,
+): Promise<T> {
+  const response = await fetch(path, {
+    credentials: "include",
+    headers: {
+      "content-type": "application/json",
+      ...(init?.headers || {}),
+    },
+    ...init,
+  })
+  if (!response.ok) {
+    const message =
+      options?.requestError?.(response.status) ||
+      (await response.text()) ||
+      `HTTP ${response.status}`
+    throw new Error(message)
+  }
+  if (response.status === 204) {
+    return undefined as T
+  }
+  return response.json() as Promise<T>
 }
 
 export function SettingsPage({ tab = "account" }: { tab?: SettingsTab }) {
@@ -110,20 +76,19 @@ export function SettingsPage({ tab = "account" }: { tab?: SettingsTab }) {
       <div className="min-w-0">
         {tab === "account" ? <AccountPanel /> : null}
         {tab === "appearance" ? <AppearanceSection /> : null}
-        {tab === "services" ? <DeploymentPanel /> : null}
         {tab === "users" ? <UsersPanel /> : null}
         {tab === "backup" ? <BackupPanel /> : null}
         {tab === "tools" ? <ToolsPanel /> : null}
       </div>
     </div>
-  );
+  )
 }
 
 function AccountPanel() {
-  const t = useTranslations("settings");
-  const common = useTranslations("common");
-  const tTop = useTranslations("topbar");
-  const user = useUnit($user) as CurrentUser | null;
+  const t = useTranslations("settings")
+  const common = useTranslations("common")
+  const tTop = useTranslations("topbar")
+  const user = useUnit($user) as CurrentUser | null
 
   return (
     <section className="space-y-4">
@@ -142,22 +107,20 @@ function AccountPanel() {
         className="w-full"
         onClick={async () => {
           try {
-            await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+            await fetch("/api/auth/logout", { method: "POST", credentials: "include" })
           } catch {
             /* ignore */
           }
-          window.location.href = "/login";
+          window.location.href = "/login"
         }}
       >
         {tTop("logout")}
       </Button>
     </section>
-  );
+  )
 }
 
 function AppearanceSection() {
-  const t = useTranslations("settings");
-
   return (
     <section className="space-y-4">
       <Card className="iotvex-card-in overflow-hidden">
@@ -166,168 +129,41 @@ function AppearanceSection() {
         </CardContent>
       </Card>
     </section>
-  );
+  )
 }
-
-function ServicesPanel() {
-  const t = useTranslations("settings");
-  const common = useTranslations("common");
-  const node = useUnit($node) as NodeStatus | null;
-  const nodeError = useUnit($nodeError) as string | Error | null;
-  const agentOnline = useUnit($agentOnline);
-  const agentConnection = useUnit($agentConnection);
-  const [runtime, setRuntime] = useState<RuntimeResponse | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const data = await api<RuntimeResponse>("/api/runtime");
-        if (!cancelled) setRuntime(data);
-      } catch {
-        if (!cancelled) setRuntime(null);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const rt = runtime?.runtime;
-  const wwwMode = rt?.wwwMode ?? "lan";
-  const dbMode = rt?.dbMode ?? "local";
-
-  const services = useMemo(
-    () => [
-      {
-        title: t("services.agentTitle"),
-        description: node?.name ?? node?.id ?? t("services.localAgent"),
-        status:
-          agentConnection === "pending"
-            ? t("services.checkingStatus")
-            : agentOnline
-              ? common("online")
-              : t("services.errorStatus"),
-        tone: agentConnection === "pending" ? "neutral" : agentOnline ? "good" : "bad",
-        detail: [
-          t("services.alwaysLocal"),
-          rt?.agentUrl ? `URL: ${rt.agentUrl}` : null,
-          nodeError
-            ? nodeError instanceof Error
-              ? nodeError.message
-              : nodeError
-            : node?.version ?? node?.status ?? t("services.ready"),
-        ]
-          .filter(Boolean)
-          .join(" · "),
-      },
-      {
-        title: t("services.otbrTitle"),
-        description: t("services.otbrDescription"),
-        status: t("services.localStatus"),
-        tone: "good" as const,
-        detail: `${t("services.alwaysLocal")} · ${t("services.otbrDetail")}`,
-      },
-      {
-        title: t("services.databaseTitle"),
-        description:
-          dbMode === "remote"
-            ? t("services.databaseRemoteDescription")
-            : t("services.databaseDescription"),
-        status: dbMode === "remote" ? t("services.remoteStatus") : t("services.localStatus"),
-        tone: "good" as const,
-        detail:
-          dbMode === "remote"
-            ? `${t("services.databaseRemoteDetail")} · ${rt?.supabaseUrlHost ?? ""}`
-            : t("services.databaseDetail"),
-      },
-      {
-        title: t("services.wwwTitle"),
-        description:
-          wwwMode === "published"
-            ? t("services.wwwPublishedDescription")
-            : t("services.wwwLanDescription"),
-        status: wwwMode === "published" ? t("services.publishedStatus") : t("services.lanStatus"),
-        tone: "neutral" as const,
-        detail:
-          wwwMode === "published"
-            ? t("services.wwwPublishedDetail")
-            : `${t("services.wwwLanDetail")} · ${rt?.mdnsName ?? "iotvex.local"}`,
-      },
-      {
-        title: t("services.automationsTitle"),
-        description: t("services.automationsDescription"),
-        status: t("services.homeSchedulerStatus"),
-        tone: "good" as const,
-        detail: `${t("services.automationsDetail")} · TZ ${rt?.timezone ?? "—"}`,
-      },
-    ],
-    [agentConnection, agentOnline, common, dbMode, node, nodeError, rt, t, wwwMode],
-  );
-
-  return (
-    <section className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
-        {services.map((service) => (
-          <Card key={service.title} className="iotvex-card-in overflow-hidden">
-            <CardHeader className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <CardTitle className="truncate text-base">{service.title}</CardTitle>
-                <Badge
-                  variant={service.tone === "bad" ? "danger" : "secondary"}
-                  className="shrink-0"
-                >
-                  <span className="mr-1.5 inline-flex">
-                    <StatusDot tone={service.tone as "good" | "bad" | "neutral"} />
-                  </span>
-                  {service.status}
-                </Badge>
-              </div>
-              <CardDescription className="line-clamp-2">{service.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm leading-relaxed text-muted-foreground">
-              {service.detail}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 
 function UsersPanel() {
-  const t = useTranslations("settings");
-  const common = useTranslations("common");
-  const [items, setItems] = useState<User[]>([]);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("settings")
+  const common = useTranslations("common")
+  const [items, setItems] = useState<User[]>([])
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const requestError = useCallback((status: number) => t("requestError", { status }), [t]);
+  const requestError = useCallback((status: number) => t("requestError", { status }), [t])
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
-      const data = await api<ApiList<User>>("/api/users", undefined, { requestError });
-      setItems(data.items);
+      const data = await api<ApiList<User>>("/api/users", undefined, { requestError })
+      setItems(data.items)
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("users.loadError"));
+      setError(cause instanceof Error ? cause.message : t("users.loadError"))
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [requestError, t]);
+  }, [requestError, t])
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void load()
+  }, [load])
 
   const createUser = async () => {
-    setSaving(true);
-    setError(null);
+    setSaving(true)
+    setError(null)
     try {
       await api(
         "/api/users",
@@ -336,20 +172,19 @@ function UsersPanel() {
           body: JSON.stringify({ email: email.trim(), password }),
         },
         { requestError },
-      );
-      setEmail("");
-      setPassword("");
-      await load();
+      )
+      setEmail("")
+      setPassword("")
+      await load()
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("users.createError"));
+      setError(cause instanceof Error ? cause.message : t("users.createError"))
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
     <section className="space-y-4">
-
       <Card className="iotvex-card-in overflow-hidden">
         <CardHeader className="space-y-1">
           <CardTitle className="text-base">{t("users.newTitle")}</CardTitle>
@@ -389,15 +224,10 @@ function UsersPanel() {
         </CardContent>
       </Card>
 
-      {error ? (
-        <p className="text-sm text-destructive">{error}</p>
-      ) : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       {!loading && items.length === 0 ? (
-        <EmptyState
-          title={t("users.emptyTitle")}
-          description={t("users.emptyDescription")}
-        />
+        <EmptyState title={t("users.emptyTitle")} description={t("users.emptyDescription")} />
       ) : (
         <div className="flex flex-col">
           {items.map((user, index) => (
@@ -423,98 +253,73 @@ function UsersPanel() {
         </div>
       )}
     </section>
-  );
+  )
 }
 
 function BackupPanel() {
-  const t = useTranslations("settings");
-  const common = useTranslations("common");
-  const [publicUrl, setPublicUrl] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("settings")
+  const [panelOrigin, setPanelOrigin] = useState("")
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const requestError = useCallback((status: number) => t("requestError", { status }), [t]);
-
-  const loadPublicUrl = useCallback(async () => {
-    setError(null);
-    // Always prefer the origin the user actually opened (any LAN/WAN IP:port).
-    if (typeof window !== "undefined" && window.location?.origin) {
-      setPublicUrl(window.location.origin);
-    }
-    try {
-      const data = await api<PublicUrlResponse>("/api/public-url", undefined, { requestError });
-      setPublicUrl(data.public_url ?? data.url ?? window.location.origin);
-    } catch (cause) {
-      if (!window.location?.origin) {
-        setError(cause instanceof Error ? cause.message : t("backup.loadPublicUrlError"));
-      }
-    }
-  }, [requestError, t]);
+  const requestError = useCallback((status: number) => t("requestError", { status }), [t])
 
   useEffect(() => {
-    void loadPublicUrl();
-  }, [loadPublicUrl]);
+    if (typeof window !== "undefined") setPanelOrigin(window.location.origin)
+  }, [])
 
   const exportCatalog = async () => {
-    setBusy(true);
-    setError(null);
-    setMessage(null);
+    setBusy(true)
+    setError(null)
+    setMessage(null)
     try {
-      const response = await fetch("/api/catalog/export");
+      const response = await fetch("/api/catalog/export")
       if (!response.ok) {
-        throw new Error((await response.text()) || t("backup.exportError"));
+        throw new Error((await response.text()) || t("backup.exportError"))
       }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `iotvex-catalog-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
-      setMessage(t("backup.exportStarted"));
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement("a")
+      anchor.href = url
+      anchor.download = `iotvex-catalog-${new Date().toISOString().slice(0, 10)}.json`
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      URL.revokeObjectURL(url)
+      setMessage(t("backup.exportStarted"))
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("backup.exportError"));
+      setError(cause instanceof Error ? cause.message : t("backup.exportError"))
     } finally {
-      setBusy(false);
+      setBusy(false)
     }
-  };
+  }
 
   const importCatalog = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    setBusy(true);
-    setError(null);
-    setMessage(null);
+    const file = event.target.files?.[0]
+    if (!file) return
+    setBusy(true)
+    setError(null)
+    setMessage(null)
     try {
-      const text = await file.text();
-      const payload = JSON.parse(text);
+      const text = await file.text()
+      const payload = JSON.parse(text)
       await api(
         "/api/catalog/import",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
+        { method: "POST", body: JSON.stringify(payload) },
         { requestError },
-      );
-      setMessage(t("backup.imported"));
+      )
+      setMessage(t("backup.imported"))
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("backup.importError"));
+      setError(cause instanceof Error ? cause.message : t("backup.importError"))
     } finally {
-      setBusy(false);
-      event.target.value = "";
+      setBusy(false)
+      event.target.value = ""
     }
-  };
+  }
 
   return (
     <section className="space-y-4">
-
       <div className="grid gap-3 sm:grid-cols-2">
         <Card className="iotvex-card-in overflow-hidden">
           <CardHeader className="space-y-1">
@@ -527,7 +332,6 @@ function BackupPanel() {
             </Button>
           </CardContent>
         </Card>
-
         <Card className="iotvex-card-in overflow-hidden">
           <CardHeader className="space-y-1">
             <CardTitle className="text-base">{t("backup.importTitle")}</CardTitle>
@@ -543,112 +347,80 @@ function BackupPanel() {
           </CardContent>
         </Card>
       </div>
-
       <Card className="iotvex-card-in overflow-hidden">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-base">{t("backup.publicUrlTitle")}</CardTitle>
-          <CardDescription>{t("backup.publicUrlDescription")}</CardDescription>
+          <CardTitle className="text-base">{t("backup.localUrlTitle")}</CardTitle>
+          <CardDescription>{t("backup.localUrlDescription")}</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <code className="min-w-0 flex-1 truncate rounded-lg bg-muted px-3 py-2 text-xs sm:text-sm" title={publicUrl || undefined}>
-            {publicUrl || t("backup.urlNotConfigured")}
+        <CardContent>
+          <code className="block truncate rounded-lg bg-muted px-3 py-2 text-xs sm:text-sm" title={panelOrigin}>
+            {panelOrigin || "—"}
           </code>
-          <Button size="sm" variant="secondary" className="shrink-0" onClick={() => void loadPublicUrl()}>
-            {common("refresh")}
-          </Button>
         </CardContent>
       </Card>
-
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </section>
-  );
+  )
 }
 
 function ToolsPanel() {
-  const t = useTranslations("settings");
-  const common = useTranslations("common");
-  const requestError = useCallback((status: number) => t("requestError", { status }), [t]);
-  const [publicUrl, setPublicUrl] = useState("");
-  const [busyAction, setBusyAction] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("settings")
+  const common = useTranslations("common")
+  const requestError = useCallback((status: number) => t("requestError", { status }), [t])
+  const [busyAction, setBusyAction] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const runTool = async (name: string, action: () => Promise<string>) => {
-    setBusyAction(name);
-    setMessage(null);
-    setError(null);
+    setBusyAction(name)
+    setMessage(null)
+    setError(null)
     try {
-      setMessage(await action());
+      setMessage(await action())
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("tools.commandError"));
+      setError(cause instanceof Error ? cause.message : t("tools.commandError"))
     } finally {
-      setBusyAction(null);
+      setBusyAction(null)
     }
-  };
-
-  const discover = () =>
-    runTool("discover", async () => {
-      await api("/api/devices/discover", { method: "POST" }, { requestError });
-      fetchCatalogFx();
-      return t("tools.discoverStarted");
-    });
-
-  const refreshCatalog = () =>
-    runTool("refresh", async () => {
-      await api("/api/home", undefined, { requestError });
-      fetchCatalogFx();
-      return t("tools.catalogRefreshed");
-    });
-
-  const fetchPublicUrl = () =>
-    runTool("public-url", async () => {
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
-      try {
-        const data = await api<PublicUrlResponse>("/api/public-url", undefined, { requestError });
-        const url = data.public_url ?? data.url ?? origin;
-        setPublicUrl(url);
-        return url ? t("tools.publicUrlReceived") : t("tools.publicUrlNotConfigured");
-      } catch {
-        setPublicUrl(origin);
-        return origin ? t("tools.publicUrlReceived") : t("tools.publicUrlNotConfigured");
-      }
-    });
+  }
 
   return (
     <section className="space-y-4">
-
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <ToolCard
           title={t("tools.discoverTitle")}
           description={t("tools.discoverDescription")}
           action={t("tools.discoverAction")}
-          busyLabel={t("tools.busy")}
+          busyLabel={common("working")}
           busy={busyAction === "discover"}
-          onClick={() => void discover()}
+          onClick={() =>
+            void runTool("discover", async () => {
+              await api("/api/devices/discover", { method: "POST" }, { requestError })
+              fetchCatalogFx()
+              return t("tools.discoverStarted")
+            })
+          }
         />
         <ToolCard
           title={t("tools.catalogTitle")}
           description={t("tools.catalogDescription")}
-          action={common("refresh")}
-          busyLabel={t("tools.busy")}
+          action={t("tools.catalogTitle")}
+          busyLabel={common("working")}
           busy={busyAction === "refresh"}
-          onClick={() => void refreshCatalog()}
-        />
-        <ToolCard
-          title={t("tools.publicUrlTitle")}
-          description={publicUrl || t("tools.publicUrlDescription")}
-          action={common("show")}
-          busyLabel={t("tools.busy")}
-          busy={busyAction === "public-url"}
-          onClick={() => void fetchPublicUrl()}
+          onClick={() =>
+            void runTool("refresh", async () => {
+              await api("/api/home", undefined, { requestError })
+              fetchCatalogFx()
+              return t("tools.catalogRefreshed")
+            })
+          }
         />
       </div>
-
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </section>
-  );
+  )
 }
 
 function ToolCard({
@@ -659,12 +431,12 @@ function ToolCard({
   busy,
   onClick,
 }: {
-  title: string;
-  description: string;
-  action: string;
-  busyLabel: string;
-  busy: boolean;
-  onClick: () => void;
+  title: string
+  description: string
+  action: string
+  busyLabel: string
+  busy: boolean
+  onClick: () => void
 }) {
   return (
     <Card className="iotvex-card-in overflow-hidden">
@@ -678,7 +450,7 @@ function ToolCard({
         </Button>
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function InfoTile({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
@@ -692,5 +464,5 @@ function InfoTile({ label, value, mono }: { label: string; value: string; mono?:
         {value}
       </p>
     </div>
-  );
+  )
 }

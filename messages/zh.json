@@ -47,7 +47,8 @@
     "clear": "清除",
     "all": "全部",
     "local": "本地",
-    "notConfigured": "未配置"
+    "notConfigured": "未配置",
+    "working": "Working…"
   },
   "languages": {
     "en": "English",
@@ -540,7 +541,9 @@
       "exportStarted": "目录导出已开始。",
       "exportError": "无法导出目录",
       "imported": "目录已导入。",
-      "importError": "无法导入目录"
+      "importError": "无法导入目录",
+      "localUrlTitle": "Panel address",
+      "localUrlDescription": "URL of this local panel in the current browser."
     },
     "tools": {
       "title": "工具",

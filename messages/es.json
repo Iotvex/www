@@ -47,7 +47,8 @@
     "clear": "Limpiar",
     "all": "Todo",
     "local": "local",
-    "notConfigured": "sin configurar"
+    "notConfigured": "sin configurar",
+    "working": "Working…"
   },
   "languages": {
     "en": "English",
@@ -540,7 +541,9 @@
       "exportStarted": "Se inició la exportación del catálogo.",
       "exportError": "No se pudo exportar el catálogo",
       "imported": "Catálogo importado.",
-      "importError": "No se pudo importar el catálogo"
+      "importError": "No se pudo importar el catálogo",
+      "localUrlTitle": "Panel address",
+      "localUrlDescription": "URL of this local panel in the current browser."
     },
     "tools": {
       "title": "Herramientas",

@@ -1,0 +1,29 @@
+* text=auto eol=lf
+
+# Treat common binary files as binary (no EOL conversions).
+#
+# Archives
+*.7z binary
+*.gz binary
+*.zip binary
+#
+# Documents
+*.pdf binary
+#
+# Fonts
+*.eot binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+#
+# Images
+*.gif binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.webp binary
+#
+# Media
+*.mp3 binary
+*.mp4 binary

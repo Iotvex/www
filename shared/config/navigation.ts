@@ -1,5 +1,4 @@
 import {
-  Home,
   Layout,
   Cpu,
   Lightbulb,
@@ -10,10 +9,8 @@ import {
   Activity,
   Puzzle,
   Box,
-  Mic,
   UserRound,
   Palette,
-  Server,
   Users,
   Archive,
   Wrench,
@@ -63,7 +60,6 @@ export const NAV_SECTIONS: NavSection[] = [
       { id: "activity", icon: Activity },
       { id: "spatial", icon: Box },
       { id: "modules", icon: Puzzle },
-      { id: "assistant", icon: Mic },
     ],
   },
   {
@@ -72,7 +68,6 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { id: "settings-account", icon: UserRound },
       { id: "settings-appearance", icon: Palette },
-      { id: "settings-services", icon: Server },
       { id: "settings-users", icon: Users },
       { id: "settings-backup", icon: Archive },
       { id: "settings-tools", icon: Wrench },

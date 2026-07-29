@@ -13,10 +13,8 @@ export type AppViewId =
   | "activity"
   | "modules"
   | "spatial"
-  | "assistant"
   | "settings-account"
   | "settings-appearance"
-  | "settings-services"
   | "settings-users"
   | "settings-backup"
   | "settings-tools"
@@ -39,10 +37,8 @@ export const APP_VIEWS: AppViewMeta[] = [
   { id: "activity", group: "system" },
   { id: "modules", group: "system" },
   { id: "spatial", group: "system" },
-  { id: "assistant", group: "system" },
   { id: "settings-account", group: "settings" },
   { id: "settings-appearance", group: "settings" },
-  { id: "settings-services", group: "settings" },
   { id: "settings-users", group: "settings" },
   { id: "settings-backup", group: "settings" },
   { id: "settings-tools", group: "settings" },
@@ -53,6 +49,8 @@ const LEGACY: Record<string, AppViewId> = {
   rules: "auto-scenarios",
   settings: "settings-account",
   inventory: "home-devices",
+  assistant: "dashboard",
+  "settings-services": "settings-account",
 }
 
 const KEY = "iotvex-view"

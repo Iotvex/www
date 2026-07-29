@@ -1,0 +1,13 @@
+# Editor
+.idea/
+.vscode/
+.cursor/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Generated documentation
+docs/

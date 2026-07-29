@@ -7,7 +7,6 @@ import { OverviewPage } from "@/widgets/overview/ui/OverviewPage"
 import { ActivityPage } from "@/widgets/activity/ui/ActivityPage"
 import { ModulesPage } from "@/widgets/modules/ui/ModulesPage"
 import { SettingsPage } from "@/widgets/settings/ui/SettingsPage"
-import { AssistantPage } from "@/features/voice-assistant/ui/AssistantPage"
 import { SpatialPage } from "@/widgets/spatial/ui/SpatialPage"
 import { useEffect, useState, type ReactNode } from "react"
 
@@ -22,10 +21,8 @@ const VIEW_COMPONENTS: Record<AppViewId, () => ReactNode> = {
   activity: () => <ActivityPage />,
   modules: () => <ModulesPage />,
   spatial: () => <SpatialPage />,
-  assistant: () => <AssistantPage />,
   "settings-account": () => <SettingsPage tab="account" />,
   "settings-appearance": () => <SettingsPage tab="appearance" />,
-  "settings-services": () => <SettingsPage tab="services" />,
   "settings-users": () => <SettingsPage tab="users" />,
   "settings-backup": () => <SettingsPage tab="backup" />,
   "settings-tools": () => <SettingsPage tab="tools" />,

@@ -1,70 +1,12 @@
 {
-  "version": 1,
-  "wwwMode": "local",
+  "version": 2,
   "mdnsName": "iotvex.local",
   "timezone": "Europe/Saratov",
-  "publish": {
-    "httpPort": 80,
-    "httpsPort": 8443,
-    "customDomain": "",
-    "providers": {
-      "caddy_local": {
-        "enabled": true,
-        "note": "LAN/WAN TLS on :8443 via install-https.sh"
-      },
-      "pinggy": {
-        "enabled": false,
-        "authtoken": "",
-        "subdomain": "",
-        "region": ""
-      },
-      "cloudflare_tunnel": {
-        "enabled": true,
-        "tunnelToken": "",
-        "hostname": ""
-      },
-      "ngrok": {
-        "enabled": false,
-        "authtoken": "",
-        "domain": ""
-      },
-      "tailscale_funnel": {
-        "enabled": false,
-        "hostname": ""
-      }
-    }
-  },
-  "cloudWww": {
-    "baseUrl": "",
-    "note": "When wwwMode=cloud, UI is hosted externally; home keeps hub (agent + OTBR)."
-  },
+  "httpPort": 80,
   "db": {
-    "mode": "local",
     "local": {
       "url": "http://host.docker.internal:54321",
-      "browserUrl": "/supabase",
-      "publicUrl": "https://live-fare-aqua-reproductive.trycloudflare.com"
-    },
-    "cloudPublic": {
-      "url": "",
-      "anonKey": ""
-    },
-    "cloudPrivate": {
-      "url": "",
-      "anonKey": ""
+      "browserUrl": "/supabase"
     }
-  },
-  "bridge": {
-    "exposeLocalDb": true,
-    "exposeAgent": true,
-    "exposeAssistant": false,
-    "autoFromMatrix": false,
-    "localDbPublicUrl": "https://live-fare-aqua-reproductive.trycloudflare.com",
-    "agentPublicUrl": "https://trackback-corporations-inherited-identical.trycloudflare.com",
-    "assistantPublicUrl": "",
-    "wwwPublicUrl": "https://smtp-path-hon-pacific.trycloudflare.com",
-    "preferredProvider": "cloudflare_tunnel",
-    "exposeSmartHome": true,
-    "smartHomePublicUrl": "https://smtp-path-hon-pacific.trycloudflare.com"
   }
 }

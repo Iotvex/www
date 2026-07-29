@@ -59,8 +59,6 @@ const RootLayout: FC<PropsWithChildren> = async ({ children }) => {
   const browserRuntime = {
     supabaseBrowserUrl: runtime.supabaseBrowserUrl,
     supabaseAnonKey: runtime.supabaseAnonKey,
-    dbMode: runtime.dbMode,
-    wwwMode: runtime.wwwMode,
     mdnsName: runtime.mdnsName,
   }
   const runtimeBoot = `window.__IOTVEX_RUNTIME__=${JSON.stringify(browserRuntime)};`

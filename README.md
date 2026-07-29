@@ -1,75 +1,27 @@
 # Iotvex WWW
 
-Next.js dashboard for the DIY home hub.
+Local-only smart-home control panel.
 
-## Modes
+## Stack
 
-**Full matrix:** every WWW mode × every DB mode is supported.
-`cloud` WWW + `local` DB automatically requires home bridges (tunneled Supabase + agent) via `scripts/publish-manager.sh` / `iotvex-publish.timer`.
+- Next.js panel on LAN (`http://iotvex.local` / host IP)
+- Local Supabase (Docker)
+- OTBR Thread border router + `iotvex-agent`
 
-### WWW (`IOTVEX_WWW_MODE` / Settings → Services)
-
-| Mode | Meaning |
-|------|---------|
-| **local** | Self-hosted UI. Always: `http(s)://<ip>:<port>` + mDNS (`iotvex.local`, editable). |
-| **local_published** | Same as local **plus** public HTTPS (port-forward, custom domain, Pinggy, Cloudflare Tunnel, ngrok, Tailscale Funnel…). |
-| **cloud** | UI hosted in Iotvex cloud; home machine keeps hub (agent + OTBR). |
-
-### Database (`IOTVEX_DB_MODE` / Settings)
-
-| Mode | Meaning |
-|------|---------|
-| **local** | Bundled Supabase on the home machine |
-| **cloud_public** | Shared Iotvex-hosted Supabase |
-| **cloud_private** | Your own Supabase project |
-
-**Hot switch:** Settings → probe target → merge catalog (upsert) into target → swap active connection (`config/runtime.json` + `runtime.secrets.json`). No image rebuild. Browser reloads to pick up new inject.
-
-Automations: config in DB; **ticks only on home** (`systemd` → `127.0.0.1:3100/api/cron/automations` → local agent).
-
-## Config files
-
-```
-config/runtime.json           # www/db modes, mDNS, publish providers (mounted into container)
-config/runtime.secrets.json   # service role / tunnel tokens (chmod 600, gitignored)
-config/runtime.secrets.json.example
-```
-
-`GET/PATCH /api/runtime`  
-`POST /api/runtime/db/probe`  
-`POST /api/runtime/db/switch`
-
-## Яндекс Умный дом (Алиса)
-
-Провайдер REST `/v1.0` + OAuth `/oauth` — см. [docs/YANDEX_SMART_HOME.md](docs/YANDEX_SMART_HOME.md).
-Локальная Alexa (`assistant/`) выключена; FAB скрыт без `NEXT_PUBLIC_IOTVEX_VOICE_ASSISTANT_UI=1`.
+No cloud publish, Cloudflare, Vercel, or voice assistant integration.
 
 ## Run
 
 ```bash
-./scripts/up.sh
-INSTALL_MDNS=1 ./scripts/up.sh
-INSTALL_HTTPS=1 IOTVEX_WWW_MODE=local_published ./scripts/up.sh
+docker compose up -d --build
 ```
 
-Remote private DB helper:
+Automations tick via `iotvex-automations.timer` → `POST http://127.0.0.1/api/cron/automations`.
 
-```bash
-./scripts/use-remote-supabase.sh https://xxxx.supabase.co ANON SERVICE_ROLE local_published
-```
+## Layout (FSD)
 
-
-## Publish / bridges (home host)
-
-```bash
-./scripts/publish-manager.sh reconcile   # or stop-all / status
-# systemd: iotvex-publish.timer + iotvex-publish.path
-```
-
-| WWW \ DB | local | cloud_public | cloud_private |
-|----------|-------|--------------|---------------|
-| local | LAN/mDNS | LAN/mDNS + remote DB | LAN/mDNS + remote DB |
-| local_published | + public WWW | + public WWW | + public WWW |
-| cloud | tunnel **DB+agent** | tunnel **agent** | tunnel **agent** |
-
-After bridges are up, see `config/cloud-client.env` for env vars a cloud WWW deploy should use (especially `cloud` × `local`).
+- `app/` — routes, providers
+- `widgets/` — page compositions
+- `features/` — user interactions
+- `entities/` — business entities
+- `shared/` — reusable ui / lib / config (multi-use only)

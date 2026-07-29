@@ -47,7 +47,8 @@
     "clear": "مسح",
     "all": "الكل",
     "local": "محلي",
-    "notConfigured": "غير مهيأ"
+    "notConfigured": "غير مهيأ",
+    "working": "Working…"
   },
   "languages": {
     "en": "English",
@@ -540,7 +541,9 @@
       "exportStarted": "بدأ تصدير الكتالوج.",
       "exportError": "تعذّر تصدير الكتالوج",
       "imported": "تم استيراد الكتالوج.",
-      "importError": "تعذّر استيراد الكتالوج"
+      "importError": "تعذّر استيراد الكتالوج",
+      "localUrlTitle": "Panel address",
+      "localUrlDescription": "URL of this local panel in the current browser."
     },
     "tools": {
       "title": "الأدوات",

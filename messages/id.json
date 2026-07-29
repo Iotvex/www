@@ -47,7 +47,8 @@
     "clear": "Bersihkan",
     "all": "Semua",
     "local": "lokal",
-    "notConfigured": "belum dikonfigurasi"
+    "notConfigured": "belum dikonfigurasi",
+    "working": "Working…"
   },
   "languages": {
     "en": "English",
@@ -540,7 +541,9 @@
       "exportStarted": "Ekspor katalog dimulai.",
       "exportError": "Tidak dapat mengekspor katalog",
       "imported": "Katalog diimpor.",
-      "importError": "Tidak dapat mengimpor katalog"
+      "importError": "Tidak dapat mengimpor katalog",
+      "localUrlTitle": "Panel address",
+      "localUrlDescription": "URL of this local panel in the current browser."
     },
     "tools": {
       "title": "Alat",

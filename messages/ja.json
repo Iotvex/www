@@ -47,7 +47,8 @@
     "clear": "クリア",
     "all": "すべて",
     "local": "ローカル",
-    "notConfigured": "未設定"
+    "notConfigured": "未設定",
+    "working": "Working…"
   },
   "languages": {
     "en": "English",
@@ -540,7 +541,9 @@
       "exportStarted": "カタログのエクスポートを開始しました。",
       "exportError": "カタログをエクスポートできませんでした",
       "imported": "カタログをインポートしました。",
-      "importError": "カタログをインポートできませんでした"
+      "importError": "カタログをインポートできませんでした",
+      "localUrlTitle": "Panel address",
+      "localUrlDescription": "URL of this local panel in the current browser."
     },
     "tools": {
       "title": "ツール",

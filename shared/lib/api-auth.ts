@@ -33,18 +33,15 @@ export function hasValidServiceToken(request: Request | NextRequest): boolean {
 export function isPublicApiPath(pathname: string): boolean {
   if (pathname === "/api/auth/login" || pathname === "/api/auth/logout") return true
   if (pathname.startsWith("/api/cron/")) return true
-  if (pathname === "/api/yandex/oauth-info") return true
   return false
 }
 
-function supabaseEdgeCreds(request: NextRequest) {
+function supabaseEdgeCreds(_request: NextRequest) {
   const url =
-    request.cookies.get("iotvex-sb-url")?.value ||
     process.env.SUPABASE_URL ||
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
     "http://127.0.0.1:54321"
   const key =
-    request.cookies.get("iotvex-sb-anon")?.value ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     process.env.SUPABASE_ANON_KEY ||
     ""

@@ -6,10 +6,6 @@ import { AppSidebar } from "@/widgets/sidebar/ui/AppSidebar"
 import { MobileNav } from "@/widgets/shell/ui/MobileNav"
 import { Topbar } from "@/widgets/topbar/ui/Topbar"
 import { ViewHost } from "@/widgets/shell/ui/ViewHost"
-import {
-  VoiceAssistantFab,
-  VoiceAssistantProvider,
-} from "@/features/voice-assistant/ui/AlexaListener"
 import { useUnit } from "effector-react"
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
@@ -40,9 +36,6 @@ export function DashboardApp() {
     }
   }, [])
 
-  // iOS standalone: first paint can leave a phantom top offset until a fixed
-  // overlay / scroll-lock cycle (hamburger Sheet) reflows the viewport.
-  // Body is pinned via CSS; this only nudges visualViewport + scroll to 0.
   useEffect(() => {
     if (typeof window === "undefined") return
     const nav = window.navigator as Navigator & { standalone?: boolean }
@@ -92,38 +85,32 @@ export function DashboardApp() {
   })
 
   return (
-    <VoiceAssistantProvider>
-      <div className="iotvex-shell relative flex overflow-hidden overscroll-none bg-background text-foreground touch-pan-y">
-        <div className="iotvex-atmosphere" aria-hidden>
-          <span className="iotvex-orb iotvex-orb-a" />
-          <span className="iotvex-orb iotvex-orb-b" />
-          <span className="iotvex-orb iotvex-orb-c" />
-          <span className="iotvex-orb iotvex-orb-d" />
-        </div>
-        <div className="relative z-10 flex h-full w-full">
-          <AppSidebar />
-          <div className="flex min-w-0 flex-1 flex-col pl-safe pr-safe">
-            <Topbar
-              title={title}
-              navOpen={navOpen}
-              onNavOpenChange={(open) => {
-                blurActive()
-                setNavOpen(open)
-              }}
-            />
-            {/* No top safe-area: opaque status bar already insets. Bottom: home indicator. */}
-            <main className="iotvex-hide-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-5 md:pb-6 lg:px-8 xl:px-10 xl:pt-6">
-              <div className="mx-auto w-full max-w-[1600px]">
-                <ViewHost viewId={viewId} />
-              </div>
-            </main>
-          </div>
-          <MobileNav />
-          {process.env.NEXT_PUBLIC_IOTVEX_VOICE_ASSISTANT_UI === "1" ? (
-            <VoiceAssistantFab />
-          ) : null}
-        </div>
+    <div className="iotvex-shell relative flex overflow-hidden overscroll-none bg-background text-foreground touch-pan-y">
+      <div className="iotvex-atmosphere" aria-hidden>
+        <span className="iotvex-orb iotvex-orb-a" />
+        <span className="iotvex-orb iotvex-orb-b" />
+        <span className="iotvex-orb iotvex-orb-c" />
+        <span className="iotvex-orb iotvex-orb-d" />
       </div>
-    </VoiceAssistantProvider>
+      <div className="relative z-10 flex h-full w-full">
+        <AppSidebar />
+        <div className="flex min-w-0 flex-1 flex-col pl-safe pr-safe">
+          <Topbar
+            title={title}
+            navOpen={navOpen}
+            onNavOpenChange={(open) => {
+              blurActive()
+              setNavOpen(open)
+            }}
+          />
+          <main className="iotvex-hide-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 md:px-6 md:pt-5 md:pb-6 lg:px-8 xl:px-10 xl:pt-6">
+            <div className="mx-auto w-full max-w-[1600px]">
+              <ViewHost viewId={viewId} />
+            </div>
+          </main>
+        </div>
+        <MobileNav />
+      </div>
+    </div>
   )
 }

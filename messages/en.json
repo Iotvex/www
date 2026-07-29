@@ -47,7 +47,8 @@
     "clear": "Clear",
     "all": "All",
     "local": "local",
-    "notConfigured": "not configured"
+    "notConfigured": "not configured",
+    "working": "Working…"
   },
   "languages": {
     "en": "English",
@@ -540,7 +541,9 @@
       "exportStarted": "Catalog export started.",
       "exportError": "Could not export catalog",
       "imported": "Catalog imported.",
-      "importError": "Could not import catalog"
+      "importError": "Could not import catalog",
+      "localUrlTitle": "Panel address",
+      "localUrlDescription": "URL of this local panel in the current browser."
     },
     "tools": {
       "title": "Tools",

@@ -21,30 +21,21 @@ services:
       - .env.local
     environment:
       IOTVEX_AGENT_URL: http://host.docker.internal:7421
-      # Python Alexa — separate stack on uncommon port 18927
-      IOTVEX_ASSISTANT_URL: http://host.docker.internal:18927
-      # Tokens come from env_file (.env.local) — do not override with empty ${VAR:-}
       IOTVEX_CONFIG_DIR: /app/config
-      IOTVEX_WWW_MODE: ${IOTVEX_WWW_MODE:-local_published}
-      IOTVEX_DB_MODE: ${IOTVEX_DB_MODE:-local}
       IOTVEX_MDNS_NAME: ${IOTVEX_MDNS_NAME:-iotvex.local}
       REDIS_URL: redis://redis:6379
-      # Always reach host Supabase from the container — never inherit 127.0.0.1 from .env
       SUPABASE_URL: http://host.docker.internal:54321
       SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
       NEXT_PUBLIC_SUPABASE_BROWSER_URL: ${NEXT_PUBLIC_SUPABASE_BROWSER_URL:-/supabase}
-      IOTVEX_TZ: ${IOTVEX_TZ:-${TZ:-Europe/Moscow}}
-      TZ: ${IOTVEX_TZ:-${TZ:-Europe/Moscow}}
+      IOTVEX_TZ: ${IOTVEX_TZ:-${TZ:-Europe/Saratov}}
+      TZ: ${IOTVEX_TZ:-${TZ:-Europe/Saratov}}
       HOSTNAME: 0.0.0.0
       PORT: "3000"
-      # Set to "1" only if Quasar rejects the full device list
-      YANDEX_DISCOVERY_MINIMAL: "0"
     ports:
       - "80:3000"
     volumes:
-      # Hot-reloadable runtime contract (www/db modes, publish providers, DB switch)
       - ./config:/app/config
     extra_hosts:
       - "host.docker.internal:host-gateway"

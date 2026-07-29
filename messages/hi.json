@@ -47,7 +47,8 @@
     "clear": "साफ़ करें",
     "all": "सभी",
     "local": "स्थानीय",
-    "notConfigured": "कॉन्फ़िगर नहीं"
+    "notConfigured": "कॉन्फ़िगर नहीं",
+    "working": "Working…"
   },
   "languages": {
     "en": "English",
@@ -540,7 +541,9 @@
       "exportStarted": "कैटलॉग निर्यात शुरू हो गया।",
       "exportError": "कैटलॉग निर्यात नहीं हो सका",
       "imported": "कैटलॉग आयात हो गया।",
-      "importError": "कैटलॉग आयात नहीं हो सका"
+      "importError": "कैटलॉग आयात नहीं हो सका",
+      "localUrlTitle": "Panel address",
+      "localUrlDescription": "URL of this local panel in the current browser."
     },
     "tools": {
       "title": "टूल",

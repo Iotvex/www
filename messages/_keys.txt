@@ -156,6 +156,7 @@ common.search
 common.show
 common.skip
 common.unknown
+common.working
 common.yes
 common.yesCascade
 entity.brightness
@@ -455,6 +456,8 @@ settings.backup.importError
 settings.backup.importTitle
 settings.backup.imported
 settings.backup.loadPublicUrlError
+settings.backup.localUrlDescription
+settings.backup.localUrlTitle
 settings.backup.publicUrlDescription
 settings.backup.publicUrlTitle
 settings.backup.title
